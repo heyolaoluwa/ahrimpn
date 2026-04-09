@@ -853,12 +853,8 @@ tbody tr:hover td { background: var(--gray-50); }
           </div>
           <div class="card">
             <div class="card-header"><span class="card-title">📣 Announcements</span>
-              <button class="btn-sm btn-green" onclick="editAnnouncement()">Add</button></div>
+              <button class="btn-sm btn-green" onclick="editAnnouncement()">Add / Edit</button></div>
             <div class="card-body" id="announcementsPreview"></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><span class="card-title">🎯 Certifications</span></div>
-            <div class="card-body" id="certPreview"></div>
           </div>
         </div>
 
@@ -1680,12 +1676,17 @@ async function loadAdminCourses() {
             <span><i class="fas fa-clock"></i> ${esc(c.duration || '—')}</span>
             <span><i class="fas fa-signal"></i> ${esc(c.level)}</span>
           </div>
-          <div style="font-size:11px;color:var(--gray-500);margin-bottom:12px">
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:8px">
             👥 ${c.enrolled} enrolled · ✅ ${c.completed_count} completed
+          </div>
+          <div style="margin-bottom:10px">
+            <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;${c.active ? 'background:#d1fae5;color:#065f46' : 'background:#fef3c7;color:#92400e'}">
+              ${c.active ? '● Public' : '● Draft'}
+            </span>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn-sm ${c.active ? 'btn-outline' : 'btn-green'}" style="padding:6px 12px;font-size:11px" onclick="toggleCourse(${c.id})">
-              ${c.active ? '<i class="fas fa-eye-slash"></i> Deactivate' : '<i class="fas fa-eye"></i> Activate'}
+              ${c.active ? '<i class="fas fa-eye-slash"></i> Unpublish' : '<i class="fas fa-eye"></i> Publish to Members'}
             </button>
           </div>
         </div>
@@ -1847,16 +1848,177 @@ function loadAccessControl() {
 // ═══════════════════════════════════════════════════════════
 //  WEBSITE CONTROL
 // ═══════════════════════════════════════════════════════════
-function loadWebsiteControl() {
-  document.getElementById('tickerPreview').innerHTML        = '<p class="preview-note">No ticker content configured</p>';
-  document.getElementById('heroPreview').innerHTML          = '<p class="preview-note">Edit hero section headline and subtitle</p>';
-  document.getElementById('announcementsPreview').innerHTML = '<p class="preview-note">No announcements yet</p>';
-  document.getElementById('certPreview').innerHTML          = '<p class="preview-note">CHRIMS, AHRIM certifications</p>';
+// ── WEBSITE CONTROL ──────────────────────────────────────────
+async function loadWebsiteControl() {
+  try {
+    const site = await api('content', 'site');
+
+    // Ticker preview
+    const msgs = site.ticker_messages || [];
+    document.getElementById('tickerPreview').innerHTML = msgs.length
+      ? msgs.map((m,i) => `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span>${esc(m)}</span><span style="color:var(--gray-400);font-size:11px">#${i+1}</span></div>`).join('')
+      : '<p class="preview-note">No ticker messages configured</p>';
+
+    // Hero preview
+    const h = site.hero || {};
+    document.getElementById('heroPreview').innerHTML = `
+      <div style="font-size:12px;color:var(--gray-500)">
+        <div style="margin-bottom:6px"><strong>Badge:</strong> ${esc(h.badge || '—')}</div>
+        <div style="margin-bottom:6px"><strong>Headline:</strong> ${esc(h.headline || '—')}</div>
+        <div><strong>Subtitle:</strong> ${esc(h.subtitle || '—')}</div>
+      </div>`;
+
+    // Announcements preview
+    const ann = site.announcements || [];
+    document.getElementById('announcementsPreview').innerHTML = ann.length
+      ? ann.map((a,i) => `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <span>${esc(a)}</span>
+          <button onclick="deleteAnnouncement(${i})" style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:12px;padding:0 4px" title="Remove">✕</button>
+        </div>`).join('')
+      : '<p class="preview-note">No announcements yet</p>';
+  } catch(e) {
+    showToast('Failed to load site content', 'error');
+  }
   renderNewsStoriesList();
 }
-function editTicker()       { showModal('Edit Ticker',       '<p class="preview-note">Ticker edit coming soon.</p>'); }
-function editHero()         { showModal('Edit Hero',         '<p class="preview-note">Hero edit coming soon.</p>'); }
-function editAnnouncement() { showModal('Add Announcement',  '<p class="preview-note">Announcements coming soon.</p>'); }
+
+function editTicker() {
+  api('content', 'site').then(site => {
+    const msgs = site.ticker_messages || [];
+    showModal('Edit Breaking News Ticker', `
+      <p style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Maximum 4 messages. Each message scrolls across the top of the public homepage.</p>
+      <div id="tickerInputs">
+        ${[0,1,2,3].map(i => `
+          <div style="margin-bottom:10px">
+            <label style="font-size:11px;font-weight:600;color:var(--gray-600)">Message ${i+1}</label>
+            <input id="tick${i}" class="form-input" style="margin-top:4px" value="${esc(msgs[i]||'')}" placeholder="Leave blank to skip"/>
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end">
+        <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn-sm btn-green" onclick="saveTicker()">Save Ticker</button>
+      </div>`);
+  }).catch(() => showToast('Could not load current ticker', 'error'));
+}
+
+async function saveTicker() {
+  const msgs = [0,1,2,3]
+    .map(i => document.getElementById('tick'+i).value.trim())
+    .filter(Boolean);
+  try {
+    await api('content', 'update_site', 'POST', { key: 'ticker_messages', value: msgs });
+    closeModal();
+    showToast('Ticker updated — changes live on homepage', 'success');
+    loadWebsiteControl();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function editHero() {
+  api('content', 'site').then(site => {
+    const h = site.hero || {};
+    showModal('Edit Hero Section', `
+      <p style="font-size:12px;color:var(--gray-500);margin-bottom:14px">These fields update the main banner on the public homepage.</p>
+      <div class="form-grid">
+        <div class="form-field form-full">
+          <label>Badge Text <span style="color:var(--gray-400);font-size:11px">(small tag above headline)</span></label>
+          <input id="heroBadge" class="form-input" value="${esc(h.badge||'Proudly Serving 5,000+ Members Nationwide')}"/>
+        </div>
+        <div class="form-field form-full">
+          <label>Headline</label>
+          <input id="heroHeadline" class="form-input" value="${esc(h.headline||'Health Information Managers — Guardians of Integrity')}"/>
+        </div>
+        <div class="form-field form-full">
+          <label>Subtitle</label>
+          <textarea id="heroSubtitle" class="form-input" rows="3" style="resize:vertical">${esc(h.subtitle||'Empowering Health Information Management Practitioners across Nigeria through professional development, digital innovation, and policy advocacy.')}</textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end">
+        <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn-sm btn-green" onclick="saveHero()">Save Hero</button>
+      </div>`);
+  }).catch(() => showToast('Could not load hero content', 'error'));
+}
+
+async function saveHero() {
+  const val = {
+    badge:    document.getElementById('heroBadge').value.trim(),
+    headline: document.getElementById('heroHeadline').value.trim(),
+    subtitle: document.getElementById('heroSubtitle').value.trim(),
+  };
+  if (!val.headline) { showToast('Headline is required', 'error'); return; }
+  try {
+    await api('content', 'update_site', 'POST', { key: 'hero', value: val });
+    closeModal();
+    showToast('Hero section updated — changes live on homepage', 'success');
+    loadWebsiteControl();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function editAnnouncement() {
+  api('content', 'site').then(site => {
+    const ann = site.announcements || [];
+    showModal('Announcements', `
+      <p style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Announcements display as a banner on the member portal and public pages.</p>
+      <div id="annList" style="margin-bottom:14px">
+        ${ann.length ? ann.map((a,i) => `
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="flex:1;font-size:13px">${esc(a)}</span>
+            <button onclick="removeAnnItem(${i})" style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:14px;padding:0 4px">✕</button>
+          </div>`).join('') : '<p class="preview-note" id="annEmpty">No announcements yet</p>'}
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input id="newAnnText" class="form-input" placeholder="Type new announcement…" style="flex:1"/>
+        <button class="btn-sm btn-green" onclick="addAnnItem()">Add</button>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn-sm btn-green" onclick="saveAnnouncements()">Save</button>
+      </div>
+      <script>window._annItems = ${JSON.stringify(ann)};<\/script>`);
+  }).catch(() => showToast('Could not load announcements', 'error'));
+}
+
+function addAnnItem() {
+  const inp = document.getElementById('newAnnText');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  window._annItems = window._annItems || [];
+  window._annItems.push(txt);
+  inp.value = '';
+  const list = document.getElementById('annList');
+  const empty = document.getElementById('annEmpty');
+  if (empty) empty.remove();
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)';
+  const idx = window._annItems.length - 1;
+  div.innerHTML = `<span style="flex:1;font-size:13px">${esc(txt)}</span><button onclick="removeAnnItem(${idx})" style="background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:14px;padding:0 4px">✕</button>`;
+  list.appendChild(div);
+}
+
+function removeAnnItem(i) {
+  window._annItems.splice(i, 1);
+  editAnnouncement(); // re-render modal with updated list
+}
+
+async function saveAnnouncements() {
+  try {
+    await api('content', 'update_site', 'POST', { key: 'announcements', value: window._annItems || [] });
+    closeModal();
+    showToast('Announcements updated', 'success');
+    loadWebsiteControl();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteAnnouncement(i) {
+  try {
+    const site = await api('content', 'site');
+    const ann = site.announcements || [];
+    ann.splice(i, 1);
+    await api('content', 'update_site', 'POST', { key: 'announcements', value: ann });
+    showToast('Announcement removed', 'success');
+    loadWebsiteControl();
+  } catch(e) { showToast(e.message, 'error'); }
+}
 
 // ═══════════════════════════════════════════════════════════
 //  TRENDING NEWS MANAGER  (database-backed via api/news.php)
@@ -2030,7 +2192,19 @@ function newsStoryForm(story) {
       </div>
 
       <div class="form-group">
-        <label class="form-label">Link URL <span style="font-weight:400;color:var(--gray-500);font-size:11px;">(optional)</span></label>
+        <label class="form-label">Excerpt <span style="font-weight:400;color:var(--gray-500);font-size:11px;">(short teaser shown on cards)</span></label>
+        <textarea id="nf-excerpt" class="form-input" rows="2"
+          placeholder="One or two sentences summarising the story…">${story && story.excerpt ? esc(story.excerpt) : ''}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Full Story <span style="font-weight:400;color:var(--gray-500);font-size:11px;">(shown when visitor clicks "Read Full Story")</span></label>
+        <textarea id="nf-body" class="form-input" rows="7" style="resize:vertical"
+          placeholder="Write the full article or caption here…">${story && story.body ? esc(story.body) : ''}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Link URL <span style="font-weight:400;color:var(--gray-500);font-size:11px;">(optional — shown as an extra button in the modal)</span></label>
         <input id="nf-url" class="form-input" type="url"
           placeholder="https://…"
           value="${story ? esc(story.url || '') : ''}">
@@ -2043,14 +2217,6 @@ function newsStoryForm(story) {
           <span>⭐ Set as Featured Story</span>
           <span style="font-weight:400;color:var(--gray-500);font-size:11px;">(replaces current featured)</span>
         </label>
-
-        <div id="nf-featured-fields" style="${story && story.featured ? '' : 'display:none;'}margin-top:14px;display:${story && story.featured ? 'flex' : 'none'};flex-direction:column;gap:12px;">
-          <div class="form-group" style="margin:0;">
-            <label class="form-label">Excerpt</label>
-            <textarea id="nf-excerpt" class="form-input" rows="3"
-              placeholder="Short description shown on homepage…">${story && story.excerpt ? esc(story.excerpt) : ''}</textarea>
-          </div>
-        </div>
       </div>
 
       <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:4px;">
@@ -2062,11 +2228,6 @@ function newsStoryForm(story) {
       </div>
 
     </div>
-    <script>
-      document.getElementById('nf-featured').addEventListener('change', function() {
-        document.getElementById('nf-featured-fields').style.display = this.checked ? 'flex' : 'none';
-      });
-    <\/script>
   `;
 }
 
@@ -2185,7 +2346,8 @@ async function saveNewsStoryForm(existingId) {
   const date       = document.getElementById('nf-date').value.trim();
   const url        = document.getElementById('nf-url').value.trim();
   const featured   = document.getElementById('nf-featured').checked;
-  const excerpt    = featured ? (document.getElementById('nf-excerpt')?.value.trim() || '') : '';
+  const excerpt    = document.getElementById('nf-excerpt')?.value.trim() || '';
+  const body       = document.getElementById('nf-body')?.value.trim() || '';
   const mediaType  = document.getElementById('nf-media-type')?.value || 'image';
 
   // Image: prefer uploaded file, fall back to manual URL input
@@ -2200,7 +2362,7 @@ async function saveNewsStoryForm(existingId) {
   try {
     await api('news', 'save', 'POST', {
       id: existingId !== null ? existingId : undefined,
-      category, title, date, url, featured, excerpt, image, media_type: mediaType
+      category, title, date, url, featured, excerpt, body, image, media_type: mediaType
     });
     closeModal();
     renderNewsStoriesList();

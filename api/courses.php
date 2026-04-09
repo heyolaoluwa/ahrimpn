@@ -70,7 +70,7 @@ elseif ($method === 'POST' && $action === 'add') {
     if (!$title) fail('Title required');
     $code = nextCode('CRS','courses','course_code');
     $db->prepare("INSERT INTO courses (course_code,title,emoji,description,modules,duration,level,cert_title,active)
-                  VALUES (?,?,?,?,?,?,?,?,1)")
+                  VALUES (?,?,?,?,?,?,?,?,0)")
        ->execute([$code,$title,$b['emoji']??'📚',$b['description']??'',(int)($b['modules']??8),
                   $b['duration']??'',$b['level']??'Beginner',$b['cert_title']??'']);
     ok(['course_code'=>$code], "Course '$title' added");

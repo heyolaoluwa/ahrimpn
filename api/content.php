@@ -3,10 +3,13 @@
 require_once __DIR__ . '/helpers.php';
 cors();
 
-$user   = requireAuth();
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 $db     = getDB();
+
+// Public read-only actions — no auth needed
+$publicActions = ['site', 'events'];
+$user = in_array($action, $publicActions) ? null : requireAuth();
 
 // ── LIST EVENTS ──────────────────────────────────────────────
 if ($method === 'GET' && $action === 'events') {

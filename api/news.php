@@ -29,6 +29,7 @@ function ensureTable(): void {
             url         VARCHAR(600) DEFAULT '',
             featured    TINYINT(1)   NOT NULL DEFAULT 0,
             excerpt     TEXT,
+            body        LONGTEXT,
             image       VARCHAR(255) DEFAULT '1.jpg',
             media_type  VARCHAR(10)  DEFAULT 'image',
             sort_order  INT          NOT NULL DEFAULT 0,
@@ -36,9 +37,12 @@ function ensureTable(): void {
             updated_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
-    // Add media_type column if upgrading from old schema
+    // Add columns if upgrading from old schema
     try {
         getDB()->exec("ALTER TABLE news_stories ADD COLUMN media_type VARCHAR(10) DEFAULT 'image' AFTER image");
+    } catch (Exception $e) { /* column already exists */ }
+    try {
+        getDB()->exec("ALTER TABLE news_stories ADD COLUMN body LONGTEXT AFTER excerpt");
     } catch (Exception $e) { /* column already exists */ }
 }
 
@@ -121,6 +125,7 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $url        = trim($body['url']         ?? '');
     $featured   = !empty($body['featured']);
     $excerpt    = trim($body['excerpt']     ?? '');
+    $bodyText   = trim($body['body']        ?? '');
     $image      = trim($body['image']       ?? '1.jpg');
     $media_type = trim($body['media_type']  ?? 'image');
 
@@ -136,17 +141,17 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id) {
         $stmt = $db->prepare('
             UPDATE news_stories
-            SET category=?, title=?, date_label=?, url=?, featured=?, excerpt=?, image=?, media_type=?
+            SET category=?, title=?, date_label=?, url=?, featured=?, excerpt=?, body=?, image=?, media_type=?
             WHERE id=?
         ');
-        $stmt->execute([$category, $title, $date, $url, $featured ? 1 : 0, $excerpt, $image, $media_type, $id]);
+        $stmt->execute([$category, $title, $date, $url, $featured ? 1 : 0, $excerpt, $bodyText, $image, $media_type, $id]);
         ok(['id' => $id]);
     } else {
         $stmt = $db->prepare('
-            INSERT INTO news_stories (category, title, date_label, url, featured, excerpt, image, media_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO news_stories (category, title, date_label, url, featured, excerpt, body, image, media_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
-        $stmt->execute([$category, $title, $date, $url, $featured ? 1 : 0, $excerpt, $image, $media_type]);
+        $stmt->execute([$category, $title, $date, $url, $featured ? 1 : 0, $excerpt, $bodyText, $image, $media_type]);
         ok(['id' => (int)$db->lastInsertId()]);
     }
 }

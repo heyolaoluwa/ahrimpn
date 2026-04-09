@@ -132,11 +132,8 @@
     </span>
     <div class="relative overflow-hidden flex-1">
       <!-- FIX: Corrected to link to AHRIMPN content, not NAHIMS -->
-      <div class="ticker-text text-sm font-medium">
-        🗓️ AHRIMPN Nigeria has declared April 19-24,2026 as HIP WEEK 2026  &nbsp;&nbsp;&nbsp;
-       <!--  📢 ICD-11 Coding Workshop (Virtual) — Members Only · See Events for details &nbsp;&nbsp;&nbsp;
-        🏆 New CPD Courses Now Available in the Member Portal — Log in to enroll &nbsp;&nbsp;&nbsp;
-        🌟 Congratulations to all newly certified CHRIMS practitioners!-->
+      <div id="tickerText" class="ticker-text text-sm font-medium">
+        🗓️ AHRIMPN Nigeria has declared April 19-24,2026 as HIP WEEK 2026 &nbsp;&nbsp;&nbsp;
       </div>
     </div>
   </div>
@@ -255,15 +252,15 @@
 
       <div class="inline-flex items-center gap-2 px-5 py-2 mb-8 rounded-full bg-white/10 border border-white/25 text-white text-xs backdrop-blur-md animate-fade-up">
         <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse-slow"></span>
-        <span class="font-semibold uppercase tracking-widest">Proudly Serving 5,000+ Members Nationwide</span>
+        <span id="heroBadge" class="font-semibold uppercase tracking-widest">Proudly Serving 5,000+ Members Nationwide</span>
       </div>
 
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-white mb-6 leading-tight tracking-tight drop-shadow-2xl animate-fade-up" style="animation-delay:.1s">
+      <h1 id="heroHeadline" class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-white mb-6 leading-tight tracking-tight drop-shadow-2xl animate-fade-up" style="animation-delay:.1s">
         Health Information Managers —<br/>
         <span class="text-brand-gold italic">Guardians of Integrity</span>
       </h1>
 
-      <p class="text-base sm:text-lg md:text-xl text-white/85 mb-10 leading-relaxed max-w-2xl font-medium animate-fade-up" style="animation-delay:.2s">
+      <p id="heroSubtitle" class="text-base sm:text-lg md:text-xl text-white/85 mb-10 leading-relaxed max-w-2xl font-medium animate-fade-up" style="animation-delay:.2s">
         Empowering Health Information Management Practitioners across Nigeria through professional development, digital innovation, and policy advocacy.
       </p>
 
@@ -961,6 +958,42 @@ function closePresidentModal() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closePresidentModal();
 });
+
+// ── LOAD CMS CONTENT (ticker + hero) ─────────────────────
+(async function loadCmsContent() {
+  try {
+    const res  = await fetch('api/content.php?action=site');
+    const data = await res.json();
+    if (!data.success) return;
+    const site = data.data || {};
+
+    // Ticker
+    const msgs = site.ticker_messages;
+    if (Array.isArray(msgs) && msgs.length) {
+      const ticker = document.getElementById('tickerText');
+      if (ticker) ticker.textContent = msgs.join('   ·   ');
+    }
+
+    // Hero
+    const h = site.hero;
+    if (h && typeof h === 'object') {
+      const badge    = document.getElementById('heroBadge');
+      const headline = document.getElementById('heroHeadline');
+      const subtitle = document.getElementById('heroSubtitle');
+      if (badge    && h.badge)    badge.textContent    = h.badge;
+      if (subtitle && h.subtitle) subtitle.textContent = h.subtitle;
+      if (headline && h.headline) {
+        // keep gold italic span for last part if " — " separator present
+        const parts = h.headline.split(' — ');
+        if (parts.length >= 2) {
+          headline.innerHTML = parts[0] + ' —<br/><span class="text-brand-gold italic">' + parts.slice(1).join(' — ') + '</span>';
+        } else {
+          headline.textContent = h.headline;
+        }
+      }
+    }
+  } catch(_) { /* silently fall back to hardcoded defaults */ }
+})();
 </script>
 
 </body>
