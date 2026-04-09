@@ -4,15 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us | AHRIMPN</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <script>
 tailwind.config = {
   theme: {
@@ -23,231 +19,358 @@ tailwind.config = {
           green: '#064E3B',
           teal: '#10B981',
           light: '#F0FDF4',
-          dark: '#111827',
+          dark: '#0b120f',
         }
       },
       fontFamily: {
-        sans: ['Manrope', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
         serif: ['Playfair Display', 'serif'],
-      },
-      animation: {
-        'fade-in-up': 'fadeInUp 0.8s ease-out',
-      },
-      keyframes: {
-        fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        }
       }
     }
   }
 }
 </script>
-
 <style>
-.glass-panel {
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-}
+  :root {
+    --green: #064E3B;
+    --gold: #D4AF37;
+  }
 
-/* Custom Hexagon & Card Styles */
-.value-card {
-  transition: all 0.3s ease;
-}
-.value-card:hover {
-  transform: translateY(-10px);
-}
-.hex-svg {
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-}
-.hex-integrity { fill: none; stroke: #00AEEF; stroke-width: 8; }
-.hex-bold { fill: none; stroke: #F37021; stroke-width: 8; }
-.hex-inclusion { fill: none; stroke: #00A651; stroke-width: 8; }
+  /* ---- Scrollbar ---- */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
 
+  /* ---- Hero pattern ---- */
+  .hero-pattern {
+    background-color: #064E3B;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(212,175,55,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(16,185,129,0.1) 0%, transparent 40%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* ---- Stat card glow ---- */
+  .stat-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(6,78,59,0.15); }
+
+  /* ---- Timeline ---- */
+  .timeline-line {
+    background: linear-gradient(to bottom, var(--gold), var(--green));
+  }
+
+  /* ---- Value cards ---- */
+  .value-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .value-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .value-card.integrity::after { background: #00AEEF; }
+  .value-card.bold::after { background: #F37021; }
+  .value-card.inclusion::after { background: #00A651; }
+  .value-card:hover { transform: translateY(-8px); box-shadow: 0 24px 48px rgba(0,0,0,0.12); }
+  .value-card:hover::after { transform: scaleX(1); }
+
+  /* ---- Exec cards ---- */
+  .exec-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .exec-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(6,78,59,0.18); }
+  .exec-card .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(6,78,59,0.92) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex; align-items: flex-end;
+    padding: 1.5rem;
+  }
+  .exec-card:hover .overlay { opacity: 1; }
+
+  /* ---- Modal ---- */
+  .modal-enter { animation: modalIn 0.3s ease forwards; }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* ---- Fade in on scroll ---- */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ---- Mobile nav ---- */
+  #mobileMenu { transition: transform 0.45s cubic-bezier(0.77,0,0.18,1); }
 </style>
 </head>
 
-<body class="font-sans text-brand-dark bg-gray-50 antialiased selection:bg-brand-green selection:text-white">
+<body class="font-sans text-gray-900 bg-white antialiased">
 
-    <div class="bg-brand-dark text-gray-400 text-xs py-2 border-b border-gray-800">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <div class="flex space-x-6">
-                <span class="flex items-center"><i class="fas fa-map-marker-alt mr-2 text-brand-gold"></i> National Secretariat, Abuja</span>
-                <span class="flex items-center"><i class="fas fa-envelope mr-2 text-brand-gold"></i> info@ahrimpn.org</span>
-            </div>
-            <div class="hidden md:flex space-x-4">
-               <!--    <a href="#" class="hover:text-white transition">Portal Login</a> -->
-                <span class="text-gray-600">|</span>
-                <a href="#" class="hover:text-white transition">Complaints</a>
-            </div>
-        </div>
+<!-- ══════════════════ TOP BAR ══════════════════ -->
+<div class="bg-brand-dark text-gray-400 text-xs py-2 hidden sm:block">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+    <div class="flex gap-6">
+      <span class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-brand-gold"></i> National Secretariat, Abuja</span>
+      <span class="flex items-center gap-2"><i class="fas fa-envelope text-brand-gold"></i> info@ahrimpn.org</span>
     </div>
-
-    <nav id="navbar" class="sticky top-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <a href="index.html" class="flex items-center gap-3 group">
-                    <img src="ahrimpn logo.png" alt="AHRIMPN Logo" class="w-14 h-14 object-contain">
-                    <div>
-                        <h1 class="text-xl font-bold text-brand-green leading-none tracking-tight">AHRIMPN</h1>
-                    
-                    </div>
-                </a>
-
-                <div class="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-gray-600">
-                    <a href="about.html" class="nav-link hover:text-brand-green transition whitespace-nowrap">About</a>
-                    <a href="mem.html"   class="nav-link hover:text-brand-green transition whitespace-nowrap">Membership</a>
-                    <a href="mem.html"   class="px-5 py-2.5 bg-brand-green text-white rounded-full shadow-md hover:bg-brand-dark hover:-translate-y-0.5 transition duration-300 text-xs uppercase tracking-widest font-bold whitespace-nowrap">
-                        Join Us
-                    </a>
-                </div>
-
-               <button id="mobile-menu-btn" class="md:hidden text-brand-green text-2xl">
-    <i class="fas fa-bars"></i>
-</button>
-
-
-
-
-<div id="mobileMenu"
-     class="fixed top-0 right-0 w-screen h-screen z-[100]
-            bg-brand-green text-white
-            transform translate-x-full
-            transition-transform duration-500 ease-in-out
-            overflow-y-auto overscroll-contain">
-
-   <!-- Background Image -->
-<div class="absolute inset-0">
-    <img src="1.jpg"
-         class="w-full h-full object-cover opacity-30 scale-105">
-    <div class="absolute inset-0 transition-opacity duration-500
-            bg-gradient-to-b
-            from-brand-green/85
-            via-brand-green/65
-            to-brand-green/45">
+    <a href="#" class="hover:text-white transition">Complaints</a>
+  </div>
 </div>
 
-</div>
-
-
-    <!-- Content -->
-    <div class="relative z-10 flex flex-col min-h-screen px-6 py-6">
-        <div class="flex justify-between items-center mb-10">
-            <img src="ahrimpn logo.png" class="w-12 h-12 bg-white rounded-full p-1">
-            <button id="close-menu-btn" class="text-white text-3xl">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <nav class="flex flex-col space-y-10 text-center mt-20">
-            <a href="about.html" class="mobile-link text-2xl font-bold hover:text-brand-gold transition">About</a>
-            <a href="mem.html"   class="mobile-link text-2xl font-bold hover:text-brand-gold transition">Membership</a>
-        </nav>
-
-        <div class="mt-16">
-            <a href="mem.html"
-               class="block text-center bg-brand-gold text-brand-dark font-bold py-4 rounded-full shadow-xl hover:bg-white transition">
-                Join AHRIMPN Today →
-            </a>
-        </div>
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+    <a href="index.html" class="flex items-center gap-3">
+      <img src="ahrimpn logo.png" alt="AHRIMPN" class="w-12 h-12 object-contain">
+      <span class="text-xl font-bold text-brand-green tracking-tight">AHRIMPN</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+      <a href="about.html" class="text-brand-green font-semibold border-b-2 border-brand-gold pb-0.5">About</a>
+      <a href="mem.html" class="hover:text-brand-green transition">Membership</a>
+      <a href="mem.html" class="bg-brand-green text-white px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-brand-dark transition shadow-md">Join Us</a>
     </div>
-</div>
+    <button id="mobile-menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+      <i class="fas fa-bars text-brand-green text-lg"></i>
+    </button>
+  </div>
+</nav>
 
-
-
+<!-- Mobile Menu Overlay -->
+<div id="mobileMenu" class="fixed top-0 right-0 w-full h-screen z-[100] bg-brand-green text-white transform translate-x-full overflow-y-auto">
+  <div class="absolute inset-0">
+    <img src="1.jpg" class="w-full h-full object-cover opacity-20">
+    <div class="absolute inset-0 bg-brand-green/80"></div>
+  </div>
+  <div class="relative z-10 flex flex-col min-h-screen px-8 py-8">
+    <div class="flex justify-between items-center">
+      <img src="ahrimpn logo.png" class="w-10 h-10 bg-white rounded-full p-1 object-contain">
+      <button id="close-menu-btn" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <nav class="flex flex-col items-center justify-center flex-1 gap-10">
+      <a href="about.html" class="mobile-link text-3xl font-bold hover:text-brand-gold transition">About</a>
+      <a href="mem.html"   class="mobile-link text-3xl font-bold hover:text-brand-gold transition">Membership</a>
+      <a href="mem.html"   class="mt-4 bg-brand-gold text-brand-dark font-bold py-4 px-10 rounded-full text-lg shadow-xl hover:bg-white transition">
+        Join AHRIMPN →
+      </a>
     </nav>
+  </div>
+</div>
 
 
-<section class="w-full bg-brand-light/50 pt-16 pb-32 border-t-4 border-brand-green">
+<!-- ══════════════════ HERO ══════════════════ -->
+<section class="hero-pattern min-h-[70vh] flex items-center relative overflow-hidden">
+  <!-- Decorative circle -->
+  <div class="absolute -right-32 -top-32 w-[500px] h-[500px] rounded-full border border-white/5"></div>
+  <div class="absolute -right-20 -top-20 w-[350px] h-[350px] rounded-full border border-white/5"></div>
 
-  <div class="container mx-auto px-6 md:px-16">
-    
-    <span class="text-brand-gold uppercase tracking-widest text-xs font-bold">
-      About Us
-    </span>
-
-    <h1 class="mt-6 text-4xl md:text-6xl font-serif font-bold leading-tight text-brand-green w-full">
-      WHO ARE WE
-    </h1>
-
-    <div class="mt-10 space-y-8 w-full">
-      <p class="text-gray-700 text-lg md:text-xl leading-relaxed">
+  <div class="max-w-7xl mx-auto px-6 py-24 md:py-32 relative z-10">
+    <div class="max-w-3xl">
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-8">
+        <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse"></span>
+        <span class="text-brand-gold text-xs font-bold uppercase tracking-widest">About Us</span>
+      </div>
+      <h1 class="text-5xl md:text-7xl font-serif font-black text-white leading-tight mb-8">
+        Who <span class="text-brand-gold">Are</span><br>We?
+      </h1>
+      <p class="text-gray-300 text-lg md:text-xl leading-relaxed mb-6 max-w-2xl">
         The Association of Health Records and Information Management Professionals
         of Nigeria (AHRIMPN) is the nationally recognized professional body
         representing practitioners in Health Records and Health Information
         Management across Nigeria.
       </p>
-
-      <p class="text-gray-700 text-lg md:text-xl leading-relaxed">
+      <p class="text-gray-400 text-base md:text-lg leading-relaxed max-w-2xl">
         AHRIMPN promotes professional excellence, ethical practice, and capacity
         development, while advocating for effective health information systems
         that support quality healthcare delivery, research, and evidence-based
         policy formulation nationwide.
       </p>
+      <div class="mt-10 flex gap-4 flex-wrap">
+        <a href="#leadership" class="bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-full hover:bg-white transition shadow-lg text-sm">
+          Meet the Executives
+        </a>
+        <a href="mem.html" class="border border-white/30 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition text-sm">
+          Join the Association
+        </a>
+      </div>
     </div>
   </div>
-
 </section>
 
-<div class="relative -top-16 z-20 container mx-auto px-6">
-  <div class="bg-white rounded-xl shadow-2xl p-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center border-b-4 border-brand-gold">
-    <div>
-      <div class="text-4xl font-bold text-brand-green counter" data-target="36">0</div>
-      <div class="text-xs uppercase text-gray-500">State Chapters</div>
+
+<!-- ══════════════════ STATS ══════════════════ -->
+<section class="max-w-7xl mx-auto px-6 -mt-8 relative z-10 mb-16">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center">
+      <div class="text-4xl md:text-5xl font-black text-brand-green counter mb-1" data-target="36">0</div>
+      <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-1">State Chapters</div>
+      <div class="w-8 h-0.5 bg-brand-gold mx-auto"></div>
     </div>
-    <div>
-      <div class="text-4xl font-bold text-brand-green counter" data-target="5000">0</div>
-      <div class="text-xs uppercase text-gray-500">Registered Members</div>
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center">
+      <div class="text-4xl md:text-5xl font-black text-brand-green counter mb-1" data-target="5000">0</div>
+      <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-1">Registered Members</div>
+      <div class="w-8 h-0.5 bg-brand-gold mx-auto"></div>
     </div>
-    <div>
-      <div class="text-4xl font-bold text-brand-green counter" data-target="44">0</div>
-      <div class="text-xs uppercase text-gray-500">Years of Impact</div>
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center">
+      <div class="text-4xl md:text-5xl font-black text-brand-green counter mb-1" data-target="44">0</div>
+      <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-1">Years of Impact</div>
+      <div class="w-8 h-0.5 bg-brand-gold mx-auto"></div>
     </div>
-    <div>
-      <div class="text-4xl font-bold text-brand-green counter" data-target="10000">0</div>
-      <div class="text-xs uppercase text-gray-500">Students Nationwide</div>
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center">
+      <div class="text-4xl md:text-5xl font-black text-brand-green counter mb-1" data-target="10000">0</div>
+      <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-1">Students Nationwide</div>
+      <div class="w-8 h-0.5 bg-brand-gold mx-auto"></div>
     </div>
   </div>
-</div>
-<!-- ===== TIMELINE HISTORY ===== -->
-<section class="py-24 bg-brand-light">
-  <div class="container mx-auto px-6">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <h2 class="text-3xl md:text-4xl font-serif font-bold">Our Journey</h2>
-      <p class="text-gray-600 mt-4">A legacy of growth, reform, and digital leadership.</p>
+</section>
+
+
+<!-- ══════════════════ TIMELINE ══════════════════ -->
+<section class="py-24 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <span class="text-brand-gold text-xs font-bold uppercase tracking-widest">Our Story</span>
+      <h2 class="text-3xl md:text-5xl font-serif font-bold text-brand-green mt-3">Our Journey</h2>
+      <p class="text-gray-500 mt-4 max-w-xl mx-auto">A legacy of growth, reform, and digital leadership.</p>
     </div>
 
-    <div class="relative border-l-4 border-brand-green pl-6 md:border-none md:pl-0">
+    <div class="relative max-w-4xl mx-auto">
+      <!-- Center line (desktop) -->
+      <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2 timeline-line rounded-full"></div>
+      <!-- Left line (mobile) -->
+      <div class="md:hidden absolute left-6 top-0 bottom-0 w-0.5 timeline-line rounded-full"></div>
 
-      <div class="md:grid md:grid-cols-2 md:gap-12 mb-12 relative">
-        <div class="md:text-right md:pr-12">
-          <h4 class="font-bold text-brand-green">Formation Era</h4>
-          <p class="text-gray-600 mt-2">
+      <!-- Item 1 -->
+      <div class="relative flex md:justify-end md:pr-[calc(50%+2rem)] pl-16 md:pl-0 mb-16 reveal">
+        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 max-w-sm w-full">
+          <div class="w-10 h-10 rounded-full bg-brand-gold flex items-center justify-center mb-4 shadow">
+            <i class="fas fa-flag text-brand-dark text-sm"></i>
+          </div>
+          <h4 class="font-bold text-brand-green text-lg mb-2">Formation Era</h4>
+          <p class="text-gray-600 text-sm leading-relaxed">
             Establishment of a unified professional body for Health Records practitioners in Nigeria.
           </p>
         </div>
-        <span class="hidden md:block absolute left-1/2 top-2 w-5 h-5 bg-brand-gold rounded-full -translate-x-1/2"></span>
+        <!-- Dot -->
+        <span class="hidden md:flex absolute right-[calc(50%-0.625rem)] top-8 w-5 h-5 rounded-full bg-brand-gold border-4 border-white shadow-md"></span>
+        <span class="md:hidden absolute left-4 top-8 w-5 h-5 rounded-full bg-brand-gold border-4 border-white shadow-md"></span>
       </div>
 
-      <div class="md:grid md:grid-cols-2 md:gap-12 mb-12 relative">
-        <div></div>
-        <div class="md:pl-12">
-          <h4 class="font-bold text-brand-green">Professional Expansion</h4>
-          <p class="text-gray-600 mt-2">
-            Growth of state chapters, national conferences, and training programmes.
+      <!-- Item 2 -->
+      <div class="relative flex md:justify-start md:pl-[calc(50%+2rem)] pl-16 mb-16 reveal">
+        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 max-w-sm w-full">
+          <div class="w-10 h-10 rounded-full bg-brand-green flex items-center justify-center mb-4 shadow">
+            <i class="fas fa-chart-line text-white text-sm"></i>
+          </div>
+          <h4 class="font-bold text-brand-green text-lg mb-2">Professional Expansion</h4>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Growth of state chapters, national conferences, and training programmes across Nigeria.
           </p>
         </div>
-        <span class="hidden md:block absolute left-1/2 top-2 w-5 h-5 bg-brand-gold rounded-full -translate-x-1/2"></span>
+        <span class="hidden md:flex absolute left-[calc(50%-0.625rem)] top-8 w-5 h-5 rounded-full bg-brand-green border-4 border-white shadow-md"></span>
+        <span class="md:hidden absolute left-4 top-8 w-5 h-5 rounded-full bg-brand-green border-4 border-white shadow-md"></span>
       </div>
 
-      <div class="md:grid md:grid-cols-2 md:gap-12 relative">
-        <div class="md:text-right md:pr-12">
-          <h4 class="font-bold text-brand-green">Digital Health Era</h4>
-          <p class="text-gray-600 mt-2">
-            Championing EMR adoption, data governance, and global best practices.
+      <!-- Item 3 -->
+      <div class="relative flex md:justify-end md:pr-[calc(50%+2rem)] pl-16 reveal">
+        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 max-w-sm w-full">
+          <div class="w-10 h-10 rounded-full bg-brand-gold flex items-center justify-center mb-4 shadow">
+            <i class="fas fa-laptop-medical text-brand-dark text-sm"></i>
+          </div>
+          <h4 class="font-bold text-brand-green text-lg mb-2">Digital Health Era</h4>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Championing EMR adoption, data governance, and global best practices in health information.
           </p>
         </div>
-        <span class="hidden md:block absolute left-1/2 top-2 w-5 h-5 bg-brand-gold rounded-full -translate-x-1/2"></span>
+        <span class="hidden md:flex absolute right-[calc(50%-0.625rem)] top-8 w-5 h-5 rounded-full bg-brand-gold border-4 border-white shadow-md"></span>
+        <span class="md:hidden absolute left-4 top-8 w-5 h-5 rounded-full bg-brand-gold border-4 border-white shadow-md"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════ CORE VALUES ══════════════════ -->
+<section class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <span class="text-brand-gold text-xs font-bold uppercase tracking-widest">Our Foundation</span>
+      <h2 class="text-3xl md:text-5xl font-serif font-bold text-brand-green mt-3">Our Core Values</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+
+      <!-- Integrity -->
+      <div class="value-card integrity bg-white rounded-3xl p-10 shadow-lg border border-gray-100 reveal">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-6">
+          <svg viewBox="0 0 40 40" class="w-8 h-8">
+            <circle cx="20" cy="16" r="7" fill="#00AEEF" opacity="0.9"/>
+            <path d="M8 36 Q8 26 20 26 Q32 26 32 36" fill="#00AEEF" opacity="0.5"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">Integrity</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          We have integrity in our work and relationships. Our passion for doing the right thing and sharing knowledge makes us trustworthy, credible, and accountable leaders.
+        </p>
+        <div class="mt-6 flex items-center gap-2 text-[#00AEEF] text-xs font-semibold">
+          <div class="w-6 h-0.5 bg-[#00AEEF]"></div> Honesty &amp; Accountability
+        </div>
+      </div>
+
+      <!-- Bold -->
+      <div class="value-card bold bg-brand-green rounded-3xl p-10 shadow-lg reveal" style="animation-delay:0.15s">
+        <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
+          <svg viewBox="0 0 40 40" class="w-8 h-8">
+            <polygon points="20,4 36,36 4,36" fill="#F37021" opacity="0.9"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-3">Bold</h3>
+        <p class="text-gray-300 text-sm leading-relaxed">
+          We act boldly with intention. We go after big ideas and challenges because we recognize the influence and impact of our work on people's health, safety, and well-being.
+        </p>
+        <div class="mt-6 flex items-center gap-2 text-brand-gold text-xs font-semibold">
+          <div class="w-6 h-0.5 bg-brand-gold"></div> Purpose &amp; Courage
+        </div>
+      </div>
+
+      <!-- Inclusion -->
+      <div class="value-card inclusion bg-white rounded-3xl p-10 shadow-lg border border-gray-100 reveal" style="animation-delay:0.3s">
+        <div class="w-16 h-16 rounded-2xl bg-green-50 flex items-center justify-center mb-6">
+          <svg viewBox="0 0 40 40" class="w-8 h-8">
+            <circle cx="14" cy="16" r="6" fill="#00A651" opacity="0.5"/>
+            <circle cx="26" cy="16" r="6" fill="#00A651" opacity="0.8"/>
+            <circle cx="20" cy="26" r="6" fill="#00A651"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">Inclusion</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          We are inclusive so that humans are at the center of everything we do. We see the whole person, respect inherent dignity, and make space for different voices to get the best results.
+        </p>
+        <div class="mt-6 flex items-center gap-2 text-[#00A651] text-xs font-semibold">
+          <div class="w-6 h-0.5 bg-[#00A651]"></div> Diversity &amp; Respect
+        </div>
       </div>
 
     </div>
@@ -255,432 +378,528 @@ tailwind.config = {
 </section>
 
 
-<section class="py-24 bg-white border-t border-gray-100">
-  <div class="container mx-auto px-6">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <span class="text-brand-gold uppercase tracking-widest text-xs font-bold">Our Foundation</span>
-      <h2 class="text-3xl md:text-5xl font-serif font-bold text-brand-green mt-4">Our Core Values</h2>
+<!-- ══════════════════ EXECUTIVES ══════════════════ -->
+<section id="leadership" class="py-24 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <span class="text-brand-gold text-xs font-bold uppercase tracking-widest">Leadership</span>
+      <h2 class="text-3xl md:text-5xl font-serif font-bold text-brand-green mt-3">Meet the Executives</h2>
+      <p class="text-gray-500 mt-4">Tap any profile to view full details</p>
     </div>
 
-    <div class="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-      
-      <div class="value-card bg-white rounded-[40px] p-10 shadow-xl border border-gray-50 flex flex-col items-center text-center animate-fade-in-up">
-        <div class="w-28 h-28 mb-6">
-          <svg viewBox="0 0 100 100" class="hex-svg w-full h-full">
-            <polygon points="50 3, 93 25, 93 75, 50 97, 7 75, 7 25" class="hex-integrity"/>
-            <circle cx="50" cy="45" r="15" fill="#111827" />
-            <path d="M50 75 Q60 60 50 55 Q40 60 50 75" fill="#00AEEF" />
-          </svg>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+
+      <!-- EXEC 1 — President (featured) -->
+      <div onclick="openModal('exec1')" class="exec-card col-span-2 sm:col-span-1 bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="4.jpg" class="w-full h-64 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">National President</p>
+              <p class="font-bold text-lg leading-tight">Abiodun Y. Afolabi</p>
+            </div>
+          </div>
+          <div class="absolute top-3 right-3 bg-brand-gold text-brand-dark text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">President</div>
         </div>
-        <h3 class="text-2xl font-bold mb-4">Integrity</h3>
-        <p class="text-gray-600 leading-relaxed text-sm md:text-base text-left">
-          We have integrity in our work and relationships. Our passion for doing the right thing and sharing knowledge and resources makes us trustworthy, credible, and accountable leaders.
-        </p>
-      </div>
-
-      <div class="value-card bg-white rounded-[40px] p-10 shadow-xl border border-gray-50 flex flex-col items-center text-center animate-fade-in-up" style="animation-delay: 0.2s;">
-        <div class="w-28 h-28 mb-6">
-          <svg viewBox="0 0 100 100" class="hex-svg w-full h-full">
-            <polygon points="50 3, 93 25, 93 75, 50 97, 7 75, 7 25" class="hex-bold"/>
-            <path d="M50 30 L50 70 M40 50 L60 50" stroke="#F37021" stroke-width="6" stroke-linecap="round"/>
-            <circle cx="50" cy="50" r="5" fill="#F37021" />
-          </svg>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm">Abiodun Y. Afolabi</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National President</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> Click to view profile</p>
         </div>
-        <h3 class="text-2xl font-bold mb-4">Bold</h3>
-        <p class="text-gray-600 leading-relaxed text-sm md:text-base text-left">
-          We act boldly with intention. We go after big ideas and big challenges with purpose because we recognize the influence and impact of our work on people's health, safety, and well-being.
-        </p>
       </div>
-
-      <div class="value-card bg-white rounded-[40px] p-10 shadow-xl border border-gray-50 flex flex-col items-center text-center animate-fade-in-up" style="animation-delay: 0.4s;">
-        <div class="w-28 h-28 mb-6">
-          <svg viewBox="0 0 100 100" class="hex-svg w-full h-full">
-            <polygon points="50 3, 93 25, 93 75, 50 97, 7 75, 7 25" class="hex-inclusion"/>
-            <circle cx="50" cy="50" r="18" fill="#00A651" opacity="0.2" />
-            <circle cx="50" cy="50" r="12" fill="#00A651" />
-          </svg>
-        </div>
-        <h3 class="text-2xl font-bold mb-4">Inclusion</h3>
-        <p class="text-gray-600 leading-relaxed text-sm md:text-base text-left">
-          We are inclusive so that humans are at the center of everything we do. We see the whole person and respect the inherent dignity of every human. We make space for different voices and opinions to help us get the best results.
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-
-<!-- MEET THE EXECUTIVES -->
-<section class="py-24 bg-brand-light" id="leadership">
-  <div class="container mx-auto px-6">
-
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-serif font-bold">Meet the Executives</h2>
-      <p class="text-gray-600 mt-4">Tap on any profile to view full details</p>
-    </div>
-
-    <div class="grid md:grid-cols-3 gap-8">
-
-      <!-- EXEC 1 -->
-      <button onclick="openModal('exec1')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="4.jpg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Abiodun Y. Afolabi</h4>
-        <p class="text-sm text-brand-green font-bold">National President</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
 
       <!-- EXEC 2 -->
-      <button onclick="openModal('exec2')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex10.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Dr Nasiru Sani</h4>
-        <p class="text-sm text-brand-green font-bold">National Vice President</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <div onclick="openModal('exec2')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex10.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Vice President</p>
+              <p class="font-bold text-sm leading-tight">Dr Nasiru Sani</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm">Dr Nasiru Sani</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Vice President</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
       <!-- EXEC 3 -->
-      <button onclick="openModal('exec3')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex3.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Suleiman Mu'azu</h4>
-        <p class="text-sm text-brand-green font-bold">National Secretary</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <div onclick="openModal('exec3')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex3.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Secretary</p>
+              <p class="font-bold text-sm leading-tight">Suleiman Mu'azu</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm">Suleiman Mu'azu</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Secretary</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
-        <!-- EXEC 4 -->
-      <button onclick="openModal('exec4')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex4.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Comrd Abdullateef Adisa Adebisi </h4>
-        <p class="text-sm text-brand-green font-bold">National Assistant Secretary</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <!-- EXEC 4 -->
+      <div onclick="openModal('exec4')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex4.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Asst. Secretary</p>
+              <p class="font-bold text-sm leading-tight">Comrd Abdullateef A. Adebisi</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm leading-snug">Comrd Abdullateef Adisa Adebisi</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Asst. Secretary</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
-        <!-- EXEC 5 -->
-      <button onclick="openModal('exec5')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex5.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Babarinde Florence</h4>
-        <p class="text-sm text-brand-green font-bold">National Treasurer</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <!-- EXEC 5 -->
+      <div onclick="openModal('exec5')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex5.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Treasurer</p>
+              <p class="font-bold text-sm leading-tight">Babarinde Florence</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm">Babarinde Florence</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Treasurer</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
-        <!-- EXEC 6 -->
-      <button onclick="openModal('exec6')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex6.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Mustapha Saidu Suleman</h4>
-        <p class="text-sm text-brand-green font-bold">National Financial Secretary</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <!-- EXEC 6 -->
+      <div onclick="openModal('exec6')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex6.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Financial Sec.</p>
+              <p class="font-bold text-sm leading-tight">Mustapha Saidu Suleman</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm">Mustapha Saidu Suleman</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Financial Secretary</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
-        <!-- EXEC 7 -->
-      <button onclick="openModal('exec7')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex7.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Suleiman Mohammed Makusidi </h4>
-        <p class="text-sm text-brand-green font-bold">National Internal Auditor</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <!-- EXEC 7 -->
+      <div onclick="openModal('exec7')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex7.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Internal Auditor</p>
+              <p class="font-bold text-sm leading-tight">Suleiman M. Makusidi</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm leading-snug">Suleiman Mohammed Makusidi</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Internal Auditor</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
       <!-- EXEC 8 -->
-      <button onclick="openModal('exec8')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex8.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold"> Halima Ahmed Haruna </h4>
-        <p class="text-sm text-brand-green font-bold">National Woman Leader</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <div onclick="openModal('exec8')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex8.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Woman Leader</p>
+              <p class="font-bold text-sm leading-tight">Halima Ahmed Haruna</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm">Halima Ahmed Haruna</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Woman Leader</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
       <!-- EXEC 9 -->
-      <button onclick="openModal('exec9')" class="bg-white p-8 rounded-xl shadow hover:shadow-2xl transition text-center">
-        <img src="ex9.jpeg" class="w-32 h-35 mx-auto rounded-full mb-4 object-cover">
-        <h4 class="font-bold">Olamigoke Isaac Ajayi</h4>
-        <p class="text-sm text-brand-green font-bold">National Publicity Secretary</p>
-        <p class="text-xs text-gray-500 mt-2">Click to view profile</p>
-      </button>
+      <div onclick="openModal('exec9')" class="exec-card bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="relative">
+          <img src="ex9.jpeg" class="w-full h-48 object-cover object-top">
+          <div class="overlay">
+            <div class="text-white">
+              <p class="text-xs uppercase tracking-widest text-brand-gold font-bold">Publicity Sec.</p>
+              <p class="font-bold text-sm leading-tight">Olamigoke Isaac Ajayi</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="font-bold text-gray-900 text-sm">Olamigoke Isaac Ajayi</p>
+          <p class="text-brand-green text-xs font-semibold mt-0.5">National Publicity Secretary</p>
+          <p class="text-gray-400 text-xs mt-2 flex items-center gap-1"><i class="fas fa-mouse-pointer text-[10px]"></i> View profile</p>
+        </div>
+      </div>
 
     </div>
   </div>
 </section>
 
-<!-- MODALS -->
-<div id="exec1" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec1')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="4.jpg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Abiodun Y. Afolabi</h3>
-      <p class="text-brand-green font-bold mb-4">National President</p>
-    </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> Uniosun Teaching Hospital, Osogbo</p>
-      <p><strong>Email:</strong> presidency@ahrimpn.org</p>
-      <p><strong>Phone:</strong> +234 803 466 0284</p>
-      <p><strong>Profile:</strong> Success is not final, failure is not fatal; excellence is never an accident.</p>
-    </div>
-  </div>
-</div>
 
-<div id="exec2" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-md w-full relative">
-    <button onclick="closeModal('exec2')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex10.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Dr Nasiru Sani</h3>
-      <p class="text-brand-green font-bold mb-4">National Vice President</p>
+<!-- ══════════════════ MODALS ══════════════════ -->
+<!-- Template: backdrop + centered card -->
+
+<!-- EXEC 1 -->
+<div id="exec1" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec1')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="4.jpg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec1')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="absolute bottom-4 left-4">
+        <img src="4.jpg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg">
+      </div>
     </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong>Nassarawa State University</p>
-      <p><strong>Email:</strong>nasirusanimusa@gmail.com</p>
-      <p><strong>Phone:</strong> 08069487121</p>
-      <!-- <p><strong>Profile:</strong> Veteran Health Information professional with strong leadership in policy and digital health.</p> -->
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Abiodun Y. Afolabi</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National President</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">Uniosun Teaching Hospital, Osogbo</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">presidency@ahrimpn.org</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">+234 803 466 0284</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">Success is not final, failure is not fatal; excellence is never an accident.</p></div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="exec3" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec3')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex3.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Suleiman Mu'azu</h3>
-      <p class="text-brand-green font-bold mb-4">National Secretary</p>
+<!-- EXEC 2 -->
+<div id="exec2" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec2')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex10.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec2')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex10.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
     </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> National hospital, Abuja</p>
-      <p><strong>Email:</strong> secretariat@ahrimpn.org</p>
-      <p><strong>Phone:</strong> 08025164554</p>
-      <p><strong>Profile:</strong>Unity, progress and dedication.</p>
-    </div>
-  </div>
-</div>
-
-<div id="exec4" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec4')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex4.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Comrd Abdullateef Adisa Adebisi </h3>
-      <p class="text-brand-green font-bold mb-4">National Assistant Secretary</p>
-    </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> Federal Medical Centre, Bida</p>
-      <p><strong>Email:</strong>infolatrich4u@gmail.com </p>
-      <p><strong>Phone:</strong> 08067865963</p>
-      <p><strong>Profile:</strong>Leadership is not about titles, positions, or flowcharts. It is about one life influencing another.</p>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Dr Nasiru Sani</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Vice President</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">Nassarawa State University</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">nasirusanimusa@gmail.com</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">08069487121</p></div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="exec5" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec5')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex5.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Babarinde Florence</h3>
-      <p class="text-brand-green font-bold mb-4">National Treasurer</p>
+<!-- EXEC 3 -->
+<div id="exec3" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec3')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex3.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec3')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex3.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
     </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> State House Hospital</p>
-      <p><strong>Email:</strong>mrsbabs2012@gmail.com </p>
-      <p><strong>Phone:</strong> 08059600415</p>
-      <p><strong>Profile:</strong>It is the you in you that makes the you you are</p>
-    </div>
-  </div>
-</div>
-
-<div id="exec6" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec6')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex6.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Mustapha Saidu Suleman</h3>
-      <p class="text-brand-green font-bold mb-4">National Financial Secretary</p>
-    </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> HRORBN Abuja</p>
-      <p><strong>Email:</strong>mustydg74@gmail.com</p>
-      <p><strong>Phone:</strong> 08068629627</p>
-      <p><strong>Profile:</strong>Unity and Service</p>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Suleiman Mu'azu</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Secretary</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">National Hospital, Abuja</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">secretariat@ahrimpn.org</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">08025164554</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">Unity, progress and dedication.</p></div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="exec7" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec7')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex7.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Suleiman Mohammed Makusidi </h3>
-      <p class="text-brand-green font-bold mb-4">National Internal Auditor</p>
+<!-- EXEC 4 -->
+<div id="exec4" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec4')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex4.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec4')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex4.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
     </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> Hospitals management board minna, Niger state </p>
-      <p><strong>Email:</strong>suleimanmk11@gmail.com </p>
-      <p><strong>Phone:</strong> 08068629627</p>
-      <p><strong>Profile:</strong>Reward for hardwork is more work</p>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Comrd Abdullateef Adisa Adebisi</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Assistant Secretary</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">Federal Medical Centre, Bida</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">infolatrich4u@gmail.com</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">08067865963</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">Leadership is not about titles, positions, or flowcharts. It is about one life influencing another.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXEC 5 -->
+<div id="exec5" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec5')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex5.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec5')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex5.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
+    </div>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Babarinde Florence</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Treasurer</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">State House Hospital</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">mrsbabs2012@gmail.com</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">08059600415</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">It is the you in you that makes the you you are.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXEC 6 -->
+<div id="exec6" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec6')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex6.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec6')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex6.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
+    </div>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Mustapha Saidu Suleman</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Financial Secretary</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">HRORBN Abuja</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">mustydg74@gmail.com</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">08068629627</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">Unity and Service.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXEC 7 -->
+<div id="exec7" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec7')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex7.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec7')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex7.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
+    </div>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Suleiman Mohammed Makusidi</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Internal Auditor</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">Hospitals Management Board Minna, Niger State</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">suleimanmk11@gmail.com</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">08068629627</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">Reward for hardwork is more work.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXEC 8 -->
+<div id="exec8" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec8')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex8.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec8')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex8.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
+    </div>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Halima Ahmed Haruna</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Woman Leader</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">HRORBN</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">harunahalima5@gmail.com</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">08068629627</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">Be the change you wish to see in the world.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXEC 9 -->
+<div id="exec9" class="fixed inset-0 bg-black/70 hidden z-50 items-center justify-center px-4" onclick="handleBackdropClick(event,'exec9')">
+  <div class="modal-enter bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl">
+    <div class="relative h-48 bg-brand-green">
+      <img src="ex9.jpeg" class="w-full h-full object-cover object-top opacity-60">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-green to-transparent"></div>
+      <button onclick="closeModal('exec9')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 transition flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
+      <div class="absolute bottom-4 left-4"><img src="ex9.jpeg" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg"></div>
+    </div>
+    <div class="p-6 pt-4">
+      <h3 class="text-xl font-serif font-bold text-gray-900">Comr. Olamigoke Isaac Ajayi</h3>
+      <p class="text-brand-green font-semibold text-sm mb-5">National Publicity Secretary</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-building"></i></span><div><span class="font-semibold text-gray-700">Place of Work</span><p class="text-gray-500">National Orthopaedic Hospital, Igbobi — Lagos</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-envelope"></i></span><div><span class="font-semibold text-gray-700">Email</span><p class="text-gray-500">info@ahrimpn.org</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-phone"></i></span><div><span class="font-semibold text-gray-700">Phone</span><p class="text-gray-500">07036782946</p></div></div>
+        <div class="flex items-start gap-3 text-sm"><span class="w-5 mt-0.5 text-brand-gold"><i class="fas fa-quote-left"></i></span><div><span class="font-semibold text-gray-700">Profile</span><p class="text-gray-500 italic">Every voice matters, but only purposeful voices create change.</p></div></div>
+      </div>
     </div>
   </div>
 </div>
 
 
-<div id="exec8" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec8')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex8.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Halima Ahmed Haruna </h3>
-      <p class="text-brand-green font-bold mb-4">National Woman Leader</p>
-    </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> HRORBN  </p>
-      <p><strong>Email:</strong>harunahalima5@gmail.com </p>
-      <p><strong>Phone:</strong> 08068629627</p>
-      <p><strong>Profile:</strong>Be the change you wish to see in the world. </p>
-    </div>
-  </div>
-</div>
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer class="bg-brand-dark text-gray-400 pt-20 pb-10">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-12 mb-16">
 
-<div id="exec9" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center px-4">
-  <div class="bg-white rounded-xl p-8 max-w-lg w-full relative">
-    <button onclick="closeModal('exec9')" class="absolute top-4 right-4 text-2xl">&times;</button>
-    <div class="text-center">
-      <img src="ex9.jpeg" class="w-28 h-28 mx-auto rounded-full mb-4">
-      <h3 class="text-2xl font-serif font-bold">Comr. Olamigoke Isaac Ajayi </h3>
-      <p class="text-brand-green font-bold mb-4">National Publicity Secretary</p>
-    </div>
-    <div class="text-sm text-gray-700 space-y-2">
-      <p><strong>Place of Work:</strong> National Orthopaedic Hospital, Igbobi - Lagos.</p>
-      <p><strong>Email:</strong>info@ahrimpn.org </p>
-      <p><strong>Phone:</strong> 07036782946</p>
-      <p><strong>Profile:</strong>Every voice matters, but only purposeful voices create change.</p>
-    </div>
-  </div>
-</div>
-
-
-</div>
-
-
-
-<!-- ===== FOOTER ===== -->
-
-    <footer class="bg-[#0b120f] text-gray-400 pt-20 pb-10 border-t border-brand-green/20">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-4 gap-12 mb-16">
-                
-                <div>
-                    <h3 class="text-white text-2xl font-serif font-bold mb-6">AHRIMPN</h3>
-                    <p class="text-sm leading-relaxed mb-6">
-                        National Secretariat<br> No 10 Kukawa Street, off Gimbiya street<br> Garki Abuja.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="http://www.facebook.com/ahrimpn" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-brand-green hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
-                        <a href="http://www.x.com/ahrimpn" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-brand-green hover:text-white transition"><i class="fab fa-twitter"></i></a>
-                        <a href="http://www.linkedin.com/company/ahrimpn" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-brand-green hover:text-white transition"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="text-white font-bold mb-6 uppercase text-sm tracking-wider">Association</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li><a href="#" class="hover:text-brand-gold transition">Constitution</a></li>
-                        <li><a href="#" class="hover:text-brand-gold transition">Executive Council</a></li>
-                        <li><a href="#" class="hover:text-brand-gold transition">State Chapters</a></li>
-                        <li><a href="#" class="hover:text-brand-gold transition">Student Body (NAHIMS)</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="text-white font-bold mb-6 uppercase text-sm tracking-wider">Practitioner Tools</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li><a href="#" class="hover:text-brand-gold transition">License Renewal</a></li>
-                        <li><a href="#" class="hover:text-brand-gold transition">CPD Points</a></li>
-                        <li><a href="#" class="hover:text-brand-gold transition">Job Portal</a></li>
-                        <li><a href="#" class="hover:text-brand-gold transition">Verify a Member</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="text-white font-bold mb-6 uppercase text-sm tracking-wider">Stay Updated</h4>
-                    <p class="text-xs mb-4">Get the latest policy updates and conference news.</p>
-                    <form onsubmit="handleSubscribe(event)" class="flex flex-col gap-3">
-                        <input type="email" placeholder="Email Address" class="bg-gray-800 border border-gray-700 text-white px-4 py-3 rounded focus:outline-none focus:border-brand-gold transition">
-                        <button type="submit" class="bg-brand-gold text-brand-dark font-bold px-4 py-3 rounded hover:bg-white transition">Subscribe</button>
-                    </form>
-                    <p id="sub-msg" class="text-brand-green text-xs mt-2 hidden">Subscribed successfully!</p>
-                </div>
-
-            </div>
-
-            <div class="border-t border-gray-800 pt-8 text-center text-xs">
-                <p>&copy; 2025 Association of Health Records and Information Management Practitioners of Nigeria.</p>
-            </div>
+      <div>
+        <div class="flex items-center gap-3 mb-6">
+          <img src="ahrimpn logo.png" class="w-10 h-10 bg-white rounded-full p-1 object-contain">
+          <span class="text-white text-xl font-serif font-bold">AHRIMPN</span>
         </div>
-    </footer>
+        <p class="text-sm leading-relaxed mb-6">
+          National Secretariat<br>No 10 Kukawa Street, off Gimbiya Street<br>Garki, Abuja.
+        </p>
+        <div class="flex gap-3">
+          <a href="http://www.facebook.com/ahrimpn" class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-brand-green hover:border-brand-green transition"><i class="fab fa-facebook-f text-xs"></i></a>
+          <a href="http://www.x.com/ahrimpn"         class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-brand-green hover:border-brand-green transition"><i class="fab fa-twitter text-xs"></i></a>
+          <a href="http://www.linkedin.com/company/ahrimpn" class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-brand-green hover:border-brand-green transition"><i class="fab fa-linkedin-in text-xs"></i></a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Association</h4>
+        <ul class="space-y-3 text-sm">
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> Constitution</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> Executive Council</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> State Chapters</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> Student Body (NAHIMS)</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Practitioner Tools</h4>
+        <ul class="space-y-3 text-sm">
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> License Renewal</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> CPD Points</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> Job Portal</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-brand-gold"></i> Verify a Member</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Stay Updated</h4>
+        <p class="text-xs mb-4 leading-relaxed">Get the latest policy updates and conference news.</p>
+        <form onsubmit="handleSubscribe(event)" class="flex flex-col gap-3">
+          <input type="email" placeholder="Your email address" class="bg-white/5 border border-white/10 text-white px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-gold transition placeholder:text-gray-600">
+          <button type="submit" class="bg-brand-gold text-brand-dark font-bold px-4 py-3 rounded-xl text-sm hover:bg-white transition">Subscribe →</button>
+        </form>
+        <p id="sub-msg" class="text-brand-teal text-xs mt-2 hidden">Subscribed successfully!</p>
+      </div>
+
+    </div>
+
+    <div class="border-t border-white/5 pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
+      <p>&copy; 2025 Association of Health Records and Information Management Practitioners of Nigeria.</p>
+      <a href="#" class="hover:text-white transition">Complaints</a>
+    </div>
+  </div>
+</footer>
 
 
-<!-- ===== SCRIPTS ===== --><!-- ===== SCRIPTS ===== -->
+<!-- ══════════════════ SCRIPTS ══════════════════ -->
 <script>
+// Mobile nav
 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-const closeMenuBtn = document.getElementById('close-menu-btn');
-const mobileMenu = document.getElementById('mobileMenu');
-const mobileLinks = document.querySelectorAll('.mobile-link');
+const closeMenuBtn  = document.getElementById('close-menu-btn');
+const mobileMenu    = document.getElementById('mobileMenu');
 
 mobileMenuBtn.addEventListener('click', () => {
   mobileMenu.classList.remove('translate-x-full');
   document.body.classList.add('overflow-hidden');
 });
-
 closeMenuBtn.addEventListener('click', () => {
   mobileMenu.classList.add('translate-x-full');
   document.body.classList.remove('overflow-hidden');
 });
-
-mobileLinks.forEach(link => {
-  link.addEventListener('click', () => {
-    mobileMenu.classList.add('translate-x-full');
-    document.body.classList.remove('overflow-hidden');
-  });
-});
+document.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', () => {
+  mobileMenu.classList.add('translate-x-full');
+  document.body.classList.remove('overflow-hidden');
+}));
 
 // Counter animation
 const counters = document.querySelectorAll('.counter');
-let hasAnimated = false;
+let counted = false;
+function runCounters() {
+  if (counted) return;
+  const statsSection = document.querySelector('.stat-card');
+  if (!statsSection) return;
+  const rect = statsSection.getBoundingClientRect();
+  if (rect.top < window.innerHeight) {
+    counted = true;
+    counters.forEach(c => {
+      const target = +c.dataset.target;
+      let count = 0;
+      const step = target / 80;
+      const tick = () => {
+        count = Math.min(count + step, target);
+        c.textContent = Math.ceil(count);
+        if (count < target) requestAnimationFrame(tick);
+        else c.textContent = target.toLocaleString() + '+';
+      };
+      requestAnimationFrame(tick);
+    });
+  }
+}
+window.addEventListener('scroll', runCounters, { passive: true });
+runCounters();
 
-window.addEventListener('scroll', () => {
-  if (hasAnimated) return;
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
+}, { threshold: 0.1 });
+reveals.forEach(r => revealObs.observe(r));
 
-  counters.forEach(counter => {
-    const target = +counter.dataset.target;
-    let count = 0;
-    const increment = target / 100;
-
-    const update = () => {
-      if (count < target) {
-        count += increment;
-        counter.innerText = Math.ceil(count);
-        setTimeout(update, 20);
-      } else {
-        counter.innerText = target + "+";
-      }
-    };
-    update();
-  });
-
-  hasAnimated = true;
-});
-</script>
-
-<script>
+// Modals
 function openModal(id) {
-  document.getElementById(id).classList.remove('hidden');
+  const el = document.getElementById(id);
+  el.classList.remove('hidden');
+  el.classList.add('flex');
   document.body.classList.add('overflow-hidden');
 }
-
 function closeModal(id) {
-  document.getElementById(id).classList.add('hidden');
+  const el = document.getElementById(id);
+  el.classList.add('hidden');
+  el.classList.remove('flex');
   document.body.classList.remove('overflow-hidden');
 }
+function handleBackdropClick(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+// Newsletter
+function handleSubscribe(e) {
+  e.preventDefault();
+  document.getElementById('sub-msg').classList.remove('hidden');
+  e.target.reset();
+}
 </script>
-
-
 
 </body>
 </html>
