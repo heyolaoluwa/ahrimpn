@@ -2046,7 +2046,7 @@ async function renderNewsStoriesList() {
     if (s.media_type === 'video') {
       return `<div class="news-manager-thumb-video">▶</div>`;
     }
-    const src = s.image.startsWith('/') ? s.image : `/uploads/${s.image}`;
+    const src = s.image.startsWith('/') ? s.image : `/uploads/news/${s.image}`;
     return `<img class="news-manager-thumb" src="${src}" alt="" onerror="this.style.display='none'">`;
   }
 
