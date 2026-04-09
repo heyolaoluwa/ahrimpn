@@ -1,0 +1,2750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AHRIMPN — Member & Admin Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://checkout.flutterwave.com/v3.js"></script>
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --green:       #064E3B;
+  --green-mid:   #0a6b52;
+  --green-light: #10B981;
+  --green-pale:  #ecfdf5;
+  --gold:        #D4AF37;
+  --gold-pale:   #fefce8;
+  --red:         #b91c1c;
+  --red-pale:    #fef2f2;
+  --amber:       #d97706;
+  --blue:        #1d4ed8;
+  --blue-pale:   #eff6ff;
+  --dark:        #0f172a;
+  --gray-900:    #111827;
+  --gray-700:    #374151;
+  --gray-500:    #6b7280;
+  --gray-300:    #d1d5db;
+  --gray-100:    #f3f4f6;
+  --gray-50:     #f9fafb;
+  --white:       #ffffff;
+  --border:      #e5e7eb;
+  --sidebar-w:   256px;
+  --header-h:    64px;
+  --radius:      14px;
+  --radius-sm:   8px;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,.08);
+  --shadow:      0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:   0 12px 40px rgba(0,0,0,.12);
+}
+
+*  { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--gray-50); color: var(--dark); min-height: 100vh; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+a { text-decoration: none; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--green); border-radius: 99px; }
+
+/* ═══════════════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════════════ */
+#authScreen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px;
+  background: linear-gradient(135deg, #064E3B 0%, #0a5c47 40%, #0f172a 100%);
+  position: relative; overflow: hidden;
+}
+#authScreen::before {
+  content: ''; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M40 0L0 40l40 40 40-40z'/%3E%3C/g%3E%3C/svg%3E");
+}
+#authScreen::after {
+  content: ''; position: absolute; bottom: -80px; right: -80px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,175,55,.15) 0%, transparent 70%);
+}
+.auth-card {
+  background: var(--white); border-radius: 24px;
+  padding: 48px 40px; width: 100%; max-width: 440px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.35); position: relative; z-index: 1;
+}
+.auth-emblem {
+  width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 16px;
+  background: linear-gradient(135deg, var(--green), var(--green-mid));
+  display: flex; align-items: center; justify-content: center; font-size: 34px;
+  box-shadow: 0 8px 24px rgba(6,78,59,.4);
+}
+.auth-card h1 {
+  font-family: 'Fraunces', serif; font-size: 22px; color: var(--green);
+  text-align: center; margin-bottom: 4px;
+}
+.auth-card .auth-sub {
+  font-size: 11.5px; color: var(--gray-500); text-align: center; margin-bottom: 28px; line-height: 1.5;
+}
+.auth-back {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 12px; color: var(--green); font-weight: 600; margin-bottom: 20px;
+}
+.auth-tabs {
+  display: flex; background: var(--gray-100); border-radius: 10px;
+  padding: 4px; margin-bottom: 28px; gap: 4px;
+}
+.auth-tab {
+  flex: 1; padding: 10px; text-align: center; border-radius: 7px;
+  font-size: 13px; font-weight: 600; color: var(--gray-500);
+  border: none; background: none; transition: all .2s;
+}
+.auth-tab.active { background: var(--white); color: var(--green); box-shadow: var(--shadow-sm); }
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+.field input, .field select {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 13.5px; transition: .2s; outline: none; color: var(--dark);
+}
+.field input:focus, .field select:focus {
+  border-color: var(--green); box-shadow: 0 0 0 3px rgba(6,78,59,.1);
+}
+.btn-primary {
+  width: 100%; padding: 13px; background: var(--green); color: var(--white);
+  border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
+  transition: .2s; letter-spacing: .2px;
+}
+.btn-primary:hover { background: var(--green-mid); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(6,78,59,.35); }
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+.auth-note { text-align: center; font-size: 11.5px; color: var(--gray-500); margin-top: 14px; }
+
+/* ═══════════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════════ */
+#app { display: none; min-height: 100vh; flex-direction: column; }
+#app.shown { display: flex; }
+
+/* HEADER */
+.app-header {
+  height: var(--header-h); background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; gap: 12px;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 1px 8px rgba(0,0,0,.06);
+}
+.header-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Fraunces', serif; font-weight: 700; color: var(--green); font-size: 18px;
+}
+.header-logo-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--green), var(--green-mid));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--white); font-size: 18px; flex-shrink: 0;
+}
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none; padding: 6px; cursor: pointer;
+}
+.hamburger span {
+  display: block; width: 22px; height: 2px; background: var(--green);
+  border-radius: 2px; transition: .3s;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+.header-spacer { flex: 1; }
+.header-user { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-mid));
+  color: var(--white); display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.header-user-info { display: flex; flex-direction: column; line-height: 1.2; }
+.header-user-name { font-size: 13px; font-weight: 600; color: var(--dark); }
+.role-pill { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+.role-admin  { background: #fee2e2; color: #991b1b; }
+.role-exec   { background: #fef3c7; color: #92400e; }
+.role-member { background: #d1fae5; color: #065f46; }
+.back-btn {
+  display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+  color: var(--gray-500); padding: 7px 14px; border: 1.5px solid var(--border);
+  border-radius: 8px; transition: .2s; white-space: nowrap;
+}
+.back-btn:hover { border-color: var(--green); color: var(--green); }
+.logout-btn {
+  padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 12px; font-weight: 600; color: var(--gray-500); background: none; transition: .2s;
+}
+.logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* PENDING BANNER */
+.pending-banner {
+  background: linear-gradient(135deg, #7c2d12, #b45309);
+  color: var(--white); padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; border-bottom: 2px solid #fbbf24;
+  position: sticky; top: var(--header-h); z-index: 190;
+}
+.pending-banner-left { display: flex; align-items: center; gap: 12px; }
+.pending-banner-icon {
+  width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.pending-banner-text h4 { font-size: 13px; font-weight: 700; }
+.pending-banner-text p  { font-size: 11px; opacity: .85; margin-top: 2px; }
+.btn-amber {
+  background: rgba(255,255,255,.2); color: var(--white);
+  border: 1.5px solid rgba(255,255,255,.35);
+  padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: .2s;
+}
+.btn-amber:hover { background: rgba(255,255,255,.3); }
+
+/* APP BODY */
+.app-body { display: flex; flex: 1; position: relative; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w); background: var(--green); color: var(--white);
+  flex-shrink: 0; display: flex; flex-direction: column;
+  padding: 20px 0 40px; position: sticky;
+  top: var(--header-h); height: calc(100vh - var(--header-h)); overflow-y: auto;
+  transition: transform .3s ease;
+}
+.sidebar-section {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .12em;
+  color: rgba(255,255,255,.35); padding: 16px 20px 6px; text-transform: uppercase;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,.7); cursor: pointer; transition: .15s;
+  border-left: 3px solid transparent; user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,.08); color: var(--white); }
+.nav-item.active { background: rgba(255,255,255,.13); color: var(--white); border-left-color: var(--gold); }
+.nav-item i { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto; background: var(--gold); color: var(--dark);
+  font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 20px;
+}
+
+/* SIDEBAR OVERLAY (mobile) */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.5); z-index: 150; backdrop-filter: blur(2px);
+}
+.sidebar-overlay.open { display: block; }
+
+/* MAIN CONTENT */
+.main { flex: 1; padding: 28px; overflow-x: hidden; min-width: 0; }
+
+/* ═══════════════════════════════════════════════
+   SECTIONS
+═══════════════════════════════════════════════ */
+.section { display: none; animation: sectionFade .25s ease; }
+.section.active { display: block; }
+@keyframes sectionFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-header { margin-bottom: 24px; }
+.page-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--gray-500); }
+
+/* ═══════════════════════════════════════════════
+   STAT CARDS
+═══════════════════════════════════════════════ */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--white); border-radius: var(--radius); padding: 20px;
+  border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;
+  transition: .2s; position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent, var(--green));
+}
+.stat-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.stat-icon {
+  width: 42px; height: 42px; border-radius: 10px; display: flex;
+  align-items: center; justify-content: center; font-size: 18px;
+}
+.stat-val { font-size: 30px; font-weight: 700; font-family: 'Fraunces', serif; line-height: 1; color: var(--dark); }
+.stat-lbl { font-size: 12px; color: var(--gray-500); font-weight: 500; }
+
+/* ═══════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════ */
+.card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+.card-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.card-title { font-size: 14px; font-weight: 700; color: var(--dark); }
+.card-body { padding: 20px; }
+
+/* ═══════════════════════════════════════════════
+   TABLES
+═══════════════════════════════════════════════ */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  padding: 10px 14px; background: var(--gray-50); font-weight: 700; text-align: left;
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--gray-500); border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+tbody td { padding: 12px 14px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--gray-50); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap;
+}
+.badge-green  { background: #d1fae5; color: #065f46; }
+.badge-red    { background: #fee2e2; color: #991b1b; }
+.badge-yellow { background: #fef3c7; color: #92400e; }
+.badge-blue   { background: #dbeafe; color: #1e40af; }
+.badge-gray   { background: var(--gray-100); color: var(--gray-500); }
+.status-pending { background: #fef3c7; color: #92400e; }
+
+/* ═══════════════════════════════════════════════
+   DUES BARS
+═══════════════════════════════════════════════ */
+.dues-bar-wrap { background: var(--gray-100); border-radius: 99px; height: 7px; overflow: hidden; margin: 5px 0; }
+.dues-bar { height: 100%; border-radius: 99px; transition: width .6s ease; }
+.dues-paid    { background: var(--green-light); }
+.dues-partial { background: var(--gold); }
+.dues-overdue { background: var(--red); }
+.dues-pending { background: var(--gray-300); }
+
+/* ═══════════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════════ */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field label { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+.form-field input, .form-field select, .form-field textarea {
+  padding: 10px 12px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px; outline: none; transition: .2s; color: var(--dark);
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--green); }
+.form-full { grid-column: 1 / -1; }
+.form-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; flex-wrap: wrap; }
+
+.btn-sm { padding: 9px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; border: none; transition: .2s; display: inline-flex; align-items: center; gap: 7px; }
+.btn-green   { background: var(--green); color: var(--white); }
+.btn-green:hover { background: var(--green-mid); }
+.btn-red     { background: var(--red); color: var(--white); }
+.btn-red:hover   { opacity: .85; }
+.btn-gold    { background: var(--gold); color: var(--dark); }
+.btn-outline { background: none; border: 1.5px solid var(--border); color: var(--gray-700); }
+.btn-outline:hover { border-color: var(--green); color: var(--green); }
+.btn-sm:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  z-index: 999; display: none; align-items: center; justify-content: center;
+  padding: 20px; backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: 20px; width: 100%; max-width: 600px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 40px 80px rgba(0,0,0,.25);
+  animation: modalIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+.modal-head {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; background: var(--white); z-index: 1;
+}
+.modal-head h3 { font-size: 16px; font-weight: 700; font-family: 'Fraunces', serif; }
+.modal-close { background: none; border: none; font-size: 16px; color: var(--gray-500); cursor: pointer; padding: 4px; transition: .2s; }
+.modal-close:hover { color: var(--red); }
+.modal-body { padding: 24px; }
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--dark); color: var(--white);
+  padding: 13px 20px; border-radius: 12px; font-size: 13px; font-weight: 600;
+  z-index: 9999; transform: translateY(80px); opacity: 0; transition: .3s cubic-bezier(.34,1.56,.64,1);
+  display: flex; align-items: center; gap: 10px; max-width: 360px; box-shadow: var(--shadow-lg);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--green); }
+.toast.error   { background: var(--red); }
+.toast.warning { background: var(--amber); }
+
+/* ═══════════════════════════════════════════════
+   MISC UI
+═══════════════════════════════════════════════ */
+.search-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.search-input {
+  flex: 1; min-width: 200px; padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 13px; outline: none; transition: .2s; color: var(--dark);
+}
+.search-input:focus { border-color: var(--green); }
+
+.loading { text-align: center; padding: 48px; color: var(--gray-500); font-size: 13px; }
+.loading i { font-size: 20px; display: block; margin-bottom: 10px; }
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state i { font-size: 48px; color: var(--gray-300); display: block; margin-bottom: 16px; }
+.empty-state h3 { font-size: 16px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; color: var(--gray-500); }
+
+.content-block { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; }
+.content-block-body { flex: 1; }
+.content-block-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.content-block-meta  { font-size: 11px; color: var(--gray-500); }
+.content-block-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border);
+  background: none; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--gray-500); transition: .2s;
+}
+.icon-btn:hover { border-color: var(--green); color: var(--green); }
+.icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+/* COURSES */
+.courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.course-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: .2s; }
+.course-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+.course-thumb { height: 130px; background: linear-gradient(135deg, var(--green), var(--green-mid)); display: flex; align-items: center; justify-content: center; font-size: 46px; }
+.course-info { padding: 16px; }
+.course-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.course-meta { font-size: 11px; color: var(--gray-500); display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.progress-bar { background: var(--gray-100); border-radius: 99px; height: 6px; overflow: hidden; margin-bottom: 6px; }
+.progress-fill { height: 100%; border-radius: 99px; background: var(--green-light); transition: width .6s; }
+
+/* MEMBER HERO */
+.member-hero {
+  background: linear-gradient(135deg, var(--green), var(--green-mid));
+  border-radius: var(--radius); padding: 28px; color: var(--white);
+  margin-bottom: 24px; position: relative; overflow: hidden;
+}
+.member-hero::after { content: ''; position: absolute; right: -30px; top: -30px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.06); }
+
+/* ID CARD */
+.id-card-wrap { background: var(--white); border-radius: 20px; border: 2px solid var(--green); padding: 28px; position: relative; overflow: hidden; max-width: 440px; }
+.id-card-wrap::before { content: 'AHRIMPN'; position: absolute; right: -18px; top: 50%; transform: translateY(-50%) rotate(-90deg); font-size: 70px; font-weight: 900; color: rgba(6,78,59,.04); letter-spacing: .2em; font-family: 'Fraunces', serif; }
+
+/* Payment screen overlay */
+#paymentScreen { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, #064E3B 0%, #0a5c47 50%, #0f172a 100%); display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+.payment-card { background: var(--white); border-radius: 20px; padding: 36px; width: 100%; max-width: 500px; box-shadow: 0 40px 80px rgba(0,0,0,.35); }
+.plan-option {
+  border: 2px solid var(--border); border-radius: 12px; padding: 16px;
+  cursor: pointer; text-align: center; transition: .2s; position: relative;
+}
+.plan-option.selected { border-color: var(--green); background: var(--green-pale); }
+.plan-option:hover { border-color: var(--green-mid); }
+.plan-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--dark); font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 20px; white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .hamburger { display: flex; }
+  .sidebar {
+    position: fixed; top: var(--header-h); left: 0;
+    height: calc(100vh - var(--header-h));
+    z-index: 160; transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: 8px 0 40px rgba(0,0,0,.2); }
+  .header-user-info { display: none; }
+  .back-btn span { display: none; }
+}
+@media (max-width: 640px) {
+  .main { padding: 16px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .auth-card { padding: 32px 24px; }
+  .modal { border-radius: 14px; }
+  .page-title { font-size: 22px; }
+  .card-header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════
+   NEWS MANAGER
+═══════════════════════════════════════════════ */
+.preview-note { font-size: 12px; color: var(--gray-500); }
+.hidden { display: none !important; }
+
+.news-manager-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--gray-500);
+  margin-bottom: 8px;
+}
+.news-manager-label-spaced { margin-top: 20px; }
+.news-manager-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--gray-50, #f9fafb);
+  border: 1px solid var(--gray-200, #e5e7eb);
+  margin-bottom: 8px;
+  transition: box-shadow .15s;
+}
+.news-manager-row:hover { box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+.news-manager-featured {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+.news-manager-thumb {
+  width: 56px;
+  height: 42px;
+  border-radius: 5px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--gray-200);
+}
+.news-manager-thumb-video {
+  width: 56px;
+  height: 42px;
+  border-radius: 5px;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.news-manager-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.news-manager-info strong { font-size: 13px; line-height: 1.4; }
+.news-manager-date { font-size: 11px; color: var(--gray-500); }
+.news-manager-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+.news-cat-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  width: fit-content;
+}
+.news-form { display: flex; flex-direction: column; gap: 16px; }
+
+
+.nf-upload-zone {
+  border: 2px dashed var(--gray-300, #d1d5db);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  background: var(--gray-50, #f9fafb);
+  position: relative;
+}
+.nf-upload-zone:hover, .nf-upload-zone.drag-over {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+.nf-upload-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.nf-upload-icon { font-size: 28px; margin-bottom: 6px; }
+.nf-upload-hint { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+.nf-upload-hint strong { color: var(--gray-700, #374151); }
+.nf-preview-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  max-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nf-preview-wrap img, .nf-preview-wrap video {
+  max-width: 100%;
+  max-height: 180px;
+  border-radius: 8px;
+  display: block;
+}
+.nf-preview-remove {
+  position: absolute;
+  top: 6px; right: 6px;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 26px; height: 26px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nf-progress-wrap {
+  height: 6px;
+  background: var(--gray-200, #e5e7eb);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.nf-progress-bar {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 99px;
+  width: 0%;
+  transition: width .2s;
+}
+.nf-media-or { text-align: center; font-size: 12px; color: var(--gray-400); position: relative; }
+.nf-media-or::before, .nf-media-or::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: var(--gray-200);
+}
+.nf-media-or::before { left: 0; }
+.nf-media-or::after  { right: 0; }
+
+/* Toast */
+.admin-toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--green); color: #fff; font-size: 13px; font-weight: 600;
+  padding: 12px 20px; border-radius: 10px; box-shadow: var(--shadow-lg);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .3s, transform .3s; pointer-events: none;
+}
+.admin-toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ═══════ AUTH SCREEN ═══════ -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-emblem">🏥</div>
+    <h1>AHRIMPN Portal</h1>
+    <p class="auth-sub">Association of Health Records &amp; Information<br>Management Professionals of Nigeria</p>
+    <a href="index.html" class="auth-back"><i class="fas fa-arrow-left"></i> Back to Main Website</a>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm">
+      <div class="field"><label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="you@ahrimpn.org"/>
+      </div>
+      <div class="field"><label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter')handleLogin()"/>
+      </div>
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+        <i class="fas fa-sign-in-alt"></i> Sign In to Portal
+      </button>
+      <p class="auth-note">Demo: <b>admin@ahrimpn.org</b> / <b>admin123</b></p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" style="display:none">
+      <div class="field"><label>Full Name</label><input type="text" id="regName" placeholder="e.g. Amara Okafor"/></div>
+      <div class="field"><label>Email Address</label><input type="email" id="regEmail" placeholder="you@example.com"/></div>
+      <div class="field"><label>Phone Number</label><input type="tel" id="regPhone" placeholder="+234 800 000 0000"/></div>
+      <div class="field"><label>State</label>
+        <select id="regState">
+          <option value="">Select State</option>
+          <option>Abia State</option><option>Adamawa State</option><option>Akwa Ibom State</option>
+          <option>Anambra State</option><option>Bauchi State</option><option>Bayelsa State</option>
+          <option>Benue State</option><option>Borno State</option><option>Cross River State</option>
+          <option>Delta State</option><option>Ebonyi State</option><option>Edo State</option>
+          <option>Ekiti State</option><option>Enugu State</option><option>FCT Abuja</option>
+          <option>Gombe State</option><option>Imo State</option><option>Jigawa State</option>
+          <option>Kaduna State</option><option>Kano State</option><option>Katsina State</option>
+          <option>Kebbi State</option><option>Kogi State</option><option>Kwara State</option>
+          <option>Lagos State</option><option>Nassarawa State</option><option>Niger State</option>
+          <option>Ogun State</option><option>Ondo State</option><option>Osun State</option>
+          <option>Oyo State</option><option>Plateau State</option><option>Rivers State</option>
+          <option>Sokoto State</option><option>Taraba State</option><option>Yobe State</option>
+          <option>Zamfara State</option>
+        </select>
+      </div>
+      <div class="field"><label>Workplace / Institution</label>
+        <input type="text" id="regWorkplace" placeholder="e.g. University College Hospital"/>
+      </div>
+      <div class="field"><label>Password</label>
+        <input type="password" id="regPass" placeholder="Minimum 8 characters"/>
+      </div>
+      <button class="btn-primary" id="regBtn" onclick="handleRegister()">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+      <p class="auth-note">Membership dues: ₦1,200/month · ₦12,000/year</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ APP SHELL ═══════ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="header-logo">
+      <div class="header-logo-icon">🏥</div>
+      <span class="logo-text">AHRIMPN</span>
+    </div>
+    <div class="header-spacer"></div>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> <span>Website</span></a>
+    <div class="header-user">
+      <div class="avatar" id="headerAvatar">A</div>
+      <div class="header-user-info">
+        <span class="header-user-name" id="headerName">User</span>
+        <span id="headerRole" class="role-pill role-member">Member</span>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </header>
+
+  <!-- PENDING BANNER -->
+  <div id="pendingBanner" style="display:none" class="pending-banner">
+    <div class="pending-banner-left">
+      <div class="pending-banner-icon">⏳</div>
+      <div class="pending-banner-text">
+        <h4>Membership Pending — Payment Required</h4>
+        <p>Activate your full membership by completing your payment below.</p>
+      </div>
+    </div>
+    <button class="btn-amber" onclick="showPaymentInstructions()">
+      <i class="fas fa-credit-card"></i> Pay Now
+    </button>
+  </div>
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <!-- MAIN -->
+    <main class="main" id="mainContent">
+
+      <!-- DASHBOARD -->
+      <div class="section" id="sec-dashboard">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub">AHRIMPN membership &amp; activity overview</p>
+        </div>
+        <div class="stats-grid" id="dashStats">
+          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="dash-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Recent Members</span></div>
+            <div style="padding:0" id="recentMembersTable"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Dues Overview</span></div>
+            <div class="card-body" id="duesOverview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBERS -->
+      <div class="section" id="sec-members">
+        <div class="page-header">
+          <h1 class="page-title">Member Management</h1>
+          <p class="page-sub">All registered AHRIMPN members</p>
+        </div>
+        <div class="search-bar">
+          <input class="search-input" placeholder="🔍 Search by name, email, state…" id="memberSearch" oninput="searchMembers(this.value)"/>
+          <button class="btn-sm btn-green" onclick="openAddMember()"><i class="fas fa-user-plus"></i> Add Member</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap" id="membersTable">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DUES -->
+      <div class="section" id="sec-dues">
+        <div class="page-header">
+          <h1 class="page-title">Dues &amp; Arrears</h1>
+          <p class="page-sub">Monthly: ₦1,200 · Annual: ₦12,000</p>
+        </div>
+        <div class="stats-grid" id="duesStats"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Dues Status</span>
+            <select class="search-input" style="width:auto;padding:8px 12px;min-width:0" onchange="loadDues(this.value)">
+              <option value="">All Members</option>
+              <option value="paid">Fully Paid</option>
+              <option value="partial">Partial</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          </div>
+          <div class="table-wrap" id="duesTable">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COURSES ADMIN -->
+      <div class="section" id="sec-courses-admin">
+        <div class="page-header">
+          <h1 class="page-title">Course Management</h1>
+          <p class="page-sub">Professional development LMS</p>
+        </div>
+        <div style="margin-bottom:16px">
+          <button class="btn-sm btn-green" onclick="openAddCourse()"><i class="fas fa-plus"></i> Add Course</button>
+        </div>
+        <div class="courses-grid" id="adminCoursesList">
+          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+        </div>
+      </div>
+
+      <!-- EVENTS ADMIN -->
+      <div class="section" id="sec-events-admin">
+        <div class="page-header">
+          <h1 class="page-title">Events Management</h1>
+          <p class="page-sub">National &amp; chapter events</p>
+        </div>
+        <div style="margin-bottom:16px">
+          <button class="btn-sm btn-green" onclick="openAddEvent()"><i class="fas fa-plus"></i> Add Event</button>
+        </div>
+        <div id="eventsAdminList"></div>
+      </div>
+
+      <!-- WEBSITE CONTROL -->
+      <div class="section" id="sec-website">
+        <div class="page-header">
+          <h1 class="page-title">Website Control</h1>
+          <p class="page-sub">Edit live content on the public website</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+          <div class="card">
+            <div class="card-header"><span class="card-title">📢 Breaking News Ticker</span>
+              <button class="btn-sm btn-green" onclick="editTicker()">Edit</button></div>
+            <div class="card-body" id="tickerPreview"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">🏠 Hero Section</span>
+              <button class="btn-sm btn-green" onclick="editHero()">Edit</button></div>
+            <div class="card-body" id="heroPreview"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📣 Announcements</span>
+              <button class="btn-sm btn-green" onclick="editAnnouncement()">Add</button></div>
+            <div class="card-body" id="announcementsPreview"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">🎯 Certifications</span></div>
+            <div class="card-body" id="certPreview"></div>
+          </div>
+        </div>
+
+        <!-- TRENDING NEWS MANAGER -->
+        <div style="margin-top:28px">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📰 Trending News &amp; Featured Story</span>
+              <button class="btn-sm btn-green" onclick="openAddNewsStory()"><i class="fas fa-plus"></i> Add Story</button>
+            </div>
+            <div class="card-body">
+              <p style="font-size:12px;color:var(--gray-500);margin-bottom:16px">
+                Stories appear on the homepage sidebar and featured area. Changes go live immediately on index.html.
+              </p>
+              <div id="newsStoriesList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCESS CONTROL -->
+      <div class="section" id="sec-access">
+        <div class="page-header">
+          <h1 class="page-title">Access Control</h1>
+          <p class="page-sub">Manage roles and permissions</p>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><span class="card-title">Role Permissions Matrix</span></div>
+          <div class="card-body">
+            <div class="table-wrap"><table>
+              <thead><tr><th>Permission</th><th>Super Admin</th><th>Executive</th><th>Member</th></tr></thead>
+              <tbody id="permMatrix"></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">User Roles</span></div>
+          <div class="table-wrap" id="rolesTable"></div>
+        </div>
+      </div>
+
+      <!-- PENDING APPROVALS -->
+      <div class="section" id="sec-pending-approvals">
+        <div class="page-header">
+          <h1 class="page-title">Pending Approvals</h1>
+          <p class="page-sub">Members awaiting payment confirmation</p>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⏳ Pending Members</span>
+            <button class="btn-sm btn-outline" onclick="loadPendingApprovals()"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          <div class="table-wrap" id="pendingTable">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBER HOME -->
+      <div class="section" id="sec-member-home">
+        <div class="page-header">
+          <h1 class="page-title">My Dashboard</h1>
+          <p class="page-sub">Welcome to your AHRIMPN member portal</p>
+        </div>
+        <div id="memberDashboard"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>
+      </div>
+
+      <!-- MY DUES -->
+      <div class="section" id="sec-my-dues">
+        <div class="page-header">
+          <h1 class="page-title">My Dues</h1>
+          <p class="page-sub">Track your membership payments</p>
+        </div>
+        <div id="myDuesPanel"></div>
+      </div>
+
+      <!-- MY COURSES -->
+      <div class="section" id="sec-my-courses">
+        <div class="page-header">
+          <h1 class="page-title">My Courses</h1>
+          <p class="page-sub">Continue your professional development</p>
+        </div>
+        <div class="courses-grid" id="myCoursesList"></div>
+      </div>
+
+      <!-- MY CERTS -->
+      <div class="section" id="sec-my-certs">
+        <div class="page-header">
+          <h1 class="page-title">My Certifications</h1>
+          <p class="page-sub">Your earned credentials</p>
+        </div>
+        <div id="myCertsPanel"></div>
+      </div>
+
+      <!-- ID CARD -->
+      <div class="section" id="sec-id-card">
+        <div class="page-header">
+          <h1 class="page-title">Membership Card</h1>
+          <p class="page-sub">Your official AHRIMPN digital ID</p>
+        </div>
+        <div id="idCardPanel" style="max-width:500px"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-head">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle" id="toastIcon"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
+const API          = 'api'; // relative — same server
+const FLW_PUB_KEY  = 'FLWPUBK_TEST-213ec04132197ad19b7c7489d7aaf173-X'; // ← replace with live key
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let TOKEN        = sessionStorage.getItem('ahrimpn_token') || '';
+let CURRENT_USER = JSON.parse(sessionStorage.getItem('ahrimpn_user') || 'null');
+let _pendingCount = 0;
+
+// ═══════════════════════════════════════════════════════════
+//  API HELPER
+// ═══════════════════════════════════════════════════════════
+async function api(file, action, method = 'GET', body = null) {
+  const url  = `${API}/${file}.php?action=${action}`;
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res  = await fetch(url, opts);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message || 'Request failed');
+  return data.data;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t, i) =>
+    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1))
+  );
+  document.getElementById('loginForm').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function handleLogin() {
+  const btn   = document.getElementById('loginBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  if (!email || !pass) { showToast('Enter email and password', 'error'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+  try {
+    const d = await api('auth', 'login', 'POST', { email, password: pass });
+    TOKEN = d.token; CURRENT_USER = d.user;
+    sessionStorage.setItem('ahrimpn_token', TOKEN);
+    sessionStorage.setItem('ahrimpn_user', JSON.stringify(CURRENT_USER));
+    launchApp();
+    checkPaymentRedirect();
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In to Portal';
+  }
+}
+
+async function handleRegister() {
+  const btn  = document.getElementById('regBtn');
+  const body = {
+    name:      document.getElementById('regName').value.trim(),
+    email:     document.getElementById('regEmail').value.trim(),
+    phone:     document.getElementById('regPhone').value.trim(),
+    state:     document.getElementById('regState').value,
+    workplace: document.getElementById('regWorkplace').value.trim(),
+    password:  document.getElementById('regPass').value,
+  };
+  for (const [k, v] of Object.entries(body)) {
+    if (!v) { showToast('Please fill all fields', 'error'); return; }
+  }
+  if (body.password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account…';
+  try {
+    const d = await api('auth', 'register', 'POST', body);
+    TOKEN = d.token; CURRENT_USER = d.user;
+    sessionStorage.setItem('ahrimpn_token', TOKEN);
+    sessionStorage.setItem('ahrimpn_user', JSON.stringify(CURRENT_USER));
+    showRegistrationPaymentStep();
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+  }
+}
+
+async function handleLogout() {
+  try { await api('auth', 'logout', 'POST'); } catch {}
+  TOKEN = ''; CURRENT_USER = null;
+  sessionStorage.clear();
+  document.getElementById('app').classList.remove('shown');
+  document.getElementById('authScreen').style.display = 'flex';
+  closeSidebar();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SIDEBAR TOGGLE (mobile)
+// ═══════════════════════════════════════════════════════════
+function toggleSidebar() {
+  const sb  = document.getElementById('sidebar');
+  const hbg = document.getElementById('hamburger');
+  const ov  = document.getElementById('sidebarOverlay');
+  const open = !sb.classList.contains('open');
+  sb.classList.toggle('open', open);
+  hbg.classList.toggle('open', open);
+  ov.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  APP LAUNCH
+// ═══════════════════════════════════════════════════════════
+function launchApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('app').classList.add('shown');
+  const u = CURRENT_USER;
+
+  document.getElementById('headerAvatar').textContent = u.name.charAt(0).toUpperCase();
+  document.getElementById('headerName').textContent   = u.name;
+
+  const rp = document.getElementById('headerRole');
+  rp.textContent = u.role === 'admin' ? 'Super Admin' : u.role === 'executive' ? 'Executive' : 'Member';
+  rp.className   = 'role-pill ' + (u.role === 'admin' ? 'role-admin' : u.role === 'executive' ? 'role-exec' : 'role-member');
+
+  // FIX: Use u.active (0/1) — 'membership_status' column does not exist
+  const banner = document.getElementById('pendingBanner');
+  banner.style.display = (u.role === 'member' && !u.active) ? 'flex' : 'none';
+
+  buildSidebar();
+  navigate(u.role === 'member' ? 'member-home' : 'dashboard');
+  refreshPendingBadge();
+}
+
+if (TOKEN && CURRENT_USER) { launchApp(); checkPaymentRedirect(); }
+
+// ═══════════════════════════════════════════════════════════
+//  SIDEBAR BUILDER
+// ═══════════════════════════════════════════════════════════
+function buildSidebar() {
+  const u     = CURRENT_USER;
+  const isAdm = ['admin', 'executive'].includes(u.role);
+  const isMbr = u.role === 'member';
+
+  const adminItems = [
+    { sec: 'dashboard',          icon: 'fa-gauge-high',       label: 'Dashboard' },
+    { sec: 'members',            icon: 'fa-users',            label: 'Members' },
+    { sec: 'pending-approvals',  icon: 'fa-user-clock',       label: 'Pending Approvals', badge: true },
+    { sec: 'dues',               icon: 'fa-money-bill-wave',  label: 'Dues & Arrears' },
+    { sec: 'courses-admin',      icon: 'fa-graduation-cap',   label: 'Courses (LMS)' },
+    { sec: 'events-admin',       icon: 'fa-calendar-star',    label: 'Events' },
+    { sec: 'website',            icon: 'fa-globe',            label: 'Website Control' },
+    { sec: 'access',             icon: 'fa-shield-halved',    label: 'Access Control' },
+  ];
+
+  const memberItems = [
+    { sec: 'member-home', icon: 'fa-house',         label: 'My Dashboard' },
+    { sec: 'my-dues',     icon: 'fa-receipt',       label: 'My Dues' },
+    { sec: 'my-courses',  icon: 'fa-book-open',     label: 'My Courses' },
+    { sec: 'my-certs',    icon: 'fa-certificate',   label: 'Certifications' },
+    { sec: 'id-card',     icon: 'fa-id-card',       label: 'My ID Card' },
+  ];
+
+  const items = isAdm ? adminItems : memberItems;
+  const sb    = document.getElementById('sidebar');
+
+  sb.innerHTML = `
+    <div style="padding:0 16px 12px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:8px">
+        ${isAdm ? 'Administration' : 'My Portal'}
+      </div>
+    </div>
+    ${items.map(it => `
+      <div class="nav-item" onclick="navigate('${it.sec}');closeSidebar()" id="nav-${it.sec}">
+        <i class="fas ${it.icon}"></i>
+        <span>${it.label}</span>
+        ${it.badge ? `<span class="nav-badge" id="pendingBadge" style="display:${_pendingCount ? 'inline' : 'none'}">${_pendingCount}</span>` : ''}
+      </div>
+    `).join('')}
+    ${isAdm && u.role === 'admin' ? '' : ''}
+    <div style="margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,.1)">
+      <div style="font-size:11px;color:rgba(255,255,255,.4);line-height:1.5">
+        AHRIMPN Portal<br>v2.0 — Secured
+      </div>
+    </div>
+  `;
+}
+
+function navigate(sec) {
+  document.querySelectorAll('.section').forEach(s  => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('sec-' + sec);
+  const nb = document.getElementById('nav-' + sec);
+  if (el) el.classList.add('active');
+  if (nb) nb.classList.add('active');
+
+  // Lazy-load section data
+  const loaders = {
+    'dashboard':         loadDashboard,
+    'members':           loadMembers,
+    'dues':              () => { loadDuesStats(); loadDues(''); },
+    'courses-admin':     loadAdminCourses,
+    'events-admin':      loadAdminEvents,
+    'access':            loadAccessControl,
+    'pending-approvals': loadPendingApprovals,
+    'member-home':       loadMemberDashboard,
+    'my-dues':           loadMyDues,
+    'my-courses':        loadMyCourses,
+    'my-certs':          loadMyCerts,
+    'id-card':           loadIdCard,
+    'website':           loadWebsiteControl,
+  };
+  if (loaders[sec]) loaders[sec]();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════
+let _toastTimer = null;
+function showToast(msg, type = 'info') {
+  const t    = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  t.className = 'toast ' + type;
+  document.getElementById('toastMsg').textContent = msg;
+  icon.className = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-circle-xmark' : 'fas fa-info-circle';
+  t.classList.add('show');
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════════════
+function showModal(title, bodyHtml) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML    = bodyHtml;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const [stats, members] = await Promise.all([
+      api('members', 'stats'),
+      api('members', 'list')
+    ]);
+    document.getElementById('dashStats').innerHTML = `
+      <div class="stat-card" style="--accent:var(--green)">
+        <div class="stat-icon" style="background:#ecfdf5;color:var(--green)"><i class="fas fa-users"></i></div>
+        <div class="stat-val">${stats.totalMembers}</div>
+        <div class="stat-lbl">Total Members</div>
+      </div>
+      <div class="stat-card" style="--accent:var(--green-light)">
+        <div class="stat-icon" style="background:#ecfdf5;color:var(--green-light)"><i class="fas fa-user-check"></i></div>
+        <div class="stat-val">${stats.activeMembers}</div>
+        <div class="stat-lbl">Active Members</div>
+      </div>
+      <div class="stat-card" style="--accent:var(--gold)">
+        <div class="stat-icon" style="background:var(--gold-pale);color:var(--amber)"><i class="fas fa-naira-sign"></i></div>
+        <div class="stat-val">₦${fmtNum(stats.totalCollected)}</div>
+        <div class="stat-lbl">Dues Collected</div>
+      </div>
+      <div class="stat-card" style="--accent:var(--red)">
+        <div class="stat-icon" style="background:var(--red-pale);color:var(--red)"><i class="fas fa-triangle-exclamation"></i></div>
+        <div class="stat-val">${stats.overdueCount}</div>
+        <div class="stat-lbl">Members with Arrears</div>
+      </div>
+    `;
+
+    // Recent members table
+    const recent = members.slice(0, 8);
+    document.getElementById('recentMembersTable').innerHTML = `
+      <table>
+        <thead><tr><th>Member</th><th>State</th><th>Status</th><th>Dues</th></tr></thead>
+        <tbody>${recent.map(m => `
+          <tr>
+            <td><b>${esc(m.name)}</b><br><span style="font-size:11px;color:var(--gray-500)">${esc(m.member_id)}</span></td>
+            <td>${esc(m.state)}</td>
+            <td>${m.active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-yellow">Pending</span>'}</td>
+            <td><span class="badge ${duesBadgeClass(m.dues?.status)}">${duesLabel(m.dues?.status)}</span></td>
+          </tr>
+        `).join('')}</tbody>
+      </table>`;
+
+    // Dues overview donut-ish
+    const dues = await api('dues', 'stats');
+    document.getElementById('duesOverview').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div style="text-align:center;padding:16px;background:var(--green-pale);border-radius:12px">
+          <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--green)">₦${fmtNum(dues.totalPaid)}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:4px">Total Collected</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:var(--red-pale);border-radius:12px">
+          <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--red)">₦${fmtNum(dues.totalArrears)}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:4px">Total Arrears</div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--gray-700)">Collection Rate</div>
+      <div class="dues-bar-wrap" style="height:10px">
+        <div class="dues-bar dues-paid" style="width:${dues.rate}%"></div>
+      </div>
+      <div style="font-size:12px;color:var(--gray-500);margin-top:6px;text-align:right">${dues.rate}% collected</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px">
+        <div style="text-align:center;padding:10px;background:var(--green-pale);border-radius:8px">
+          <div style="font-weight:700;color:var(--green)">${dues.counts?.paid ?? 0}</div>
+          <div style="font-size:10px;color:var(--gray-500)">Paid</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--gold-pale);border-radius:8px">
+          <div style="font-weight:700;color:var(--amber)">${dues.counts?.partial ?? 0}</div>
+          <div style="font-size:10px;color:var(--gray-500)">Partial</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--red-pale);border-radius:8px">
+          <div style="font-weight:700;color:var(--red)">${dues.counts?.overdue ?? 0}</div>
+          <div style="font-size:10px;color:var(--gray-500)">Overdue</div>
+        </div>
+      </div>
+    `;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MEMBERS
+// ═══════════════════════════════════════════════════════════
+let _allMembers = [];
+
+async function loadMembers(q = '') {
+  document.getElementById('membersTable').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    _allMembers = await api('members', 'list' + (q ? '&q=' + encodeURIComponent(q) : ''));
+    renderMembersTable(_allMembers);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function renderMembersTable(members) {
+  if (!members.length) {
+    document.getElementById('membersTable').innerHTML = '<div class="empty-state"><i class="fas fa-users-slash"></i><h3>No members found</h3><p>Try a different search term.</p></div>';
+    return;
+  }
+  document.getElementById('membersTable').innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Member</th><th>Contact</th><th>State</th><th>Status</th><th>Dues</th>
+        ${CURRENT_USER.role === 'admin' ? '<th>Actions</th>' : ''}
+      </tr></thead>
+      <tbody>${members.map(m => `
+        <tr>
+          <td>
+            <div style="font-weight:600">${esc(m.name)}</div>
+            <div style="font-size:11px;color:var(--gray-500)">${esc(m.member_id)}</div>
+          </td>
+          <td>
+            <div style="font-size:12px">${esc(m.email)}</div>
+            <div style="font-size:11px;color:var(--gray-500)">${esc(m.phone || '—')}</div>
+          </td>
+          <td style="font-size:12px">${esc(m.state)}</td>
+          <td>${m.active ? '<span class="badge badge-green">✓ Active</span>' : '<span class="badge badge-yellow">⏳ Pending</span>'}</td>
+          <td>
+            <span class="badge ${duesBadgeClass(m.dues?.status)}">${duesLabel(m.dues?.status)}</span>
+            ${m.dues?.arrearAmount > 0 ? `<div style="font-size:11px;color:var(--red);margin-top:3px">₦${fmtNum(m.dues.arrearAmount)} owed</div>` : ''}
+          </td>
+          ${CURRENT_USER.role === 'admin' ? `
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="btn-sm btn-outline" style="padding:6px 10px;font-size:11px" onclick="openRecordPayment(${m.id},'${esc(m.name)}')">
+                <i class="fas fa-money-bill-wave"></i> Pay
+              </button>
+              <button class="btn-sm btn-outline" style="padding:6px 10px;font-size:11px" onclick="toggleMember(${m.id})">
+                <i class="fas fa-power-off"></i> ${m.active ? 'Deactivate' : 'Activate'}
+              </button>
+              <button class="btn-sm btn-outline" style="padding:6px 10px;font-size:11px" onclick="openPromote(${m.id},'${esc(m.name)}','${m.role}')">
+                <i class="fas fa-user-shield"></i>
+              </button>
+            </div>
+          </td>` : ''}
+        </tr>
+      `).join('')}</tbody>
+    </table>`;
+}
+
+function searchMembers(q) {
+  clearTimeout(window._searchTimer);
+  window._searchTimer = setTimeout(() => loadMembers(q), 350);
+}
+
+function openAddMember() {
+  showModal('Add New Member', `
+    <div class="form-grid">
+      <div class="form-field form-full"><label>Full Name</label><input id="addName" placeholder="e.g. Amara Okafor"/></div>
+      <div class="form-field"><label>Email</label><input type="email" id="addEmail" placeholder="email@example.com"/></div>
+      <div class="form-field"><label>Phone</label><input id="addPhone" placeholder="+234..."/></div>
+      <div class="form-field"><label>State</label>
+        <select id="addState"><option value="">Select state</option>
+          ${['FCT Abuja','Lagos State','Oyo State','Rivers State','Kano State','Enugu State','Delta State','Anambra State'].map(s=>`<option>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-field"><label>Workplace</label><input id="addWorkplace" placeholder="Hospital / Institution"/></div>
+      <div class="form-field"><label>Join Date</label><input type="date" id="addJoinDate" value="${new Date().toISOString().split('T')[0]}"/></div>
+      <div class="form-field form-full"><label>Temporary Password</label><input type="text" id="addPass" value="ahrimpn2025"/></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-green" onclick="addMember()"><i class="fas fa-user-plus"></i> Add Member</button>
+    </div>
+  `);
+}
+
+async function addMember() {
+  try {
+    const r = await api('members', 'add', 'POST', {
+      name:      document.getElementById('addName').value.trim(),
+      email:     document.getElementById('addEmail').value.trim(),
+      phone:     document.getElementById('addPhone').value.trim(),
+      state:     document.getElementById('addState').value,
+      workplace: document.getElementById('addWorkplace').value.trim(),
+      join_date: document.getElementById('addJoinDate').value,
+      password:  document.getElementById('addPass').value,
+    });
+    closeModal(); showToast('Member added — ID: ' + r.member_id, 'success');
+    loadMembers();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function toggleMember(id) {
+  try {
+    await api('members', 'toggle', 'POST', { id });
+    loadMembers(); showToast('Status updated', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openPromote(id, name, currentRole) {
+  showModal('Update Role — ' + name, `
+    <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Change role for <b>${esc(name)}</b></p>
+    <select id="roleSelect" style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
+      <option value="member"    ${currentRole === 'member'    ? 'selected' : ''}>Member</option>
+      <option value="executive" ${currentRole === 'executive' ? 'selected' : ''}>Executive</option>
+      <option value="admin"     ${currentRole === 'admin'     ? 'selected' : ''}>Super Admin</option>
+    </select>
+    <div class="form-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-green" onclick="promoteUser(${id})">Save Role</button>
+    </div>
+  `);
+}
+
+async function promoteUser(id) {
+  try {
+    await api('members', 'promote', 'POST', { id, role: document.getElementById('roleSelect').value });
+    closeModal(); showToast('Role updated', 'success'); loadMembers();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DUES
+// ═══════════════════════════════════════════════════════════
+async function loadDuesStats() {
+  try {
+    const d = await api('dues', 'stats');
+    document.getElementById('duesStats').innerHTML = `
+      <div class="stat-card" style="--accent:var(--green)">
+        <div class="stat-icon" style="background:var(--green-pale);color:var(--green)"><i class="fas fa-naira-sign"></i></div>
+        <div class="stat-val">₦${fmtNum(d.totalPaid)}</div>
+        <div class="stat-lbl">Total Collected</div>
+      </div>
+      <div class="stat-card" style="--accent:var(--red)">
+        <div class="stat-icon" style="background:var(--red-pale);color:var(--red)"><i class="fas fa-clock-rotate-left"></i></div>
+        <div class="stat-val">₦${fmtNum(d.totalArrears)}</div>
+        <div class="stat-lbl">Total Arrears</div>
+      </div>
+      <div class="stat-card" style="--accent:var(--green-light)">
+        <div class="stat-icon" style="background:var(--green-pale);color:var(--green-light)"><i class="fas fa-percent"></i></div>
+        <div class="stat-val">${d.rate}%</div>
+        <div class="stat-lbl">Collection Rate</div>
+      </div>
+    `;
+  } catch(e) {}
+}
+
+async function loadDues(statusFilter = '') {
+  document.getElementById('duesTable').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const rows = await api('dues', 'list' + (statusFilter ? '&status=' + statusFilter : ''));
+    if (!rows.length) {
+      document.getElementById('duesTable').innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No records</h3><p>No members match this filter.</p></div>';
+      return;
+    }
+    document.getElementById('duesTable').innerHTML = `
+      <table>
+        <thead><tr><th>Member</th><th>State</th><th>Months Paid</th><th>Progress</th><th>Arrears</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows.map(r => `
+          <tr>
+            <td>
+              <div style="font-weight:600">${esc(r.name)}</div>
+              <div style="font-size:11px;color:var(--gray-500)">${esc(r.member_id)}</div>
+            </td>
+            <td style="font-size:12px">${esc(r.state)}</td>
+            <td style="font-size:12px">${r.dues.monthsPaid} / ${r.dues.monthsElapsed} mo</td>
+            <td style="min-width:120px">
+              <div class="dues-bar-wrap">
+                <div class="dues-bar dues-${r.dues.status}" style="width:${r.dues.pct}%"></div>
+              </div>
+              <div style="font-size:10px;color:var(--gray-500)">${r.dues.pct}%</div>
+            </td>
+            <td style="font-size:12px;font-weight:600;color:var(--red)">
+              ${r.dues.arrearAmount > 0 ? '₦' + fmtNum(r.dues.arrearAmount) : '—'}
+            </td>
+            <td><span class="badge ${duesBadgeClass(r.dues.status)}">${duesLabel(r.dues.status)}</span></td>
+            <td>
+              <button class="btn-sm btn-green" style="padding:6px 12px;font-size:11px" onclick="openRecordPayment(${r.id},'${esc(r.name)}')">
+                <i class="fas fa-plus"></i> Record
+              </button>
+            </td>
+          </tr>
+        `).join('')}</tbody>
+      </table>`;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openRecordPayment(userId, name) {
+  showModal('Record Payment — ' + name, `
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Payment Type</label>
+        <select id="payType" onchange="updateAmount()">
+          <option value="monthly">Monthly (₦1,200)</option>
+          <option value="annual">Annual (₦12,000)</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Amount (₦)</label>
+        <input type="number" id="payAmount" value="1200" min="1200"/>
+      </div>
+      <div class="form-field form-full">
+        <label>Notes (optional)</label>
+        <textarea id="payNotes" rows="2" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-green" onclick="recordPayment(${userId})"><i class="fas fa-check"></i> Record Payment</button>
+    </div>
+  `);
+}
+function updateAmount() {
+  const t = document.getElementById('payType').value;
+  document.getElementById('payAmount').value = t === 'annual' ? 12000 : 1200;
+}
+async function recordPayment(userId) {
+  try {
+    await api('dues', 'record', 'POST', {
+      user_id: userId,
+      amount:  parseFloat(document.getElementById('payAmount').value),
+      type:    document.getElementById('payType').value,
+      notes:   document.getElementById('payNotes').value,
+    });
+    closeModal(); showToast('Payment recorded', 'success');
+    loadDues(); loadDuesStats();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PENDING APPROVALS
+// ═══════════════════════════════════════════════════════════
+async function loadPendingApprovals() {
+  document.getElementById('pendingTable').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const rows = await api('members', 'pending');
+    _pendingCount = rows.length;
+    const badge = document.getElementById('pendingBadge');
+    if (badge) { badge.textContent = _pendingCount; badge.style.display = _pendingCount ? 'inline' : 'none'; }
+    if (!rows.length) {
+      document.getElementById('pendingTable').innerHTML = '<div class="empty-state"><i class="fas fa-check-double"></i><h3>All clear!</h3><p>No pending approvals.</p></div>';
+      return;
+    }
+    document.getElementById('pendingTable').innerHTML = `
+      <table>
+        <thead><tr><th>Member</th><th>State</th><th>Registered</th><th>Payment Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows.map(m => `
+          <tr>
+            <td>
+              <div style="font-weight:600">${esc(m.name)}</div>
+              <div style="font-size:11px;color:var(--gray-500)">${esc(m.email)}</div>
+            </td>
+            <td style="font-size:12px">${esc(m.state)}</td>
+            <td style="font-size:11px;color:var(--gray-500)">${fmtDate(m.join_date)}
+              ${m.payment_initiated_at ? `<div style="color:var(--amber)">💳 ${fmtDate(m.payment_initiated_at)}</div>` : ''}
+            </td>
+            <td>
+              ${m.flw_status === 'pending'  ? '<span class="badge badge-yellow">⏳ Payment Initiated</span>' :
+                m.flw_status === 'failed'   ? '<span class="badge badge-red">❌ Payment Failed</span>' :
+                '<span class="badge badge-gray">📝 No Payment Yet</span>'}
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn-sm btn-green" style="padding:6px 12px;font-size:11px" onclick="approvePayment(${m.id})">
+                  <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-sm btn-red" style="padding:6px 10px;font-size:11px" onclick="rejectMember(${m.id},'${esc(m.name)}')">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}</tbody>
+      </table>`;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function refreshPendingBadge() {
+  if (!['admin', 'executive'].includes(CURRENT_USER?.role)) return;
+  try {
+    const rows = await api('members', 'pending');
+    _pendingCount = rows.length;
+    const badge = document.getElementById('pendingBadge');
+    if (badge) { badge.textContent = _pendingCount; badge.style.display = _pendingCount ? 'inline' : 'none'; }
+  } catch {}
+}
+
+function approvePayment(id) {
+  showModal('Approve Membership', `
+    <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Select the payment plan to record:</p>
+    <select id="approveType" style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:12px">
+      <option value="monthly">Monthly — ₦1,200</option>
+      <option value="annual">Annual — ₦12,000</option>
+    </select>
+    <div class="form-field">
+      <label>Notes (optional)</label>
+      <input id="approveNotes" placeholder="e.g. Bank transfer verified"/>
+    </div>
+    <div class="form-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-green" onclick="doApprove(${id})"><i class="fas fa-check"></i> Activate Membership</button>
+    </div>
+  `);
+}
+
+async function doApprove(id) {
+  try {
+    await api('members', 'approve_payment', 'POST', {
+      id,
+      payment_type: document.getElementById('approveType').value,
+      notes:        document.getElementById('approveNotes').value,
+    });
+    closeModal(); showToast('Membership activated!', 'success');
+    loadPendingApprovals(); loadDashboard();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function rejectMember(id, name) {
+  if (!confirm(`Reject and remove ${name}? This cannot be undone.`)) return;
+  try {
+    await api('members', 'reject', 'POST', { id });
+    showToast('Member rejected', 'warning');
+    loadPendingApprovals();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COURSES (admin)
+// ═══════════════════════════════════════════════════════════
+async function loadAdminCourses() {
+  document.getElementById('adminCoursesList').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const courses = await api('courses', 'list');
+    if (!courses.length) {
+      document.getElementById('adminCoursesList').innerHTML = '<div class="empty-state"><i class="fas fa-graduation-cap"></i><h3>No courses yet</h3><p>Add your first course.</p></div>';
+      return;
+    }
+    document.getElementById('adminCoursesList').innerHTML = courses.map(c => `
+      <div class="course-card">
+        <div class="course-thumb" style="background:linear-gradient(135deg,var(--green),var(--green-mid))">${c.emoji || '📚'}</div>
+        <div class="course-info">
+          <div class="course-title">${esc(c.title)}</div>
+          <div class="course-meta">
+            <span><i class="fas fa-layer-group"></i> ${c.modules} modules</span>
+            <span><i class="fas fa-clock"></i> ${esc(c.duration || '—')}</span>
+            <span><i class="fas fa-signal"></i> ${esc(c.level)}</span>
+          </div>
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:12px">
+            👥 ${c.enrolled} enrolled · ✅ ${c.completed_count} completed
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-sm ${c.active ? 'btn-outline' : 'btn-green'}" style="padding:6px 12px;font-size:11px" onclick="toggleCourse(${c.id})">
+              ${c.active ? '<i class="fas fa-eye-slash"></i> Deactivate' : '<i class="fas fa-eye"></i> Activate'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openAddCourse() {
+  showModal('Add New Course', `
+    <div class="form-grid">
+      <div class="form-field form-full"><label>Title</label><input id="cTitle" placeholder="e.g. Health Records Management Fundamentals"/></div>
+      <div class="form-field"><label>Emoji Icon</label><input id="cEmoji" value="📚" placeholder="📚"/></div>
+      <div class="form-field"><label>Level</label>
+        <select id="cLevel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+      </div>
+      <div class="form-field"><label>Modules</label><input type="number" id="cModules" value="8" min="1"/></div>
+      <div class="form-field"><label>Duration</label><input id="cDuration" placeholder="e.g. 6 weeks"/></div>
+      <div class="form-field form-full"><label>Certificate Title</label><input id="cCert" placeholder="e.g. Certified HRM Professional"/></div>
+      <div class="form-field form-full"><label>Description</label><textarea id="cDesc" rows="3" style="resize:vertical"></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-green" onclick="addCourse()"><i class="fas fa-plus"></i> Add Course</button>
+    </div>
+  `);
+}
+
+async function addCourse() {
+  try {
+    const r = await api('courses', 'add', 'POST', {
+      title:       document.getElementById('cTitle').value.trim(),
+      emoji:       document.getElementById('cEmoji').value.trim(),
+      level:       document.getElementById('cLevel').value,
+      modules:     document.getElementById('cModules').value,
+      duration:    document.getElementById('cDuration').value.trim(),
+      cert_title:  document.getElementById('cCert').value.trim(),
+      description: document.getElementById('cDesc').value.trim(),
+    });
+    closeModal(); showToast('Course added', 'success'); loadAdminCourses();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function toggleCourse(id) {
+  try {
+    await api('courses', 'toggle', 'POST', { id });
+    loadAdminCourses();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EVENTS (admin)
+// ═══════════════════════════════════════════════════════════
+async function loadAdminEvents() {
+  document.getElementById('eventsAdminList').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const events = await api('events', 'list');
+    if (!events.length) {
+      document.getElementById('eventsAdminList').innerHTML = '<div class="empty-state"><i class="fas fa-calendar-xmark"></i><h3>No events yet</h3><p>Add your first event.</p></div>';
+      return;
+    }
+    document.getElementById('eventsAdminList').innerHTML = events.map(e => `
+      <div class="content-block">
+        <div style="font-size:28px;flex-shrink:0">${e.image_url ? '' : '📅'}</div>
+        <div class="content-block-body">
+          <div class="content-block-title">${esc(e.title)}</div>
+          <div class="content-block-meta">
+            ${fmtDate(e.start_date)} ${e.venue ? '· ' + esc(e.venue) : ''} · <span class="badge badge-${e.status === 'Upcoming' ? 'blue' : 'gray'}">${esc(e.status)}</span>
+          </div>
+        </div>
+        <div class="content-block-actions">
+          <button class="icon-btn" onclick="openEditEvent(${e.id},'${esc(e.title)}')"><i class="fas fa-pen"></i></button>
+          <button class="icon-btn danger" onclick="deleteEvent(${e.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+  } catch(ex) { showToast(ex.message, 'error'); }
+}
+
+function openAddEvent() {
+  showModal('Add New Event', eventForm());
+}
+
+function openEditEvent(id, title) {
+  showModal('Edit Event — ' + title, eventForm(id));
+}
+
+function eventForm(id = null) {
+  return `
+    <div class="form-grid">
+      <div class="form-field form-full"><label>Title</label><input id="evTitle" placeholder="Event title"/></div>
+      <div class="form-field"><label>Start Date</label><input type="datetime-local" id="evStart"/></div>
+      <div class="form-field"><label>End Date</label><input type="datetime-local" id="evEnd"/></div>
+      <div class="form-field form-full"><label>Venue</label><input id="evVenue" placeholder="City, Hall/Hotel"/></div>
+      <div class="form-field"><label>Type</label>
+        <select id="evType"><option>Conference</option><option>Workshop</option><option>Seminar</option><option>AGM</option><option>Training</option></select>
+      </div>
+      <div class="form-field"><label>Status</label>
+        <select id="evStatus"><option>Upcoming</option><option>Ongoing</option><option>Completed</option><option>Cancelled</option></select>
+      </div>
+      <div class="form-field form-full"><label>Registration Link</label><input id="evLink" placeholder="https://..."/></div>
+      <div class="form-field form-full"><label>Description</label><textarea id="evDesc" rows="3" style="resize:vertical"></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm btn-green" onclick="saveEvent(${id})"><i class="fas fa-save"></i> ${id ? 'Update' : 'Create'} Event</button>
+    </div>`;
+}
+
+async function saveEvent(id) {
+  const b = {
+    title:       document.getElementById('evTitle').value.trim(),
+    start_date:  document.getElementById('evStart').value,
+    end_date:    document.getElementById('evEnd').value,
+    venue:       document.getElementById('evVenue').value.trim(),
+    event_type:  document.getElementById('evType').value,
+    status:      document.getElementById('evStatus').value,
+    reg_link:    document.getElementById('evLink').value.trim(),
+    description: document.getElementById('evDesc').value.trim(),
+  };
+  if (!b.title) { showToast('Title is required', 'error'); return; }
+  try {
+    await api('events', id ? 'update&id=' + id : 'create', id ? 'PUT' : 'POST', b);
+    closeModal(); showToast(id ? 'Event updated' : 'Event created', 'success');
+    loadAdminEvents();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteEvent(id) {
+  if (!confirm('Delete this event?')) return;
+  try {
+    await fetch(`${API}/events.php?id=${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    loadAdminEvents(); showToast('Event deleted', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACCESS CONTROL
+// ═══════════════════════════════════════════════════════════
+function loadAccessControl() {
+  const perms = [
+    ['View all members',     '✅', '✅', '❌'],
+    ['Edit member data',     '✅', '❌', '❌'],
+    ['Record dues payments', '✅', '✅', '❌'],
+    ['Approve new members',  '✅', '✅', '❌'],
+    ['Manage courses',       '✅', '❌', '❌'],
+    ['Manage events',        '✅', '✅', '❌'],
+    ['Edit website content', '✅', '❌', '❌'],
+    ['Manage roles',         '✅', '❌', '❌'],
+    ['View own profile',     '✅', '✅', '✅'],
+    ['View own dues',        '✅', '✅', '✅'],
+    ['Access courses',       '✅', '✅', '✅'],
+  ];
+  document.getElementById('permMatrix').innerHTML = perms.map(([p, a, e, m]) => `
+    <tr><td style="font-size:12px">${p}</td><td style="text-align:center">${a}</td><td style="text-align:center">${e}</td><td style="text-align:center">${m}</td></tr>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  WEBSITE CONTROL
+// ═══════════════════════════════════════════════════════════
+function loadWebsiteControl() {
+  document.getElementById('tickerPreview').innerHTML        = '<p class="preview-note">No ticker content configured</p>';
+  document.getElementById('heroPreview').innerHTML          = '<p class="preview-note">Edit hero section headline and subtitle</p>';
+  document.getElementById('announcementsPreview').innerHTML = '<p class="preview-note">No announcements yet</p>';
+  document.getElementById('certPreview').innerHTML          = '<p class="preview-note">CHRIMS, AHRIM certifications</p>';
+  renderNewsStoriesList();
+}
+function editTicker()       { showModal('Edit Ticker',       '<p class="preview-note">Ticker edit coming soon.</p>'); }
+function editHero()         { showModal('Edit Hero',         '<p class="preview-note">Hero edit coming soon.</p>'); }
+function editAnnouncement() { showModal('Add Announcement',  '<p class="preview-note">Announcements coming soon.</p>'); }
+
+// ═══════════════════════════════════════════════════════════
+//  TRENDING NEWS MANAGER  (database-backed via api/news.php)
+// ═══════════════════════════════════════════════════════════
+const NEWS_CATEGORIES = ['Policy','Conference','Training','Certification','Announcement','Research','Award'];
+
+async function renderNewsStoriesList() {
+  const el = document.getElementById('newsStoriesList');
+  if (!el) return;
+  el.innerHTML = '<p style="color:var(--gray-400);font-size:13px;">Loading…</p>';
+
+  let stories = [];
+  try {
+    stories = await api('news', 'list');
+  } catch(e) {
+    el.innerHTML = `<p style="color:#ef4444;font-size:13px;">Failed to load: ${e.message}</p>`;
+    return;
+  }
+
+  const featured = stories.find(s => s.featured);
+  const sidebar  = stories.filter(s => !s.featured);
+
+  function thumbHTML(s) {
+    if (!s.image || s.image === '1.jpg') return '';
+    if (s.media_type === 'video') {
+      return `<div class="news-manager-thumb-video">▶</div>`;
+    }
+    const src = s.image.startsWith('/') ? s.image : `/uploads/${s.image}`;
+    return `<img class="news-manager-thumb" src="${src}" alt="" onerror="this.style.display='none'">`;
+  }
+
+  el.innerHTML = `
+    <p class="news-manager-label">Featured Story</p>
+    ${featured ? `
+      <div class="news-manager-row news-manager-featured">
+        ${thumbHTML(featured)}
+        <div class="news-manager-info">
+          <span class="news-cat-badge">${esc(featured.category)}</span>
+          <strong>${esc(featured.title)}</strong>
+          <span class="news-manager-date">${esc(featured.date_label || '')}</span>
+        </div>
+        <div class="news-manager-actions">
+          <button class="btn-sm btn-outline" onclick="openEditNewsStory(${featured.id})"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-sm btn-red" onclick="deleteNewsStory(${featured.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>` : `<p class="preview-note" style="font-size:13px;color:var(--gray-400);margin-bottom:12px;">No featured story set.</p>`}
+
+    <p class="news-manager-label news-manager-label-spaced">Sidebar Stories (${sidebar.length})</p>
+    ${sidebar.length === 0 ? `<p style="font-size:13px;color:var(--gray-400);">No sidebar stories yet.</p>` : ''}
+    ${sidebar.map(s => `
+      <div class="news-manager-row">
+        ${thumbHTML(s)}
+        <div class="news-manager-info">
+          <span class="news-cat-badge">${esc(s.category)}</span>
+          <strong>${esc(s.title)}</strong>
+          <span class="news-manager-date">${esc(s.date_label || '')}</span>
+        </div>
+        <div class="news-manager-actions">
+          <button class="btn-sm btn-outline" onclick="openEditNewsStory(${s.id})"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-sm btn-red" onclick="deleteNewsStory(${s.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`).join('')}
+  `;
+}
+
+
+// Cache fetched story for edit modal (avoids a second API call)
+let _newsDraft = {};
+
+function openAddNewsStory() {
+  _newsDraft = {};
+  showModal('Add News Story', newsStoryForm(null));
+}
+
+async function openEditNewsStory(id) {
+  // Re-fetch list to get fresh data
+  let story = null;
+  try {
+    const list = await api('news', 'list');
+    story = list.find(s => s.id === id) || null;
+  } catch(e) { showAdminToast('Could not load story: ' + e.message); return; }
+  _newsDraft = story || {};
+  showModal('Edit News Story', newsStoryForm(story));
+}
+
+function newsStoryForm(story) {
+  const cats = NEWS_CATEGORIES.map(c =>
+    `<option value="${c}" ${story && story.category === c ? 'selected' : ''}>${c}</option>`
+  ).join('');
+
+  const hasUploadedMedia = story && story.image && story.image.startsWith('/uploads/');
+  const isVideo = story && story.media_type === 'video';
+  const mediaUrl = hasUploadedMedia ? story.image : '';
+
+  let previewHTML = '';
+  if (mediaUrl) {
+    if (isVideo) {
+      previewHTML = `
+        <div class="nf-preview-wrap" id="nf-preview-wrap">
+          <video src="${mediaUrl}" controls style="max-width:100%;max-height:180px;border-radius:8px;"></video>
+          <button class="nf-preview-remove" onclick="nfClearMedia()" title="Remove">✕</button>
+        </div>`;
+    } else {
+      previewHTML = `
+        <div class="nf-preview-wrap" id="nf-preview-wrap">
+          <img src="${mediaUrl}" alt="preview">
+          <button class="nf-preview-remove" onclick="nfClearMedia()" title="Remove">✕</button>
+        </div>`;
+    }
+  }
+
+  return `
+    <div class="news-form">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="nf-category" class="form-input">${cats}</select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input id="nf-date" class="form-input" type="text"
+            placeholder="e.g. April 8, 2026"
+            value="${story ? esc(story.date_label || '') : ''}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Headline <span style="color:#ef4444">*</span></label>
+        <textarea id="nf-title" class="form-input" rows="2"
+          placeholder="Story headline…">${story ? esc(story.title) : ''}</textarea>
+      </div>
+
+      <!-- Media Upload -->
+      <div class="form-group">
+        <label class="form-label" style="margin-bottom:8px;">
+          📎 Media
+          <span style="font-weight:400;color:var(--gray-500);font-size:11px;margin-left:6px;">
+            Images up to 10 MB · Videos up to 100 MB
+          </span>
+        </label>
+
+        <div id="nf-preview-container">
+          ${previewHTML || `
+          <div class="nf-upload-zone" id="nf-upload-zone"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="nfHandleDrop(event)">
+            <input type="file" id="nf-file-input" accept="image/*,video/*" onchange="nfHandleFile(this.files[0])">
+            <div class="nf-upload-icon">🖼️</div>
+            <div style="font-size:13px;font-weight:600;">Click or drag & drop</div>
+            <div class="nf-upload-hint">
+              <strong>Images:</strong> JPEG, PNG, GIF, WEBP &nbsp;·&nbsp;
+              <strong>Video:</strong> MP4, WEBM, MOV
+            </div>
+          </div>
+          <div class="nf-progress-wrap" id="nf-progress-wrap" style="display:none;">
+            <div class="nf-progress-bar" id="nf-progress-bar"></div>
+          </div>
+          <div id="nf-upload-status" style="font-size:12px;color:var(--gray-500);margin-top:4px;"></div>
+          `}
+        </div>
+
+        <div class="nf-media-or" style="margin:10px 0;">or use a URL</div>
+
+        <input id="nf-image-url" class="form-input" type="text"
+          placeholder="https://… or leave blank if uploaded above"
+          value="${!hasUploadedMedia && story && story.image && story.image !== '1.jpg' ? esc(story.image) : ''}">
+        <input type="hidden" id="nf-image" value="${story ? esc(story.image || '') : ''}">
+        <input type="hidden" id="nf-media-type" value="${story ? esc(story.media_type || 'image') : 'image'}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Link URL <span style="font-weight:400;color:var(--gray-500);font-size:11px;">(optional)</span></label>
+        <input id="nf-url" class="form-input" type="url"
+          placeholder="https://…"
+          value="${story ? esc(story.url || '') : ''}">
+      </div>
+
+      <div style="background:var(--gray-50,#f9fafb);border:1px solid var(--gray-200,#e5e7eb);border-radius:8px;padding:14px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;">
+          <input type="checkbox" id="nf-featured" ${story && story.featured ? 'checked' : ''}
+            style="width:16px;height:16px;accent-color:#f59e0b;">
+          <span>⭐ Set as Featured Story</span>
+          <span style="font-weight:400;color:var(--gray-500);font-size:11px;">(replaces current featured)</span>
+        </label>
+
+        <div id="nf-featured-fields" style="${story && story.featured ? '' : 'display:none;'}margin-top:14px;display:${story && story.featured ? 'flex' : 'none'};flex-direction:column;gap:12px;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Excerpt</label>
+            <textarea id="nf-excerpt" class="form-input" rows="3"
+              placeholder="Short description shown on homepage…">${story && story.excerpt ? esc(story.excerpt) : ''}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:4px;">
+        <button type="button" class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn-sm btn-green" id="nf-save-btn"
+          onclick="saveNewsStoryForm(${story ? story.id : 'null'})">
+          <i class="fas fa-save"></i> Save Story
+        </button>
+      </div>
+
+    </div>
+    <script>
+      document.getElementById('nf-featured').addEventListener('change', function() {
+        document.getElementById('nf-featured-fields').style.display = this.checked ? 'flex' : 'none';
+      });
+    <\/script>
+  `;
+}
+
+function nfHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('nf-upload-zone')?.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) nfHandleFile(file);
+}
+
+async function nfHandleFile(file) {
+  if (!file) return;
+
+  const isVideo = file.type.startsWith('video/');
+  const maxBytes = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
+  const maxLabel = isVideo ? '100 MB' : '10 MB';
+
+  if (file.size > maxBytes) {
+    alert(`File too large. Maximum size for ${isVideo ? 'videos' : 'images'} is ${maxLabel}.`);
+    return;
+  }
+
+  // Show progress
+  const progressWrap = document.getElementById('nf-progress-wrap');
+  const progressBar  = document.getElementById('nf-progress-bar');
+  const statusEl     = document.getElementById('nf-upload-status');
+  if (progressWrap) progressWrap.style.display = 'block';
+  if (statusEl) statusEl.textContent = 'Uploading…';
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${API}/news.php?action=upload`);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + TOKEN);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && progressBar) {
+        progressBar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+      }
+    };
+
+    const result = await new Promise((resolve, reject) => {
+      xhr.onload = () => {
+        try { resolve(JSON.parse(xhr.responseText)); }
+        catch { reject(new Error('Invalid server response')); }
+      };
+      xhr.onerror = () => reject(new Error('Network error'));
+      xhr.send(formData);
+    });
+
+    if (!result.success) throw new Error(result.message || 'Upload failed');
+
+    // Store values
+    document.getElementById('nf-image').value      = result.data.url;
+    document.getElementById('nf-media-type').value = result.data.media_type;
+
+    // Show preview
+    const container = document.getElementById('nf-preview-container');
+    if (container) {
+      if (result.data.media_type === 'video') {
+        container.innerHTML = `
+          <div class="nf-preview-wrap" id="nf-preview-wrap">
+            <video src="${result.data.url}" controls style="max-width:100%;max-height:180px;border-radius:8px;"></video>
+            <button class="nf-preview-remove" onclick="nfClearMedia()" title="Remove">✕</button>
+          </div>`;
+      } else {
+        container.innerHTML = `
+          <div class="nf-preview-wrap" id="nf-preview-wrap">
+            <img src="${result.data.url}" alt="preview" style="max-width:100%;max-height:180px;border-radius:8px;">
+            <button class="nf-preview-remove" onclick="nfClearMedia()" title="Remove">✕</button>
+          </div>`;
+      }
+    }
+
+    if (statusEl) statusEl.textContent = '✓ Uploaded successfully';
+
+  } catch (err) {
+    if (progressWrap) progressWrap.style.display = 'none';
+    if (statusEl) statusEl.textContent = '✗ ' + err.message;
+    alert('Upload failed: ' + err.message);
+  }
+}
+
+
+function nfClearMedia() {
+  document.getElementById('nf-image').value = '';
+  document.getElementById('nf-media-type').value = 'image';
+  const container = document.getElementById('nf-preview-container');
+  if (container) {
+    container.innerHTML = `
+      <div class="nf-upload-zone" id="nf-upload-zone"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="nfHandleDrop(event)">
+        <input type="file" id="nf-file-input" accept="image/*,video/*" onchange="nfHandleFile(this.files[0])">
+        <div class="nf-upload-icon">🖼️</div>
+        <div style="font-size:13px;font-weight:600;">Click or drag & drop</div>
+        <div class="nf-upload-hint">
+          <strong>Images:</strong> JPEG, PNG, GIF, WEBP &nbsp;·&nbsp;
+          <strong>Video:</strong> MP4, WEBM, MOV
+        </div>
+      </div>
+      <div class="nf-progress-wrap" id="nf-progress-wrap" style="display:none;">
+        <div class="nf-progress-bar" id="nf-progress-bar"></div>
+      </div>
+      <div id="nf-upload-status" style="font-size:12px;color:var(--gray-500);margin-top:4px;"></div>`;
+  }
+}
+
+
+async function saveNewsStoryForm(existingId) {
+  const title      = document.getElementById('nf-title').value.trim();
+  const category   = document.getElementById('nf-category').value;
+  const date       = document.getElementById('nf-date').value.trim();
+  const url        = document.getElementById('nf-url').value.trim();
+  const featured   = document.getElementById('nf-featured').checked;
+  const excerpt    = featured ? (document.getElementById('nf-excerpt')?.value.trim() || '') : '';
+  const mediaType  = document.getElementById('nf-media-type')?.value || 'image';
+
+  // Image: prefer uploaded file, fall back to manual URL input
+  let image = document.getElementById('nf-image')?.value.trim() || '';
+  if (!image) image = document.getElementById('nf-image-url')?.value.trim() || '1.jpg';
+
+  if (!title) { alert('Headline is required.'); return; }
+
+  const saveBtn = document.getElementById('nf-save-btn');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…'; }
+
+  try {
+    await api('news', 'save', 'POST', {
+      id: existingId !== null ? existingId : undefined,
+      category, title, date, url, featured, excerpt, image, media_type: mediaType
+    });
+    closeModal();
+    renderNewsStoriesList();
+    showAdminToast('Story saved — homepage updated.');
+  } catch(e) {
+    showAdminToast('Error: ' + e.message);
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Story'; }
+  }
+}
+
+async function deleteNewsStory(id) {
+  if (!confirm('Delete this story?')) return;
+  try {
+    await api('news', 'delete', 'POST', { id });
+    renderNewsStoriesList();
+    showAdminToast('Story deleted.');
+  } catch(e) { showAdminToast('Error: ' + e.message); }
+}
+
+function showAdminToast(msg) {
+  let t = document.getElementById('adminToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'adminToast';
+    t.className = 'admin-toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MEMBER DASHBOARD
+// ═══════════════════════════════════════════════════════════
+async function loadMemberDashboard() {
+  try {
+    const me = await api('members', 'get&id=' + CURRENT_USER.id);
+    const d  = me.dues;
+    document.getElementById('memberDashboard').innerHTML = `
+      <div class="member-hero">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;font-family:'Fraunces',serif;flex-shrink:0">
+            ${me.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700">Welcome back, ${esc(me.name.split(' ')[0])}!</div>
+            <div style="font-size:12px;opacity:.8;margin-top:4px">${esc(me.member_id)} · ${esc(me.state)}</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px">
+          <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:18px;font-weight:700;font-family:'Fraunces',serif">${d.monthsPaid}</div>
+            <div style="font-size:10px;opacity:.7;margin-top:2px">Months Paid</div>
+          </div>
+          <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:18px;font-weight:700;font-family:'Fraunces',serif">₦${fmtNum(d.totalPaid)}</div>
+            <div style="font-size:10px;opacity:.7;margin-top:2px">Total Paid</div>
+          </div>
+          <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:18px;font-weight:700;font-family:'Fraunces',serif">${d.status === 'pending' ? '—' : d.arrearMonths}</div>
+            <div style="font-size:10px;opacity:.7;margin-top:2px">Months in Arrears</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+        <div class="card" onclick="navigate('my-dues')" style="cursor:pointer">
+          <div class="card-body" style="text-align:center;padding:24px">
+            <div style="font-size:36px;margin-bottom:8px">💳</div>
+            <div style="font-size:14px;font-weight:700">My Dues</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:4px">₦${fmtNum(d.arrearAmount)} owed</div>
+          </div>
+        </div>
+        <div class="card" onclick="navigate('my-courses')" style="cursor:pointer">
+          <div class="card-body" style="text-align:center;padding:24px">
+            <div style="font-size:36px;margin-bottom:8px">📚</div>
+            <div style="font-size:14px;font-weight:700">My Courses</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Continue learning</div>
+          </div>
+        </div>
+        <div class="card" onclick="navigate('id-card')" style="cursor:pointer">
+          <div class="card-body" style="text-align:center;padding:24px">
+            <div style="font-size:36px;margin-bottom:8px">🪪</div>
+            <div style="font-size:14px;font-weight:700">My ID Card</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:4px">View & download</div>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MY DUES
+// ═══════════════════════════════════════════════════════════
+async function loadMyDues() {
+  document.getElementById('myDuesPanel').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const data = await api('dues', 'mine');
+    const d    = data.dues;
+    const statusColor = d.status === 'paid' ? 'var(--green)' : d.status === 'partial' ? 'var(--amber)' : d.status === 'overdue' ? 'var(--red)' : 'var(--gray-500)';
+    document.getElementById('myDuesPanel').innerHTML = `
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:20px">
+            <div style="text-align:center;padding:16px;background:var(--green-pale);border-radius:12px">
+              <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--green)">₦${fmtNum(d.totalPaid)}</div>
+              <div style="font-size:11px;color:var(--gray-500);margin-top:4px">Total Paid</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:${d.arrearAmount ? 'var(--red-pale)' : 'var(--green-pale)'};border-radius:12px">
+              <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:${statusColor}">₦${fmtNum(d.arrearAmount)}</div>
+              <div style="font-size:11px;color:var(--gray-500);margin-top:4px">Arrears</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:var(--gray-50);border-radius:12px">
+              <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--dark)">${d.pct}%</div>
+              <div style="font-size:11px;color:var(--gray-500);margin-top:4px">Up to Date</div>
+            </div>
+          </div>
+          <div style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;font-weight:600">Payment Progress</span>
+            <span class="badge ${duesBadgeClass(d.status)}">${duesLabel(d.status)}</span>
+          </div>
+          <div class="dues-bar-wrap" style="height:10px">
+            <div class="dues-bar dues-${d.status}" style="width:${d.pct}%"></div>
+          </div>
+          ${d.status !== 'paid' && d.status !== 'pending' ? `
+            <div style="margin-top:16px;text-align:center">
+              <button class="btn-sm btn-green" onclick="showPaymentInstructions()">
+                <i class="fas fa-credit-card"></i> Pay Now via Flutterwave
+              </button>
+            </div>` : ''}
+        </div>
+      </div>
+      ${data.payment_history?.length ? `
+        <div class="card">
+          <div class="card-header"><span class="card-title">Payment History</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Amount</th><th>Type</th><th>Months</th></tr></thead>
+              <tbody>${data.payment_history.map(p => `
+                <tr>
+                  <td style="font-size:12px">${fmtDate(p.paid_at)}</td>
+                  <td style="font-weight:600">₦${fmtNum(p.amount)}</td>
+                  <td><span class="badge badge-blue">${p.payment_type}</span></td>
+                  <td style="font-size:12px">${p.months_count} month${p.months_count > 1 ? 's' : ''}</td>
+                </tr>
+              `).join('')}</tbody>
+            </table>
+          </div>
+        </div>` : ''}
+    `;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MY COURSES
+// ═══════════════════════════════════════════════════════════
+async function loadMyCourses() {
+  document.getElementById('myCoursesList').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const courses = await api('courses', 'mine');
+    if (!courses.length) {
+      document.getElementById('myCoursesList').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-book-open"></i><h3>No courses available</h3><p>Check back soon for courses.</p></div>';
+      return;
+    }
+    document.getElementById('myCoursesList').innerHTML = courses.map(c => `
+      <div class="course-card">
+        <div class="course-thumb">${c.emoji || '📚'}</div>
+        <div class="course-info">
+          <div class="course-title">${esc(c.title)}</div>
+          <div class="course-meta">
+            <span><i class="fas fa-layer-group"></i> ${c.modules} modules</span>
+            <span><i class="fas fa-signal"></i> ${esc(c.level)}</span>
+          </div>
+          ${c.progress !== null ? `
+            <div class="progress-bar"><div class="progress-fill" style="width:${c.progress}%"></div></div>
+            <div style="font-size:11px;color:var(--gray-500);margin-bottom:10px">${c.progress}% complete</div>
+          ` : '<div style="font-size:11px;color:var(--gray-500);margin-bottom:10px">Not started</div>'}
+          ${c.completed ? `
+            <div style="background:var(--green-pale);color:var(--green);font-size:11px;font-weight:700;padding:8px;border-radius:8px;text-align:center">
+              🏆 Completed — ${fmtDate(c.completed_date)}
+            </div>
+          ` : (c.progress !== null ? `
+            <button class="btn-sm btn-green" style="width:100%;justify-content:center" onclick="updateProgress(${c.id})">
+              <i class="fas fa-play"></i> Continue
+            </button>
+          ` : `
+            <button class="btn-sm btn-outline" style="width:100%;justify-content:center" onclick="enrollCourse(${c.id})">
+              <i class="fas fa-plus"></i> Enroll
+            </button>
+          `)}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function enrollCourse(id) {
+  try {
+    await api('courses', 'enroll', 'POST', { course_id: id });
+    showToast('Enrolled!', 'success'); loadMyCourses();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function updateProgress(id) {
+  try {
+    const r = await api('courses', 'progress', 'POST', { course_id: id, add: 20 });
+    showToast(r.message || 'Progress updated', 'success'); loadMyCourses();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CERTS
+// ═══════════════════════════════════════════════════════════
+async function loadMyCerts() {
+  try {
+    const courses = await api('courses', 'mine');
+    const completed = courses.filter(c => c.completed);
+    if (!completed.length) {
+      document.getElementById('myCertsPanel').innerHTML = '<div class="empty-state"><i class="fas fa-certificate"></i><h3>No certifications yet</h3><p>Complete a course to earn your first certificate.</p></div>';
+      return;
+    }
+    document.getElementById('myCertsPanel').innerHTML = completed.map(c => `
+      <div style="background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden">
+        <div style="position:absolute;right:20px;top:20px;font-size:40px;opacity:.15">🏆</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.7;text-transform:uppercase;margin-bottom:8px">Certificate of Completion</div>
+        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:4px">${esc(c.cert_title || c.title)}</div>
+        <div style="font-size:12px;opacity:.7">Awarded ${fmtDate(c.completed_date)} · AHRIMPN</div>
+      </div>
+    `).join('');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ID CARD
+// ═══════════════════════════════════════════════════════════
+async function loadIdCard() {
+  try {
+    const me = await api('members', 'get&id=' + CURRENT_USER.id);
+    document.getElementById('idCardPanel').innerHTML = `
+      <div class="id-card-wrap">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <div style="width:50px;height:50px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px">🏥</div>
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:13px;font-weight:700;color:var(--green)">AHRIMPN</div>
+            <div style="font-size:9px;color:var(--gray-500);line-height:1.3">Association of Health Records &<br>Information Management Professionals</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:700;font-family:'Fraunces',serif;flex-shrink:0">
+            ${me.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--dark)">${esc(me.name)}</div>
+            <div style="font-size:11px;color:var(--gray-500)">${esc(me.state)} · ${esc(me.workplace || '—')}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+          <div style="background:var(--green-pale);border-radius:8px;padding:10px">
+            <div style="font-size:9px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px">Member ID</div>
+            <div style="font-size:14px;font-weight:700;color:var(--green)">${esc(me.member_id)}</div>
+          </div>
+          <div style="background:var(--green-pale);border-radius:8px;padding:10px">
+            <div style="font-size:9px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px">Member Since</div>
+            <div style="font-size:14px;font-weight:700;color:var(--green)">${fmtDate(me.join_date)}</div>
+          </div>
+        </div>
+        <div style="border-top:2px solid var(--green);padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <span class="badge ${me.active ? 'badge-green' : 'badge-yellow'}" style="font-size:12px">
+            ${me.active ? '✓ Active Member' : '⏳ Pending Activation'}
+          </span>
+          <button class="btn-sm btn-outline" style="padding:6px 14px;font-size:11px" onclick="window.print()">
+            <i class="fas fa-print"></i> Print
+          </button>
+        </div>
+      </div>
+    `;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PAYMENT — REGISTRATION FLOW (Flutterwave)
+// ═══════════════════════════════════════════════════════════
+function showRegistrationPaymentStep() {
+  const overlay = document.createElement('div');
+  overlay.id = 'paymentScreen';
+  overlay.innerHTML = `
+    <div class="payment-card">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-mid));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:30px">🏥</div>
+        <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--green);margin-bottom:6px">Account Created! ✅</h2>
+        <p style="font-size:13px;color:var(--gray-500)">Welcome, ${esc(CURRENT_USER.name)}. Choose a plan to activate your membership.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div class="plan-option selected" id="plan-monthly" onclick="selectPaymentPlan('monthly')">
+          <div style="font-size:22px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦1,200</div>
+          <div style="font-size:13px;font-weight:600;color:var(--gray-700);margin-top:4px">Monthly</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Billed monthly</div>
+        </div>
+        <div class="plan-option" id="plan-annual" onclick="selectPaymentPlan('annual')" style="position:relative">
+          <div class="plan-badge">SAVE ₦2,400</div>
+          <div style="font-size:22px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦12,000</div>
+          <div style="font-size:13px;font-weight:600;color:var(--gray-700);margin-top:4px">Annual</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px">12 months upfront</div>
+        </div>
+      </div>
+      <div id="payStatus" style="display:none;margin-bottom:14px;padding:12px;border-radius:8px;font-size:13px;text-align:center;font-weight:600"></div>
+      <button id="payNowBtn" onclick="initiateFlutterwavePayment()"
+        style="width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s">
+        <i class="fas fa-lock"></i> Pay with Flutterwave
+      </button>
+      <p style="text-align:center;font-size:11px;color:var(--gray-500);margin-top:10px">
+        Secured by Flutterwave · Card · Bank Transfer · USSD
+      </p>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);text-align:center">
+        <button onclick="proceedToPendingPortal()"
+          style="background:none;border:none;font-size:12px;color:var(--gray-500);cursor:pointer;text-decoration:underline">
+          Pay later — enter portal (membership pending)
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  window._selectedPlan = 'monthly';
+}
+
+// FIX: Define this function — was called but never existed
+function proceedToPendingPortal() {
+  const screen = document.getElementById('paymentScreen');
+  if (screen) screen.remove();
+  launchApp();
+  showToast('You can pay anytime from your dashboard.', 'warning');
+}
+
+function selectPaymentPlan(plan) {
+  window._selectedPlan = plan;
+  ['monthly', 'annual'].forEach(p => {
+    const el = document.getElementById('plan-' + p);
+    if (!el) return;
+    el.classList.toggle('selected', p === plan);
+  });
+}
+
+async function initiateFlutterwavePayment() {
+  const btn      = document.getElementById('payNowBtn');
+  const statusEl = document.getElementById('payStatus');
+  btn.disabled   = true;
+  btn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Generating payment link…';
+
+  try {
+    const result = await api('payment', 'initiate', 'POST', {
+      user_id: CURRENT_USER.id,
+      plan:    window._selectedPlan || 'monthly',
+    });
+
+    window._currentTxRef = result.tx_ref;
+
+    FlutterwaveCheckout({
+      public_key:      FLW_PUB_KEY,
+      tx_ref:          result.tx_ref,
+      amount:          window._selectedPlan === 'annual' ? 12000 : 1200,
+      currency:        'NGN',
+      payment_options: 'card,banktransfer,ussd',
+      customer:        { email: CURRENT_USER.email, name: CURRENT_USER.name },
+      customizations:  {
+        title:       'AHRIMPN Membership Dues',
+        description: (window._selectedPlan === 'annual' ? '12-month' : '1-month') + ' membership dues',
+        logo:        '',
+      },
+      callback: async function(data) {
+        if (data.status === 'successful' || data.status === 'completed') {
+          setPayStatus('loading', '⏳ Verifying payment…');
+          try {
+            await verifyPaymentAfterCheckout(data.transaction_id, data.tx_ref);
+          } catch(e) {
+            setPayStatus('error', '⚠️ ' + e.message + '. Contact support if funds were deducted.');
+          }
+        } else {
+          setPayStatus('warning', '⚠️ Payment was not completed. Please try again.');
+        }
+      },
+      onclose: function() {
+        btn.disabled  = false;
+        btn.innerHTML = '<i class="fas fa-lock"></i> Pay with Flutterwave';
+      },
+    });
+  } catch(e) {
+    setPayStatus('error', '❌ ' + e.message);
+    btn.disabled  = false;
+    btn.innerHTML = '<i class="fas fa-lock"></i> Pay with Flutterwave';
+  }
+}
+
+function setPayStatus(type, msg) {
+  const el = document.getElementById('payStatus') || document.getElementById('modalPayStatus');
+  if (!el) return;
+  el.style.display = 'block';
+  const bg = { loading: '#ecfdf5', error: '#fef2f2', warning: '#fffbeb', success: '#ecfdf5' };
+  const fg = { loading: '#065f46', error: '#991b1b', warning: '#92400e', success: '#065f46' };
+  el.style.cssText = `display:block;padding:12px;border-radius:8px;font-size:13px;text-align:center;font-weight:600;background:${bg[type]};color:${fg[type]}`;
+  el.innerHTML = msg;
+}
+
+async function verifyPaymentAfterCheckout(transactionId, txRef) {
+  const res = await api('payment', 'verify&transaction_id=' + transactionId + '&tx_ref=' + txRef);
+  if (res.status === 'success' || res.status === 'already_verified') {
+    CURRENT_USER.active = 1;
+    sessionStorage.setItem('ahrimpn_user', JSON.stringify(CURRENT_USER));
+    setPayStatus('success', '✅ Payment verified! Membership activated.');
+    setTimeout(() => {
+      const screen = document.getElementById('paymentScreen');
+      if (screen) screen.remove();
+      launchApp();
+      showToast('Welcome! Your membership is now active 🎉', 'success');
+    }, 1500);
+  }
+}
+
+// Payment instructions for members already in portal
+function showPaymentInstructions() {
+  showModal('💳 Activate Membership', `
+    <div style="text-align:center;padding:8px 0 20px">
+      <div style="font-size:40px;margin-bottom:10px">💳</div>
+      <h3 style="font-size:17px;font-weight:700;color:var(--green);margin-bottom:6px;font-family:'Fraunces',serif">Complete Your Membership</h3>
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px">Choose a plan and pay securely via Flutterwave</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div class="plan-option selected" id="modal-plan-monthly" onclick="selectModalPlan('monthly')">
+        <div style="font-size:20px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦1,200</div>
+        <div style="font-size:12px;font-weight:600;color:var(--gray-700);margin-top:4px">Monthly</div>
+      </div>
+      <div class="plan-option" id="modal-plan-annual" onclick="selectModalPlan('annual')" style="position:relative">
+        <div class="plan-badge">SAVE ₦2,400</div>
+        <div style="font-size:20px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦12,000</div>
+        <div style="font-size:12px;font-weight:600;color:var(--gray-700);margin-top:4px">Annual</div>
+      </div>
+    </div>
+    <div id="modalPayStatus" style="display:none;margin-bottom:12px"></div>
+    <div class="form-actions" style="justify-content:center;flex-direction:column;gap:10px">
+      <button class="btn-sm btn-green" id="modalPayBtn" onclick="initiateModalPayment()" style="width:100%;justify-content:center">
+        <i class="fas fa-lock"></i> Pay Securely with Flutterwave
+      </button>
+      <button class="btn-sm btn-outline" onclick="closeModal()" style="justify-content:center">Close</button>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--gray-500);margin-top:10px">Card · Bank Transfer · USSD</p>
+  `);
+  window._modalPlan = 'monthly';
+}
+
+function selectModalPlan(plan) {
+  window._modalPlan = plan;
+  ['monthly', 'annual'].forEach(p => {
+    const el = document.getElementById('modal-plan-' + p);
+    if (!el) return;
+    el.classList.toggle('selected', p === plan);
+  });
+}
+
+async function initiateModalPayment() {
+  const btn = document.getElementById('modalPayBtn');
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading…';
+  try {
+    const result = await api('payment', 'initiate', 'POST', {
+      user_id: CURRENT_USER.id,
+      plan:    window._modalPlan || 'monthly',
+    });
+    FlutterwaveCheckout({
+      public_key:      FLW_PUB_KEY,
+      tx_ref:          result.tx_ref,
+      amount:          window._modalPlan === 'annual' ? 12000 : 1200,
+      currency:        'NGN',
+      payment_options: 'card,banktransfer,ussd',
+      customer:        { email: CURRENT_USER.email, name: CURRENT_USER.name },
+      customizations:  { title: 'AHRIMPN Membership Dues', description: 'Membership dues' },
+      callback: async function(data) {
+        if (data.status === 'successful' || data.status === 'completed') {
+          setPayStatus('loading', '⏳ Verifying…');
+          try {
+            await verifyPaymentAfterCheckout(data.transaction_id, data.tx_ref);
+            closeModal();
+          } catch(e) { showToast(e.message, 'error'); }
+        }
+      },
+      onclose: function() {
+        btn.disabled  = false;
+        btn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Flutterwave';
+      },
+    });
+  } catch(e) {
+    showToast(e.message, 'error');
+    btn.disabled  = false;
+    btn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Flutterwave';
+  }
+}
+
+// Handle ?payment=success redirect from Flutterwave callback
+function checkPaymentRedirect() {
+  const params    = new URLSearchParams(window.location.search);
+  const payResult = params.get('payment');
+  if (!payResult) return;
+  window.history.replaceState({}, '', window.location.pathname);
+  if (payResult === 'success') {
+    setTimeout(() => showToast('Payment successful! Membership activated ✅', 'success'), 800);
+    if (TOKEN && CURRENT_USER) {
+      api('members', 'get&id=' + CURRENT_USER.id).then(u => {
+        if (u) {
+          CURRENT_USER = { ...CURRENT_USER, ...u };
+          sessionStorage.setItem('ahrimpn_user', JSON.stringify(CURRENT_USER));
+          const banner = document.getElementById('pendingBanner');
+          if (banner && CURRENT_USER.active) banner.style.display = 'none';
+        }
+      }).catch(() => {});
+    }
+  } else if (payResult === 'failed') {
+    setTimeout(() => showToast('Payment not completed. Try again from your dashboard.', 'error'), 800);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════════
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtNum(n) {
+  return Number(n || 0).toLocaleString('en-NG');
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function duesBadgeClass(status) {
+  return { paid: 'badge-green', partial: 'badge-yellow', overdue: 'badge-red', pending: 'badge-gray' }[status] || 'badge-gray';
+}
+function duesLabel(status) {
+  return { paid: '✓ Paid', partial: '◑ Partial', overdue: '⚠ Overdue', pending: '⏳ Pending' }[status] || '—';
+}
+
+// Responsive: collapse dashboard grid on mobile
+window.addEventListener('resize', () => {
+  const g = document.querySelector('.dash-grid');
+  if (g) g.style.gridTemplateColumns = window.innerWidth < 640 ? '1fr' : '1fr 1fr';
+});
+</script>
+</body>
+</html>

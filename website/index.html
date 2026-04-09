@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AHRIMPN | Home</title>
+  <meta name="description" content="Association of Health Records and Information Management Professionals of Nigeria — Empowering practitioners through development, advocacy, and digital innovation."/>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts: Fraunces (display) + DM Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              gold:  '#D4AF37',
+              green: '#064E3B',
+              teal:  '#10B981',
+              light: '#F0FDF4',
+              dark:  '#0f172a',
+            }
+          },
+          fontFamily: {
+            sans:    ['DM Sans', 'sans-serif'],
+            heading: ['Fraunces', 'serif'],
+          },
+          animation: {
+            'fade-up':   'fadeUp 0.7s ease-out both',
+            'zoom-slow': 'zoomSlow 22s infinite alternate ease-in-out',
+            'marquee':   'marquee 22s linear infinite',
+            'pulse-slow':'pulseSlow 3s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeUp:    { '0%': { opacity:'0', transform:'translateY(24px)' }, '100%': { opacity:'1', transform:'translateY(0)' } },
+            zoomSlow:  { '0%': { transform:'scale(1)' },   '100%': { transform:'scale(1.08)' } },
+            marquee:   { '0%': { transform:'translateX(100%)' }, '100%': { transform:'translateX(-100%)' } },
+            pulseSlow: { '0%,100%': { opacity:'.6' }, '50%': { opacity:'1' } },
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar       { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #064E3B; border-radius: 99px; }
+
+    /* Glass */
+    .glass { background: rgba(255,255,255,.92); backdrop-filter: blur(14px); }
+
+    /* Reveal animation helper */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Mandates card hover line */
+    .mandate-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; width: 0; height: 3px;
+      background: #D4AF37; transition: width .4s ease;
+    }
+    .mandate-card:hover::after { width: 100%; }
+
+    /* Nav active link */
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #064E3B; transition: width .3s ease; }
+    .nav-link:hover::after { width: 100%; }
+
+    /* Ticker */
+    @keyframes ticker { 0%{ transform:translateX(100vw) } 100%{ transform:translateX(-100%) } }
+    .ticker-text { animation: ticker 28s linear infinite; white-space: nowrap; display: inline-block; }
+
+    /* Noise overlay for depth */
+    .noise::before {
+      content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+      opacity: .5;
+    }
+
+    /* Mobile menu link stagger */
+    .mobile-nav-link { transition: opacity .3s, transform .3s; opacity: 0; transform: translateX(20px); }
+    #mobileMenu.open .mobile-nav-link { opacity: 1; transform: translateX(0); }
+    #mobileMenu.open .mobile-nav-link:nth-child(1) { transition-delay:.1s }
+    #mobileMenu.open .mobile-nav-link:nth-child(2) { transition-delay:.18s }
+  </style>
+</head>
+
+<body class="font-sans text-brand-dark bg-gray-50 antialiased selection:bg-brand-green selection:text-white">
+
+<!-- ═══════════════════════════════════════
+     TOP BAR
+═══════════════════════════════════════ -->
+<div class="bg-brand-dark text-gray-400 text-xs py-2 hidden md:block border-b border-gray-800">
+  <div class="container mx-auto px-6 flex justify-between items-center">
+    <div class="flex space-x-6">
+      <span class="flex items-center gap-2">
+        <i class="fas fa-map-marker-alt text-brand-gold"></i>
+        National Secretariat, Garki, Abuja
+      </span>
+      <a href="mailto:info@ahrimpn.org" class="flex items-center gap-2 hover:text-white transition">
+        <i class="fas fa-envelope text-brand-gold"></i>
+        info@ahrimpn.org
+      </a>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="mem.html" class="hover:text-white transition">Portal Login</a>
+      <span class="text-gray-700">|</span>
+     <!--  <a href="#" class="hover:text-white transition">Complaints</a>-->
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     BREAKING NEWS TICKER
+═══════════════════════════════════════ -->
+<div class="bg-brand-green text-white overflow-hidden border-b-2 border-brand-gold/40 relative z-40">
+  <div class="flex items-center gap-4 px-4 py-2">
+    <span class="bg-brand-gold text-brand-dark text-[10px] font-black px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0 uppercase tracking-wider">
+      Latest
+    </span>
+    <div class="relative overflow-hidden flex-1">
+      <!-- FIX: Corrected to link to AHRIMPN content, not NAHIMS -->
+      <div class="ticker-text text-sm font-medium">
+        🗓️ AHRIMPN Nigeria has declared April 19-24,2026 as HIP WEEK 2026  &nbsp;&nbsp;&nbsp;
+       <!--  📢 ICD-11 Coding Workshop (Virtual) — Members Only · See Events for details &nbsp;&nbsp;&nbsp;
+        🏆 New CPD Courses Now Available in the Member Portal — Log in to enroll &nbsp;&nbsp;&nbsp;
+        🌟 Congratulations to all newly certified CHRIMS practitioners!-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════ -->
+<nav id="navbar" class="sticky top-0 z-50 glass border-b border-gray-100 shadow-sm transition-all duration-300">
+  <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <div class="flex justify-between items-center">
+
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
+        <img src="ahrimpn logo.png" alt="AHRIMPN Logo" class="w-10 h-10 sm:w-12 sm:h-12 object-contain">
+        <div>
+          <h1 class="text-base sm:text-lg font-heading font-bold text-brand-green leading-none">AHRIMPN</h1>
+          <p class="text-[9px] text-gray-500 font-medium leading-tight hidden sm:block">Health Records & Info Mgmt Professionals</p>
+        </div>
+      </a>
+
+      <!-- Desktop Nav (md and up) -->
+      <div class="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-gray-600">
+        <a href="about.html" class="nav-link hover:text-brand-green transition whitespace-nowrap">About</a>
+        <a href="mem.html"   class="nav-link hover:text-brand-green transition whitespace-nowrap">Membership</a>
+        <a href="mem.html"
+           class="px-5 py-2.5 bg-brand-green text-white rounded-full shadow-md hover:bg-brand-dark hover:-translate-y-0.5 transition duration-300 text-xs uppercase tracking-widest font-bold whitespace-nowrap">
+          Join Us
+        </a>
+      </div>
+
+      <!-- Hamburger (below md) -->
+      <button id="hamburger-btn"
+              class="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-brand-light transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-green"
+              aria-label="Open menu" aria-expanded="false">
+        <span class="hamburger-line block w-6 h-0.5 bg-brand-green rounded transition-all duration-300"></span>
+        <span class="hamburger-line block w-6 h-0.5 bg-brand-green rounded transition-all duration-300"></span>
+        <span class="hamburger-line block w-4 h-0.5 bg-brand-green rounded transition-all duration-300"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     MOBILE MENU — FIX: moved OUTSIDE <nav>,
+     correct ID, single event listener block
+═══════════════════════════════════════ -->
+<div id="mobileMenu"
+     class="fixed inset-0 z-[200] bg-brand-green text-white
+            translate-x-full transition-transform duration-500 ease-in-out overflow-y-auto"
+     aria-hidden="true">
+
+  <!-- Background photo -->
+  <div class="absolute inset-0 overflow-hidden">
+    <img src="1.jpg" class="w-full h-full object-cover opacity-20 scale-105 animate-zoom-slow" alt="">
+    <div class="absolute inset-0 bg-gradient-to-br from-brand-green/90 via-brand-green/75 to-brand-dark/80"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 flex flex-col min-h-screen px-6 sm:px-10 py-6 sm:py-8">
+    <!-- Header row -->
+    <div class="flex justify-between items-center mb-10 sm:mb-12">
+      <img src="ahrimpn logo.png" class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-1 object-contain" alt="AHRIMPN">
+      <button id="close-menu-btn"
+              class="text-white/80 hover:text-white transition text-3xl p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-lg"
+              aria-label="Close menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Nav links -->
+    <nav class="flex flex-col gap-6 sm:gap-8 mt-2">
+      <a href="about.html" class="mobile-nav-link text-2xl sm:text-3xl font-heading font-bold hover:text-brand-gold transition">About</a>
+      <a href="mem.html"   class="mobile-nav-link text-2xl sm:text-3xl font-heading font-bold hover:text-brand-gold transition">Membership</a>
+    </nav>
+
+    <!-- CTA + socials -->
+    <div class="mt-auto pt-10 sm:pt-12">
+      <a href="mem.html"
+         class="block text-center bg-brand-gold text-brand-dark font-bold py-4 rounded-2xl shadow-xl hover:bg-white transition text-base sm:text-lg">
+        Join AHRIMPN Today →
+      </a>
+      <div class="mt-6 sm:mt-8 flex gap-4 justify-center">
+        <a href="http://www.facebook.com/ahrimpn"           class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold hover:text-brand-dark transition"><i class="fab fa-facebook-f text-sm"></i></a>
+        <a href="http://www.x.com/ahrimpn"                  class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold hover:text-brand-dark transition"><i class="fab fa-twitter text-sm"></i></a>
+        <a href="http://www.linkedin.com/company/ahrimpn"   class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold hover:text-brand-dark transition"><i class="fab fa-linkedin-in text-sm"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<section id="home" class="relative w-full min-h-[88vh] flex items-center justify-center overflow-hidden bg-brand-dark pt-8 pb-28 md:pb-20">
+
+  <!-- Background Slider -->
+  <div id="slider-container" class="absolute inset-0 w-full h-full">
+    <div class="slider-slide absolute inset-0 transition-opacity duration-1000 opacity-100">
+      <img src="1.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Conference"/>
+      <div class="absolute inset-0 bg-gradient-to-r from-brand-green/85 via-brand-green/60 to-brand-dark/70"></div>
+    </div>
+    <div class="slider-slide absolute inset-0 transition-opacity duration-1000 opacity-0">
+      <img src="3.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Members"/>
+      <div class="absolute inset-0 bg-gradient-to-r from-brand-green/85 via-brand-green/60 to-brand-dark/70"></div>
+    </div>
+  </div>
+
+  <!-- Decorative geometric accent -->
+  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-brand-dark/30 to-transparent pointer-events-none"></div>
+  <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-brand-gold/5 blur-3xl pointer-events-none"></div>
+
+  <!-- Hero Content -->
+  <div class="relative z-10 container mx-auto px-6 text-center">
+    <div class="max-w-5xl mx-auto flex flex-col items-center">
+
+      <div class="inline-flex items-center gap-2 px-5 py-2 mb-8 rounded-full bg-white/10 border border-white/25 text-white text-xs backdrop-blur-md animate-fade-up">
+        <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse-slow"></span>
+        <span class="font-semibold uppercase tracking-widest">Proudly Serving 5,000+ Members Nationwide</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-white mb-6 leading-tight tracking-tight drop-shadow-2xl animate-fade-up" style="animation-delay:.1s">
+        Health Information Managers —<br/>
+        <span class="text-brand-gold italic">Guardians of Integrity</span>
+      </h1>
+
+      <p class="text-base sm:text-lg md:text-xl text-white/85 mb-10 leading-relaxed max-w-2xl font-medium animate-fade-up" style="animation-delay:.2s">
+        Empowering Health Information Management Practitioners across Nigeria through professional development, digital innovation, and policy advocacy.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 items-center justify-center animate-fade-up" style="animation-delay:.3s">
+        <a href="mem.html"
+           class="w-full sm:w-auto bg-brand-gold text-brand-dark font-bold px-10 py-4 rounded-xl shadow-xl hover:bg-white hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 text-sm uppercase tracking-wide">
+          Become a Member <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="about.html"
+           class="w-full sm:w-auto px-10 py-4 border-2 border-white/60 text-white font-bold rounded-xl hover:bg-white hover:text-brand-green hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm text-center text-sm uppercase tracking-wide">
+          Learn More
+        </a>
+      </div>
+
+      <!-- Slide dots -->
+      <div class="flex gap-2 mt-12">
+        <button class="slide-dot w-6 h-1.5 rounded-full bg-brand-gold transition-all" data-slide="0" aria-label="Slide 1"></button>
+        <button class="slide-dot w-2 h-1.5 rounded-full bg-white/40 transition-all" data-slide="1" aria-label="Slide 2"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 opacity-40">
+    <span class="text-white text-xs uppercase tracking-widest font-medium">Scroll</span>
+    <div class="w-px h-10 bg-gradient-to-b from-white to-transparent"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     STATS CARD
+═══════════════════════════════════════ -->
+<div class="relative z-20 -mt-12 container mx-auto px-6">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center border-b-4 border-brand-gold reveal">
+    <div class="group">
+      <div class="text-4xl font-heading font-bold text-brand-green mb-1">
+        <span class="counter" data-target="36" data-suffix="">0</span>
+      </div>
+      <div class="text-xs text-gray-400 uppercase font-semibold tracking-widest">State Chapters</div>
+    </div>
+    <div class="group">
+      <div class="text-4xl font-heading font-bold text-brand-green mb-1">
+        <span class="counter" data-target="5000" data-suffix="+">0</span>
+      </div>
+      <div class="text-xs text-gray-400 uppercase font-semibold tracking-widest">Registered Members</div>
+    </div>
+    <div class="group">
+      <div class="text-4xl font-heading font-bold text-brand-green mb-1">
+        <span class="counter" data-target="44" data-suffix="">0</span>
+      </div>
+      <div class="text-xs text-gray-400 uppercase font-semibold tracking-widest">Annual Conferences</div>
+    </div>
+    <div class="group">
+      <div class="text-4xl font-heading font-bold text-brand-green mb-1">
+        <span class="counter" data-target="10000" data-suffix="+">0</span>
+      </div>
+      <div class="text-xs text-gray-400 uppercase font-semibold tracking-widest">Student Members</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LEADERSHIP
+═══════════════════════════════════════ -->
+<section id="leadership" class="py-20 md:py-32 bg-brand-light overflow-hidden">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col md:flex-row items-center gap-12 md:gap-20">
+
+      <!-- Image -->
+      <div class="w-full md:w-5/12 relative mb-16 md:mb-0 reveal">
+        <div class="absolute inset-0 bg-brand-green rounded-2xl rotate-2"></div>
+        <div class="relative z-10 w-full h-[420px] md:h-[540px] rounded-2xl shadow-2xl overflow-hidden">
+          <img src="4.jpg" alt="National President" class="w-[130%] h-[130%] object-cover object-top grayscale hover:grayscale-0 transition duration-700 -translate-x-[5%] -translate-y-[8%]"/>
+        </div>
+        <div class="absolute -bottom-6 -right-4 md:-bottom-8 md:-right-6 bg-white p-5 shadow-2xl rounded-xl z-20 border-l-4 border-brand-gold">
+          <p class="font-heading font-bold text-lg text-brand-dark">Abiodun Y. AFOLABI</p>
+          <p class="text-xs text-brand-green font-bold uppercase tracking-wider mt-1">National President</p>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="w-full md:w-7/12 reveal" style="transition-delay:.15s">
+        <span class="text-brand-gold font-bold tracking-widest uppercase text-xs">Leadership</span>
+        <h2 class="text-3xl md:text-4xl font-heading font-bold text-brand-dark mt-2 mb-6 leading-tight">
+          Building a Digital Future for Health Information Management
+        </h2>
+        <blockquote class="border-l-4 border-brand-gold pl-5 italic text-gray-500 mb-6 leading-relaxed">
+          "Welcome to the new era of AHRIMPN. As we navigate the complexities of modern healthcare, the role of the Health Information Manager has never been more critical."
+        </blockquote>
+        <p class="text-gray-500 leading-relaxed mb-8">
+          Our administration is focused on welfare, standardization, and ensuring every practitioner is equipped with the tools of the 21st century — from electronic health records to international coding standards.
+        </p>
+        <button type="button" onclick="document.getElementById('presidentModal').classList.remove('hidden'); document.body.style.overflow='hidden';"
+           class="inline-flex items-center gap-2 text-brand-green font-bold text-sm hover:gap-4 transition-all uppercase tracking-wider cursor-pointer">
+          Read the President's Message <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     NEWS & UPDATES
+═══════════════════════════════════════ -->
+<section id="news" class="py-20 md:py-28 bg-white">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col md:flex-row gap-10 lg:gap-16">
+
+      <!-- ── LEFT SIDEBAR: Trending News (rendered by JS) ── -->
+      <aside class="w-full md:w-80 lg:w-96 flex-shrink-0">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b-2 border-brand-gold">
+          <span class="w-2.5 h-2.5 rounded-full bg-brand-gold animate-pulse-slow"></span>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-brand-dark">Trending News</h3>
+        </div>
+        <div class="flex flex-col gap-5" id="news-sidebar"></div>
+        <a href="event.html"
+           class="mt-6 w-full flex items-center justify-center gap-2 border border-brand-green text-brand-green text-xs font-bold uppercase tracking-widest py-3 rounded-xl hover:bg-brand-green hover:text-white transition duration-300">
+          All News &amp; Events <i class="fas fa-arrow-right"></i>
+        </a>
+      </aside>
+
+      <!-- ── RIGHT MAIN: Featured Story (rendered by JS) ── -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b-2 border-brand-green">
+          <span class="w-2.5 h-2.5 rounded-full bg-brand-green"></span>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-brand-dark">Featured Story</h3>
+        </div>
+        <div id="news-featured"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     AD BANNER (single, clean)
+═══════════════════════════════════════ -->
+<section class="bg-gray-100 py-6 border-y border-gray-200">
+  <div class="container mx-auto px-6">
+    <a href="https://example.com" target="_blank" rel="noopener"
+       class="block rounded-xl overflow-hidden shadow hover:shadow-lg transition group">
+      <img src="ads.png" alt="Sponsored" class="w-full h-20 md:h-48 object-cover group-hover:scale-[1.01] transition duration-500"/>
+    </a>
+    <p class="text-[10px] text-gray-400 text-center mt-2 uppercase tracking-widest">Advertisement</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     MANDATES
+═══════════════════════════════════════ -->
+<section id="about" class="py-20 md:py-32 bg-white">
+  <div class="container mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+      <span class="text-brand-gold font-bold tracking-widest uppercase text-xs">What We Do</span>
+      <h2 class="text-3xl md:text-4xl font-heading font-bold text-brand-dark mt-2 mb-4">Our Core Mandates</h2>
+      <div class="h-1 w-16 bg-brand-gold mx-auto mb-4"></div>
+      <p class="text-gray-500 leading-relaxed">Operating under a strict national mandate to advocate for and improve the welfare of health information management professionals across Nigeria.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="mandate-card relative group p-8 border border-gray-100 rounded-2xl hover:shadow-2xl hover:border-brand-green/20 transition duration-300 bg-white overflow-hidden reveal">
+        <div class="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center text-brand-green text-2xl mb-6 group-hover:bg-brand-green group-hover:text-white transition duration-300">
+          <i class="fas fa-university"></i>
+        </div>
+        <h3 class="text-xl font-heading font-bold mb-3 text-brand-dark">Training &amp; Development</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Collaborating with reputable institutions to train our professionals, ensuring practice meets global standards including ICD coding and EMR systems.</p>
+      </div>
+
+      <div class="mandate-card relative group p-8 border border-gray-100 rounded-2xl hover:shadow-2xl hover:border-brand-green/20 transition duration-300 bg-white overflow-hidden reveal" style="transition-delay:.1s">
+        <div class="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center text-brand-green text-2xl mb-6 group-hover:bg-brand-green group-hover:text-white transition duration-300">
+          <i class="fas fa-id-card-alt"></i>
+        </div>
+        <h3 class="text-xl font-heading font-bold mb-3 text-brand-dark">Members' Welfare Advocacy</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Advocating consistently for improved welfare, fair treatment, sustainable professional growth, and recognition of the HIM profession in Nigeria.</p>
+      </div>
+
+      <div class="mandate-card relative group p-8 border border-gray-100 rounded-2xl hover:shadow-2xl hover:border-brand-green/20 transition duration-300 bg-white overflow-hidden reveal" style="transition-delay:.2s">
+        <div class="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center text-brand-green text-2xl mb-6 group-hover:bg-brand-green group-hover:text-white transition duration-300">
+          <i class="fas fa-laptop-medical"></i>
+        </div>
+        <h3 class="text-xl font-heading font-bold mb-3 text-brand-dark">Digital Health Advocacy</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Leading the charge for Electronic Medical Records adoption across Federal Medical Centres and championing national health data governance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     EVENTS — dynamic from API, falls back to placeholders
+═══════════════════════════════════════ -->
+<section id="events" class="py-20 md:py-32 bg-brand-dark relative overflow-hidden noise">
+  <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1920&q=60')] bg-fixed bg-center bg-cover opacity-10 pointer-events-none"></div>
+
+  <div class="container mx-auto px-6 relative z-10">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6 reveal">
+      <div>
+        <span class="text-brand-gold font-bold uppercase text-xs tracking-widest">Up Next</span>
+        <h2 class="text-3xl md:text-4xl text-white font-heading font-bold mt-2">Upcoming Events</h2>
+      </div>
+      <a href="event.html" class="text-white/70 hover:text-brand-gold transition mt-4 md:mt-0 flex items-center gap-2 text-sm">
+        View All Events <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div id="events-grid" class="grid md:grid-cols-2 gap-6 reveal" style="transition-delay:.1s">
+      <!-- Loading placeholder -->
+      <div class="col-span-2 text-center py-10 text-white/40 text-sm">
+        <i class="fas fa-spinner fa-spin text-2xl mb-3 block"></i> Loading events…
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SPLIT ADS
+═══════════════════════════════════════ -->
+<section class="bg-gray-100 py-8 border-y border-gray-200">
+  <div class="container mx-auto px-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a href="https://example.com" target="_blank" rel="noopener" class="block rounded-xl overflow-hidden shadow hover:shadow-lg transition group">
+        <img src="ads1.png" alt="Sponsor" class="w-full h-36 md:h-48 object-cover group-hover:scale-[1.02] transition duration-500"/>
+      </a>
+      <a href="https://example.com" target="_blank" rel="noopener" class="block rounded-xl overflow-hidden shadow hover:shadow-lg transition group">
+        <img src="ads2.png" alt="Sponsor" class="w-full h-36 md:h-48 object-cover group-hover:scale-[1.02] transition duration-500"/>
+      </a>
+    </div>
+    <p class="text-[10px] text-gray-400 text-center mt-3 uppercase tracking-widest">Sponsored by our partners</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer class="bg-[#080f0c] text-gray-400 pt-20 pb-10 border-t border-brand-green/15">
+  <div class="container mx-auto px-6">
+    <div class="grid md:grid-cols-4 gap-12 mb-16">
+
+      <div>
+        <h3 class="text-white text-2xl font-heading font-bold mb-4">AHRIMPN</h3>
+        <p class="text-sm leading-relaxed mb-6">
+          No. 10 Kukawa Street, off Gimbiya Street<br>
+          Garki, Abuja, FCT — Nigeria
+        </p>
+        <div class="flex gap-3">
+          <a href="http://www.facebook.com/ahrimpn"  class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-green hover:text-white transition"><i class="fab fa-facebook-f text-xs"></i></a>
+          <a href="http://www.x.com/ahrimpn"         class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-green hover:text-white transition"><i class="fab fa-twitter text-xs"></i></a>
+          <a href="http://www.linkedin.com/company/ahrimpn" class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-green hover:text-white transition"><i class="fab fa-linkedin-in text-xs"></i></a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Association</h4>
+        <ul class="space-y-3 text-sm">
+          <li><a href="#" class="hover:text-brand-gold transition">Constitution</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition">Executive Council</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition">State Chapters</a></li>
+          <li><a href="#" class="hover:text-brand-gold transition">Student Body (NAHIMS)</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Practitioner Tools</h4>
+        <ul class="space-y-3 text-sm">
+          <li><a href="mem.html" class="hover:text-brand-gold transition">License Renewal</a></li>
+          <li><a href="mem.html" class="hover:text-brand-gold transition">CPD Points</a></li>
+          <li><a href="mem.html" class="hover:text-brand-gold transition">Job Portal</a></li>
+          <li><a href="mem.html" class="hover:text-brand-gold transition">Verify a Member</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Stay Updated</h4>
+        <p class="text-xs mb-4">Get latest policy updates and conference news.</p>
+        <form onsubmit="handleSubscribe(event)" class="flex flex-col gap-3">
+          <input type="email" placeholder="Your email address" required
+                 class="bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-brand-gold transition placeholder-gray-600 text-sm"/>
+          <button type="submit"
+                  class="bg-brand-gold text-brand-dark font-bold px-4 py-3 rounded-lg hover:bg-white transition text-sm" id="subBtn">
+            Subscribe
+          </button>
+        </form>
+        <p id="sub-msg" class="text-brand-teal text-xs mt-2 hidden">✓ Subscribed successfully!</p>
+      </div>
+    </div>
+
+    <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+      <p>&copy; 2025 Association of Health Records and Information Management Professionals of Nigeria. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-brand-gold transition">Privacy Policy</a>
+        <a href="#" class="hover:text-brand-gold transition">Terms of Use</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     SCRIPTS — single clean block
+═══════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────
+// 0. NEWS SECTION — fetched from api/news.php (database)
+// ──────────────────────────────────────────────────────
+(async function renderNews() {
+  function shareButtons(url, title, size) {
+    const enc = encodeURIComponent, s = size === 'lg' ? 'w-8 h-8' : 'w-7 h-7';
+    const safeUrl   = url   || location.href;
+    const safeTitle = title || '';
+    return `
+      <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Share:</span>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=${enc(safeUrl)}" target="_blank" rel="noopener"
+         class="${s} rounded-full bg-blue-600 text-white flex items-center justify-center hover:scale-110 transition text-xs" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://twitter.com/intent/tweet?text=${enc(safeTitle)}&url=${enc(safeUrl)}" target="_blank" rel="noopener"
+         class="${s} rounded-full bg-sky-500 text-white flex items-center justify-center hover:scale-110 transition text-xs" title="Share on X"><i class="fab fa-twitter"></i></a>
+      <a href="https://wa.me/?text=${enc(safeTitle + ' ' + safeUrl)}" target="_blank" rel="noopener"
+         class="${s} rounded-full bg-green-500 text-white flex items-center justify-center hover:scale-110 transition text-xs" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      <button type="button" onclick="copyLink(this,'${safeUrl}')"
+              class="${s} rounded-full bg-gray-200 text-gray-600 flex items-center justify-center hover:scale-110 transition text-xs" title="Copy link"><i class="fas fa-link"></i></button>`;
+  }
+
+  function renderStories(stories) {
+    const sidebar   = stories.filter(s => !s.featured);
+    const featured  = stories.find(s => s.featured);
+    const sidebarEl = document.getElementById('news-sidebar');
+    const featuredEl= document.getElementById('news-featured');
+
+    if (sidebarEl) {
+      sidebarEl.innerHTML = sidebar.map(s => `
+        <article class="group border border-gray-100 rounded-xl p-4 hover:shadow-md hover:border-brand-green/20 transition duration-300 bg-gray-50">
+          <span class="inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-brand-green/10 text-brand-green mb-2">${s.category}</span>
+          <h4 class="text-sm font-bold text-brand-dark leading-snug group-hover:text-brand-green transition mb-1">
+            <a href="${s.url || '#'}">${s.title}</a>
+          </h4>
+          <p class="text-xs text-gray-400 mb-3">${s.date_label || ''}</p>
+          <div class="flex items-center gap-2">${shareButtons(s.url, s.title, 'sm')}</div>
+        </article>`).join('') || '<p class="text-sm text-gray-400">No stories yet.</p>';
+    }
+
+    if (featuredEl) {
+      featuredEl.innerHTML = featured ? `
+        <div class="rounded-2xl overflow-hidden shadow-lg border border-gray-100 bg-white group">
+          <div class="relative h-56 sm:h-72 md:h-80 overflow-hidden bg-brand-dark">
+            <img src="${featured.image || '1.jpg'}" alt="${featured.title}" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
+            <span class="absolute top-4 left-4 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-brand-gold text-brand-dark">${featured.category}</span>
+          </div>
+          <div class="p-6 sm:p-8">
+            <p class="text-xs text-gray-400 mb-2">${featured.date_label || ''} &nbsp;·&nbsp; <span class="text-brand-green font-semibold">${featured.category}</span></p>
+            <h2 class="text-xl sm:text-2xl font-heading font-bold text-brand-dark leading-snug mb-3 group-hover:text-brand-green transition">${featured.title}</h2>
+            ${featured.excerpt ? `<p class="text-gray-500 text-sm leading-relaxed mb-6">${featured.excerpt}</p>` : ''}
+            <div class="flex flex-wrap items-center gap-4">
+              <a href="${featured.url || 'event.html'}"
+                 class="inline-flex items-center gap-2 bg-brand-green text-white text-xs font-bold uppercase tracking-widest px-6 py-3 rounded-xl hover:bg-brand-dark transition duration-300">
+                Read Full Story <i class="fas fa-arrow-right"></i>
+              </a>
+              <div class="flex items-center gap-2">${shareButtons(featured.url, featured.title, 'lg')}</div>
+            </div>
+          </div>
+        </div>` : '<p class="text-sm text-gray-400">No featured story set.</p>';
+    }
+  }
+
+  // Show loading state
+  const sEl = document.getElementById('news-sidebar');
+  const fEl = document.getElementById('news-featured');
+  if (sEl) sEl.innerHTML = '<p class="text-sm text-gray-400 animate-pulse">Loading…</p>';
+  if (fEl) fEl.innerHTML = '<p class="text-sm text-gray-400 animate-pulse">Loading…</p>';
+
+  try {
+    const res = await fetch('api/news.php?action=list');
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+      renderStories(json.data);
+    } else {
+      // API returned empty — show placeholder text
+      if (sEl) sEl.innerHTML = '<p class="text-sm text-gray-400">No stories published yet.</p>';
+      if (fEl) fEl.innerHTML = '<p class="text-sm text-gray-400">No featured story yet.</p>';
+    }
+  } catch(e) {
+    // Network error or server down — fail silently with a note
+    if (sEl) sEl.innerHTML = '<p class="text-sm text-gray-400">News unavailable.</p>';
+    if (fEl) fEl.innerHTML = '<p class="text-sm text-gray-400">News unavailable.</p>';
+  }
+})();
+
+// ──────────────────────────────────────────────────────
+// 0. COPY LINK — news share buttons
+// ──────────────────────────────────────────────────────
+function copyLink(btn, url) {
+  navigator.clipboard.writeText(url).then(function() {
+    var icon = btn.querySelector('i');
+    icon.className = 'fas fa-check';
+    btn.classList.add('bg-brand-green', 'text-white');
+    btn.classList.remove('bg-gray-200', 'text-gray-600');
+    setTimeout(function() {
+      icon.className = 'fas fa-link';
+      btn.classList.remove('bg-brand-green', 'text-white');
+      btn.classList.add('bg-gray-200', 'text-gray-600');
+    }, 2000);
+  });
+}
+
+// 1. MOBILE MENU — FIX: single listener, correct IDs
+// ──────────────────────────────────────────────────────
+(function() {
+  const hamburger = document.getElementById('hamburger-btn');
+  const closeBtn  = document.getElementById('close-menu-btn');
+  const menu      = document.getElementById('mobileMenu');
+  const lines     = hamburger.querySelectorAll('.hamburger-line');
+
+  function openMenu() {
+    menu.classList.remove('translate-x-full');
+    menu.classList.add('open');
+    menu.setAttribute('aria-hidden', 'false');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    // Animate hamburger to X
+    lines[0].style.transform = 'rotate(45deg) translate(5px, 6px)';
+    lines[1].style.opacity   = '0';
+    lines[2].style.transform = 'rotate(-45deg) translate(3px, -4px)';
+    lines[2].style.width     = '24px';
+  }
+
+  function closeMenu() {
+    menu.classList.add('translate-x-full');
+    menu.classList.remove('open');
+    menu.setAttribute('aria-hidden', 'true');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    lines[0].style.transform = '';
+    lines[1].style.opacity   = '';
+    lines[2].style.transform = '';
+    lines[2].style.width     = '';
+  }
+
+  hamburger.addEventListener('click', openMenu);
+  closeBtn.addEventListener('click', closeMenu);
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+})();
+
+// ──────────────────────────────────────────────────────
+// 2. IMAGE SLIDER
+// ──────────────────────────────────────────────────────
+(function() {
+  const slides = document.querySelectorAll('.slider-slide');
+  const dots   = document.querySelectorAll('.slide-dot');
+  let current  = 0;
+  let timer;
+
+  function goTo(n) {
+    slides[current].style.opacity = '0';
+    dots[current].classList.replace('w-6', 'w-2');
+    dots[current].classList.replace('bg-brand-gold', 'bg-white/40');
+    current = n;
+    slides[current].style.opacity = '1';
+    dots[current].classList.replace('w-2', 'w-6');
+    dots[current].classList.replace('bg-white/40', 'bg-brand-gold');
+  }
+
+  function next() { goTo((current + 1) % slides.length); }
+
+  timer = setInterval(next, 6000);
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => { clearInterval(timer); goTo(i); timer = setInterval(next, 6000); });
+  });
+})();
+
+// ──────────────────────────────────────────────────────
+// 3. COUNTER ANIMATION — FIX: suffix stored separately, never mixed into numeric value
+// ──────────────────────────────────────────────────────
+(function() {
+  const counters = document.querySelectorAll('.counter');
+  let animated   = false;
+
+  function animate() {
+    counters.forEach(el => {
+      const target = parseInt(el.dataset.target, 10);
+      const suffix = el.dataset.suffix || '';
+      const duration = 1800;
+      const start    = performance.now();
+
+      function step(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target).toLocaleString() + (progress >= 1 ? suffix : '');
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !animated) {
+      animated = true;
+      animate();
+      observer.disconnect();
+    }
+  }, { threshold: 0.4 });
+
+  const statsSection = document.querySelector('.counter');
+  if (statsSection) observer.observe(statsSection.closest('div') || statsSection);
+})();
+
+// ──────────────────────────────────────────────────────
+// 4. SCROLL REVEAL
+// ──────────────────────────────────────────────────────
+(function() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+})();
+
+// ──────────────────────────────────────────────────────
+// 5. LOAD EVENTS FROM API (with graceful fallback)
+// ──────────────────────────────────────────────────────
+(async function() {
+  const grid = document.getElementById('events-grid');
+  if (!grid) return;
+
+  // Static fallback events shown if API is unavailable
+  const fallback = [
+    { title: 'Annual National Conference 2026', start_date: '2026-11-14', venue: 'Osun State, Nigeria', event_type: 'Conference', status: 'Upcoming', reg_link: 'event.html' },
+    { title: 'ICD-11 Coding Workshop',          start_date: '2026-10-22', venue: 'Virtual (Zoom)',       event_type: 'Workshop',   status: 'Upcoming', reg_link: 'event.html' },
+  ];
+
+  function fmtDate(d) {
+    if (!d) return { day: '—', mon: '—' };
+    const dt = new Date(d);
+    return { day: dt.getDate(), mon: dt.toLocaleString('en-GB', { month: 'short' }) };
+  }
+
+  function renderEvents(events) {
+    const upcoming = events.filter(e => e.status !== 'Completed').slice(0, 4);
+    if (!upcoming.length) {
+      grid.innerHTML = '<div class="col-span-2 text-center py-10 text-white/40 text-sm">No upcoming events at this time.</div>';
+      return;
+    }
+    grid.innerHTML = upcoming.map((e, i) => {
+      const { day, mon } = fmtDate(e.start_date);
+      const isFirst = i === 0;
+      return `
+        <a href="${e.reg_link || 'event.html'}"
+           class="group bg-white/5 hover:bg-white/10 backdrop-blur border border-white/10 hover:border-white/20 p-6 rounded-2xl flex gap-5 transition duration-300 cursor-pointer">
+          <div class="flex-shrink-0 ${isFirst ? 'bg-brand-green' : 'bg-white/10'} text-white w-20 h-20 rounded-xl flex flex-col items-center justify-center shadow-lg">
+            <span class="text-2xl font-heading font-bold leading-none">${day}</span>
+            <span class="text-xs uppercase tracking-wider mt-1 opacity-80">${mon}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-white font-heading font-bold text-lg mb-2 group-hover:text-brand-gold transition leading-tight">${e.title}</h3>
+            <p class="text-gray-400 text-sm mb-3 flex items-center gap-2">
+              <i class="${e.venue?.toLowerCase().includes('virtual') ? 'fas fa-video' : 'fas fa-map-marker-alt'}"></i>
+              ${e.venue || 'TBA'}
+            </p>
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-xs ${isFirst ? 'text-brand-gold border-brand-gold' : 'text-gray-400 border-gray-600'} border px-3 py-1 rounded-full">
+                ${isFirst ? 'Registration Open' : e.event_type}
+              </span>
+              ${e.status === 'Upcoming' ? '<span class="text-xs text-white/40">→ Learn More</span>' : ''}
+            </div>
+          </div>
+        </a>`;
+    }).join('');
+  }
+
+  try {
+    const res  = await fetch('api/events.php?action=list&status=Upcoming&limit=4');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.data) && data.data.length) {
+      renderEvents(data.data);
+    } else {
+      renderEvents(fallback);
+    }
+  } catch {
+    // API not reachable — use fallback silently
+    renderEvents(fallback);
+  }
+})();
+
+// ──────────────────────────────────────────────────────
+// 6. SUBSCRIBE FORM
+// ──────────────────────────────────────────────────────
+function handleSubscribe(e) {
+  e.preventDefault();
+  const btn = document.getElementById('subBtn');
+  const msg = document.getElementById('sub-msg');
+  const orig = btn.textContent;
+
+  btn.textContent = 'Subscribing…';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.textContent = 'Subscribed!';
+    btn.classList.add('bg-green-600', 'text-white');
+    msg.classList.remove('hidden');
+    e.target.reset();
+
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.disabled = false;
+      btn.classList.remove('bg-green-600');
+      msg.classList.add('hidden');
+    }, 3000);
+  }, 1200);
+}
+</script>
+
+<!-- ═══════════════════════════════════════
+     PRESIDENTIAL MESSAGE MODAL
+═══════════════════════════════════════ -->
+<div id="presidentModal" class="hidden fixed inset-0 z-[999] flex items-center justify-center p-4"
+     onclick="if(event.target===this){closePresidentModal()}">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-brand-dark/70 backdrop-blur-sm"></div>
+
+  <!-- Panel -->
+  <div class="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between px-8 py-5 border-b border-gray-100 bg-brand-light flex-shrink-0">
+      <div>
+        <span class="text-brand-gold font-bold tracking-widest uppercase text-xs">Leadership</span>
+        <h3 class="font-heading font-bold text-xl text-brand-dark mt-0.5">Presidential Message</h3>
+      </div>
+      <button type="button" onclick="closePresidentModal()"
+              class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-brand-green hover:text-white text-gray-500 transition duration-200"
+              aria-label="Close modal">
+        <i class="fas fa-times text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="overflow-y-auto px-8 py-7 space-y-5 text-gray-600 leading-relaxed text-sm flex-1">
+
+      <!-- President card -->
+      <div class="flex items-center gap-4 mb-2">
+        <img src="4.jpg" alt="National President" class="w-14 h-14 rounded-full object-cover object-top border-2 border-brand-gold shadow"/>
+        <div>
+          <p class="font-heading font-bold text-brand-dark text-base">Abiodun Y. AFOLABI</p>
+          <p class="text-xs text-brand-green font-bold uppercase tracking-wider">National President, AHRIMPN</p>
+        </div>
+      </div>
+
+      <blockquote class="border-l-4 border-brand-gold pl-5 italic text-gray-500 text-base leading-relaxed">
+        "Welcome to the new era of AHRIMPN. As we navigate the complexities of modern healthcare, the role of the Health Information Manager has never been more critical."
+      </blockquote>
+
+      <p>
+        Dear esteemed colleagues, friends, and partners of the Association of Health Records and Information Management Professionals of Nigeria (AHRIMPN),
+      </p>
+      <p>
+        It is with immense pride and a deep sense of responsibility that I address you as the National President of our great association. We stand at a pivotal moment in the history of health information management in Nigeria — a moment defined by unprecedented technological advancement, evolving healthcare demands, and the urgent need for a robust, well-equipped workforce.
+      </p>
+      <p>
+        Our administration is anchored on four core pillars: <strong class="text-brand-dark">Welfare, Standardization, Digital Innovation, and Advocacy</strong>. We believe that every registered practitioner deserves a safe, thriving career pathway; that the standards we uphold must align with international best practices including ICD-11 and global health informatics frameworks; and that the tools of the 21st century — from electronic health records to data analytics — must be accessible to every member.
+      </p>
+      <p>
+        Since assuming office, we have made significant strides in strengthening our institutional structures, expanding our membership base, and forging strategic partnerships with government agencies, academic institutions, and international bodies. We are committed to ensuring AHRIMPN remains at the forefront of healthcare transformation in Nigeria.
+      </p>
+      <p>
+        To our student members and young professionals — you are the future of this profession. We are investing in training programmes, mentorship initiatives, and digital resources designed to accelerate your growth and prepare you for leadership roles in the rapidly evolving health sector.
+      </p>
+      <p>
+        To our seasoned practitioners — your experience and wisdom are invaluable. We call on you to continue to mentor, guide, and champion the cause of Health Information Management at every level of your practice.
+      </p>
+      <p>
+        Together, we will build a digital future for health information management. Together, we will elevate the standard of patient care through accurate, timely, and well-managed health information. And together, we will ensure that AHRIMPN continues to be a voice of authority, excellence, and professionalism in Nigeria and beyond.
+      </p>
+      <p class="font-semibold text-brand-dark">
+        Thank you for your trust, your commitment, and your unwavering dedication to this noble profession.
+      </p>
+      <p class="text-brand-green font-bold">Yours in service,<br/>Abiodun Y. AFOLABI<br/><span class="text-xs font-normal text-gray-400 uppercase tracking-wider">National President, AHRIMPN</span></p>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-8 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0 flex justify-end">
+      <button type="button" onclick="closePresidentModal()"
+              class="inline-flex items-center gap-2 bg-brand-green text-white text-xs font-bold uppercase tracking-widest px-6 py-3 rounded-xl hover:bg-brand-dark transition duration-300">
+        Close <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function closePresidentModal() {
+  document.getElementById('presidentModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePresidentModal();
+});
+</script>
+
+</body>
+</html>
