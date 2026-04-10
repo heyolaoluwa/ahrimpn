@@ -81,15 +81,30 @@ elseif ($method === 'POST' && $action === 'register') {
     $memberId = nextCode('MBR', 'users', 'member_id');
     $hash     = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
 
-    // New self-registered members start inactive (active=0) until payment
-    $db->prepare("
-        INSERT INTO users
-            (member_id, name, email, password_hash, phone, state, workplace,
-             membership_category, professional_cadre, present_qualification, payment_type,
-             role, join_date, active, activated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', CURDATE(), 0, NULL)
-    ")->execute([$memberId, $name, $email, $hash, $phone, $state, $workplace,
-                 $category, $cadre, $qualification, $paymentType]);
+    // New self-registered members start inactive (active=0) until payment.
+    // Try INSERT with new columns first; fall back if migration not yet run.
+    try {
+        $db->prepare("
+            INSERT INTO users
+                (member_id, name, email, password_hash, phone, state, workplace,
+                 membership_category, professional_cadre, present_qualification, payment_type,
+                 role, join_date, active, activated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', CURDATE(), 0, NULL)
+        ")->execute([$memberId, $name, $email, $hash, $phone, $state, $workplace,
+                     $category, $cadre, $qualification, $paymentType]);
+    } catch (\PDOException $e) {
+        // Columns don't exist yet (migration pending) — use the base schema
+        if (stripos($e->getMessage(), 'Unknown column') !== false) {
+            $db->prepare("
+                INSERT INTO users
+                    (member_id, name, email, password_hash, phone, state, workplace,
+                     role, join_date, active, activated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'member', CURDATE(), 0, NULL)
+            ")->execute([$memberId, $name, $email, $hash, $phone, $state, $workplace]);
+        } else {
+            fail('Registration failed: ' . $e->getMessage());
+        }
+    }
 
     $userId = (int) $db->lastInsertId();
 
