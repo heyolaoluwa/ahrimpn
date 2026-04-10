@@ -230,6 +230,9 @@
 ═══════════════════════════════════════ -->
 <section id="home" class="relative w-full min-h-[88vh] flex items-center justify-center overflow-hidden bg-brand-dark pt-8 pb-28 md:pb-20">
 
+  <!-- CMS colour overlay (sits above slider, controlled by admin) -->
+  <div id="heroColorOverlay" class="absolute inset-0 pointer-events-none" style="background:transparent;transition:background .4s;z-index:2"></div>
+
   <!-- Background Slider -->
   <div id="slider-container" class="absolute inset-0 w-full h-full">
     <div class="slider-slide absolute inset-0 transition-opacity duration-1000 opacity-100">
@@ -980,6 +983,8 @@ document.addEventListener('keydown', function(e) {
       const badge    = document.getElementById('heroBadge');
       const headline = document.getElementById('heroHeadline');
       const subtitle = document.getElementById('heroSubtitle');
+      const overlay  = document.getElementById('heroColorOverlay');
+
       if (badge    && h.badge)    badge.textContent    = h.badge;
       if (subtitle && h.subtitle) subtitle.textContent = h.subtitle;
       if (headline && h.headline) {
@@ -991,6 +996,23 @@ document.addEventListener('keydown', function(e) {
           headline.textContent = h.headline;
         }
       }
+
+      // Apply saved background colour via the CMS overlay
+      if (overlay && h.bg_color) {
+        overlay.style.background = h.bg_color;
+        overlay.style.opacity    = '0.82';
+      }
+
+      // Apply saved text colour to hero text elements
+      if (h.text_color) {
+        if (headline) headline.style.color = h.text_color;
+        if (subtitle) subtitle.style.color = h.text_color;
+        if (badge)    badge.style.color    = h.text_color;
+      }
+
+      // Apply saved font sizes
+      if (headline && h.headline_size) headline.style.fontSize = h.headline_size;
+      if (subtitle && h.subtitle_size) subtitle.style.fontSize = h.subtitle_size;
     }
   } catch(_) { /* silently fall back to hardcoded defaults */ }
 })();

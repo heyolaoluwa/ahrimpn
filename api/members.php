@@ -34,6 +34,17 @@ if ($method === 'GET' && $action === 'list') {
     ok($rows);
 }
 
+// ── GET ALL USERS (for Access Control — includes admins/executives) ──
+elseif ($method === 'GET' && $action === 'list_all') {
+    requireRole($user, 'admin');
+    $stmt = $db->query("
+        SELECT id, member_id, name, email, phone, state, role, join_date, active
+        FROM users
+        ORDER BY role ASC, name ASC
+    ");
+    ok($stmt->fetchAll());
+}
+
 // ── GET SINGLE ────────────────────────────────────────────────
 elseif ($method === 'GET' && $action === 'get') {
     $id = (int) ($_GET['id'] ?? 0);

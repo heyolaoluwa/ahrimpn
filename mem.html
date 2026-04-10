@@ -1977,23 +1977,91 @@ async function deleteEvent(id) {
 // ═══════════════════════════════════════════════════════════
 //  ACCESS CONTROL
 // ═══════════════════════════════════════════════════════════
-function loadAccessControl() {
+async function loadAccessControl() {
   const perms = [
     ['View all members',     '✅', '✅', '❌'],
     ['Edit member data',     '✅', '❌', '❌'],
     ['Record dues payments', '✅', '✅', '❌'],
     ['Approve new members',  '✅', '✅', '❌'],
+    ['Approve job listings', '✅', '✅', '❌'],
     ['Manage courses',       '✅', '❌', '❌'],
     ['Manage events',        '✅', '✅', '❌'],
     ['Edit website content', '✅', '❌', '❌'],
     ['Manage roles',         '✅', '❌', '❌'],
+    ['Post job listings',    '✅', '✅', '✅'],
     ['View own profile',     '✅', '✅', '✅'],
     ['View own dues',        '✅', '✅', '✅'],
     ['Access courses',       '✅', '✅', '✅'],
   ];
   document.getElementById('permMatrix').innerHTML = perms.map(([p, a, e, m]) => `
-    <tr><td style="font-size:12px">${p}</td><td style="text-align:center">${a}</td><td style="text-align:center">${e}</td><td style="text-align:center">${m}</td></tr>
+    <tr>
+      <td style="font-size:12px">${p}</td>
+      <td style="text-align:center">${a}</td>
+      <td style="text-align:center">${e}</td>
+      <td style="text-align:center">${m}</td>
+    </tr>
   `).join('');
+
+  // Load actual user roles
+  const rolesEl = document.getElementById('rolesTable');
+  rolesEl.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading users…</div>';
+  try {
+    const all = await api('members', 'list_all');
+
+    if (!all.length) {
+      rolesEl.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><h3>No users found</h3></div>';
+      return;
+    }
+
+    rolesEl.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Member ID</th>
+            <th>Current Role</th>
+            <th>Change Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${all.map(u => `
+            <tr>
+              <td style="font-weight:600;font-size:13px">${esc(u.name)}</td>
+              <td style="font-size:12px;color:var(--gray-500)">${esc(u.email)}</td>
+              <td style="font-size:12px">${esc(u.member_id)}</td>
+              <td>
+                <span class="role-pill ${u.role === 'admin' ? 'role-admin' : u.role === 'executive' ? 'role-exec' : 'role-member'}">
+                  ${u.role === 'admin' ? 'Super Admin' : u.role === 'executive' ? 'Executive' : 'Member'}
+                </span>
+              </td>
+              <td>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <select id="role-sel-${u.id}" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;color:var(--dark)">
+                    <option value="member"    ${u.role === 'member'    ? 'selected' : ''}>Member</option>
+                    <option value="executive" ${u.role === 'executive' ? 'selected' : ''}>Executive</option>
+                    <option value="admin"     ${u.role === 'admin'     ? 'selected' : ''}>Super Admin</option>
+                  </select>
+                  <button type="button" class="btn-sm btn-green" style="padding:5px 12px;font-size:11px" onclick="applyRoleChange(${u.id})">
+                    Apply
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) { rolesEl.innerHTML = `<div style="padding:16px;color:var(--red);font-size:13px">Failed to load users: ${e.message}</div>`; }
+}
+
+async function applyRoleChange(id) {
+  const sel = document.getElementById('role-sel-' + id);
+  if (!sel) return;
+  try {
+    await api('members', 'promote', 'POST', { id, role: sel.value });
+    showToast('Role updated successfully', 'success');
+    loadAccessControl();
+  } catch(e) { showToast(e.message, 'error'); }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2012,11 +2080,18 @@ async function loadWebsiteControl() {
 
     // Hero preview
     const h = site.hero || {};
+    const heroBg   = h.bg_color   || '#064E3B';
+    const heroText = h.text_color || '#ffffff';
+    const heroHSize = h.headline_size || '2.4rem';
+    const heroSSize = h.subtitle_size || '1rem';
     document.getElementById('heroPreview').innerHTML = `
-      <div style="font-size:12px;color:var(--gray-500)">
-        <div style="margin-bottom:6px"><strong>Badge:</strong> ${esc(h.badge || '—')}</div>
-        <div style="margin-bottom:6px"><strong>Headline:</strong> ${esc(h.headline || '—')}</div>
-        <div><strong>Subtitle:</strong> ${esc(h.subtitle || '—')}</div>
+      <div style="background:${esc(heroBg)};color:${esc(heroText)};border-radius:10px;padding:16px;margin-bottom:10px">
+        ${h.badge ? `<div style="display:inline-block;background:rgba(255,255,255,.15);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;letter-spacing:.05em">${esc(h.badge)}</div>` : ''}
+        <div style="font-family:'Fraunces',serif;font-size:${esc(heroHSize)};font-weight:700;line-height:1.2;margin-bottom:6px">${esc(h.headline || '—')}</div>
+        <div style="font-size:${esc(heroSSize)};opacity:.85">${esc(h.subtitle || '—')}</div>
+      </div>
+      <div style="font-size:11px;color:var(--gray-500)">
+        BG: <b>${esc(heroBg)}</b> · Text: <b>${esc(heroText)}</b> · Headline: <b>${esc(heroHSize)}</b> · Subtitle: <b>${esc(heroSSize)}</b>
       </div>`;
 
     // Announcements preview
@@ -2067,34 +2142,164 @@ async function saveTicker() {
 function editHero() {
   api('content', 'site').then(site => {
     const h = site.hero || {};
+    const heroBg    = h.bg_color        || '#064E3B';
+    const heroText  = h.text_color      || '#ffffff';
+    const heroHSize = h.headline_size   || '2.4rem';
+    const heroSSize = h.subtitle_size   || '1rem';
+
     showModal('Edit Hero Section', `
-      <p style="font-size:12px;color:var(--gray-500);margin-bottom:14px">These fields update the main banner on the public homepage.</p>
+      <p style="font-size:12px;color:var(--gray-500);margin-bottom:16px">Updates the main banner on the public homepage.</p>
+
       <div class="form-grid">
         <div class="form-field form-full">
-          <label>Badge Text <span style="color:var(--gray-400);font-size:11px">(small tag above headline)</span></label>
-          <input id="heroBadge" class="form-input" value="${esc(h.badge||'Proudly Serving 5,000+ Members Nationwide')}"/>
+          <label>Badge Text <span style="color:var(--gray-400);font-size:11px">(small pill above headline)</span></label>
+          <input id="heroBadge" class="form-input" value="${esc(h.badge || 'Proudly Serving 5,000+ Members Nationwide')}"/>
         </div>
         <div class="form-field form-full">
           <label>Headline</label>
-          <input id="heroHeadline" class="form-input" value="${esc(h.headline||'Health Information Managers — Guardians of Integrity')}"/>
+          <input id="heroHeadline" class="form-input" value="${esc(h.headline || 'Health Information Managers — Guardians of Integrity')}"/>
         </div>
         <div class="form-field form-full">
           <label>Subtitle</label>
-          <textarea id="heroSubtitle" class="form-input" rows="3" style="resize:vertical">${esc(h.subtitle||'Empowering Health Information Management Practitioners across Nigeria through professional development, digital innovation, and policy advocacy.')}</textarea>
+          <textarea id="heroSubtitle" class="form-input" rows="3" style="resize:vertical">${esc(h.subtitle || 'Empowering Health Information Management Practitioners across Nigeria.')}</textarea>
         </div>
       </div>
-      <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end">
-        <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
-        <button class="btn-sm btn-green" onclick="saveHero()">Save Hero</button>
+
+      <div style="border-top:1px solid var(--border);margin:16px 0;padding-top:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:12px">🎨 Colours &amp; Typography</div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Background Colour</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="color" id="heroBgColor" value="${esc(heroBg)}"
+                style="width:44px;height:38px;padding:2px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer"/>
+              <input id="heroBgHex" class="form-input" value="${esc(heroBg)}" placeholder="#064E3B"
+                style="flex:1" oninput="syncColorPicker('heroBgColor','heroBgHex')"/>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+              ${[['#064E3B','Forest Green'],['#0f172a','Dark Navy'],['#1d4ed8','Royal Blue'],['#7c2d12','Deep Red'],['#78350f','Amber Brown'],['#1e1b4b','Indigo'],['#134e4a','Teal'],['#000000','Black']].map(([c,n]) =>
+                `<button type="button" title="${n}" onclick="setHeroColor('${c}')"
+                  style="width:24px;height:24px;border-radius:5px;background:${c};border:2px solid ${c === heroBg ? '#fff' : 'transparent'};cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.2)"></button>`
+              ).join('')}
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Text Colour</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="color" id="heroTextColor" value="${esc(heroText)}"
+                style="width:44px;height:38px;padding:2px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer"/>
+              <input id="heroTextHex" class="form-input" value="${esc(heroText)}" placeholder="#ffffff"
+                style="flex:1" oninput="syncColorPicker('heroTextColor','heroTextHex')"/>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              ${[['#ffffff','White'],['#f9fafb','Off-white'],['#d1fae5','Mint'],['#fef9c3','Pale Yellow'],['#0f172a','Dark']].map(([c,n]) =>
+                `<button type="button" title="${n}" onclick="setHeroTextColor('${c}')"
+                  style="width:24px;height:24px;border-radius:5px;background:${c};border:2px solid ${c === heroText ? '#064E3B' : 'transparent'};cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.2)"></button>`
+              ).join('')}
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Headline Font Size</label>
+            <select id="heroHSize" class="form-input">
+              ${[['1.8rem','Small'],['2.1rem','Medium'],['2.4rem','Large (default)'],['2.8rem','X-Large'],['3.2rem','2XL'],['3.8rem','3XL']].map(([v,l]) =>
+                `<option value="${v}" ${heroHSize === v ? 'selected' : ''}>${l} (${v})</option>`
+              ).join('')}
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Subtitle Font Size</label>
+            <select id="heroSSize" class="form-input">
+              ${[['0.85rem','Small'],['1rem','Normal (default)'],['1.1rem','Medium'],['1.25rem','Large'],['1.4rem','X-Large']].map(([v,l]) =>
+                `<option value="${v}" ${heroSSize === v ? 'selected' : ''}>${l} (${v})</option>`
+              ).join('')}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- live preview -->
+      <div style="margin-top:4px;margin-bottom:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Preview</div>
+        <div id="heroLivePreview" style="border-radius:12px;padding:20px;overflow:hidden">
+          <div style="display:inline-block;background:rgba(255,255,255,.15);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;letter-spacing:.05em" id="prevBadge">${esc(h.badge || '')}</div>
+          <div style="font-family:'Fraunces',serif;font-weight:700;line-height:1.2;margin-bottom:8px" id="prevHeadline">${esc(h.headline || '')}</div>
+          <div style="opacity:.85" id="prevSubtitle">${esc(h.subtitle || '')}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn-sm btn-green" onclick="saveHero()"><i class="fas fa-save"></i> Save Hero</button>
       </div>`);
+
+    // Wire up live preview updates
+    updateHeroPreview();
+    ['heroBadge','heroHeadline','heroSubtitle','heroBgColor','heroTextColor','heroHSize','heroSSize'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateHeroPreview);
+    });
   }).catch(() => showToast('Could not load hero content', 'error'));
+}
+
+function syncColorPicker(pickerId, hexId) {
+  const hex = document.getElementById(hexId)?.value;
+  if (/^#[0-9a-fA-F]{6}$/.test(hex)) {
+    const picker = document.getElementById(pickerId);
+    if (picker) picker.value = hex;
+  }
+  updateHeroPreview();
+}
+
+function setHeroColor(color) {
+  const p = document.getElementById('heroBgColor');
+  const h = document.getElementById('heroBgHex');
+  if (p) p.value = color;
+  if (h) h.value = color;
+  updateHeroPreview();
+}
+
+function setHeroTextColor(color) {
+  const p = document.getElementById('heroTextColor');
+  const h = document.getElementById('heroTextHex');
+  if (p) p.value = color;
+  if (h) h.value = color;
+  updateHeroPreview();
+}
+
+function updateHeroPreview() {
+  const bg      = document.getElementById('heroBgColor')?.value  || '#064E3B';
+  const text    = document.getElementById('heroTextColor')?.value || '#ffffff';
+  const hSize   = document.getElementById('heroHSize')?.value    || '2.4rem';
+  const sSize   = document.getElementById('heroSSize')?.value    || '1rem';
+  const badge   = document.getElementById('heroBadge')?.value    || '';
+  const hl      = document.getElementById('heroHeadline')?.value || '';
+  const sub     = document.getElementById('heroSubtitle')?.value || '';
+
+  const wrap = document.getElementById('heroLivePreview');
+  if (wrap) { wrap.style.background = bg; wrap.style.color = text; }
+  const pBadge = document.getElementById('prevBadge');
+  if (pBadge) pBadge.textContent = badge;
+  const pHl = document.getElementById('prevHeadline');
+  if (pHl) { pHl.textContent = hl; pHl.style.fontSize = hSize; }
+  const pSub = document.getElementById('prevSubtitle');
+  if (pSub) { pSub.textContent = sub; pSub.style.fontSize = sSize; }
+
+  // Also sync hex input if color picker changed directly
+  const bgHex = document.getElementById('heroBgHex');
+  if (bgHex && bgHex.value !== bg) bgHex.value = bg;
+  const textHex = document.getElementById('heroTextHex');
+  if (textHex && textHex.value !== text) textHex.value = text;
 }
 
 async function saveHero() {
   const val = {
-    badge:    document.getElementById('heroBadge').value.trim(),
-    headline: document.getElementById('heroHeadline').value.trim(),
-    subtitle: document.getElementById('heroSubtitle').value.trim(),
+    badge:         document.getElementById('heroBadge').value.trim(),
+    headline:      document.getElementById('heroHeadline').value.trim(),
+    subtitle:      document.getElementById('heroSubtitle').value.trim(),
+    bg_color:      document.getElementById('heroBgColor')?.value   || '#064E3B',
+    text_color:    document.getElementById('heroTextColor')?.value || '#ffffff',
+    headline_size: document.getElementById('heroHSize')?.value     || '2.4rem',
+    subtitle_size: document.getElementById('heroSSize')?.value     || '1rem',
   };
   if (!val.headline) { showToast('Headline is required', 'error'); return; }
   try {
