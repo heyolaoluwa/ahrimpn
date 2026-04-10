@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-<script src="https://checkout.flutterwave.com/v3.js"></script>
+<!-- Flutterwave removed: payments now via manual bank transfer -->
 <style>
 /* ═══════════════════════════════════════════════
    DESIGN TOKENS
@@ -688,13 +688,42 @@ tbody tr:hover td { background: var(--gray-50); }
       <div class="field"><label>Workplace / Institution</label>
         <input type="text" id="regWorkplace" placeholder="e.g. University College Hospital"/>
       </div>
+      <div class="field"><label>Membership Category <span style="color:#b91c1c">*</span></label>
+        <select id="regCategory" onchange="updateRegPricing()">
+          <option value="">Select Category</option>
+          <option value="Affiliate">Affiliate Membership</option>
+          <option value="Full">Full Membership</option>
+          <option value="Associate">Associate Membership</option>
+          <option value="Fellow">Fellow Membership</option>
+          <option value="Honorary">Honorary Membership</option>
+        </select>
+      </div>
+      <div class="field"><label>Professional Cadre <span style="color:#b91c1c">*</span></label>
+        <select id="regCadre">
+          <option value="">Select Cadre</option>
+          <option value="Technician">Technician</option>
+          <option value="Technologist">Technologist</option>
+          <option value="Officer">Officer</option>
+        </select>
+      </div>
+      <div class="field"><label>Present Qualification <span style="color:#b91c1c">*</span></label>
+        <select id="regQualification">
+          <option value="">Select Qualification</option>
+          <option value="PD/ND">PD/ND</option>
+          <option value="HND">HND</option>
+          <option value="BHIM">BHIM</option>
+          <option value="MSC/MHIM">MSC/MHIM</option>
+          <option value="PHD">PHD</option>
+        </select>
+      </div>
       <div class="field"><label>Password</label>
         <input type="password" id="regPass" placeholder="Minimum 8 characters"/>
       </div>
+      <div id="regPricingNote" style="display:none;font-size:12px;color:var(--green);background:var(--green-pale);padding:10px 12px;border-radius:8px;margin-bottom:12px"></div>
       <button class="btn-primary" id="regBtn" onclick="handleRegister()">
         <i class="fas fa-user-plus"></i> Create Account
       </button>
-      <p class="auth-note">Membership dues: ₦1,200/month · ₦12,000/year</p>
+      <p class="auth-note">Select your membership category above to see pricing</p>
     </div>
   </div>
 </div>
@@ -777,6 +806,42 @@ tbody tr:hover td { background: var(--gray-50); }
         <div class="search-bar">
           <input class="search-input" placeholder="🔍 Search by name, email, state…" id="memberSearch" oninput="searchMembers(this.value)"/>
           <button class="btn-sm btn-green" onclick="openAddMember()"><i class="fas fa-user-plus"></i> Add Member</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+          <select class="search-input" style="width:auto;padding:8px 12px;min-width:0;font-size:12px" id="filterState" onchange="applyMemberFilters()">
+            <option value="">All States</option>
+            <option>Abia State</option><option>Adamawa State</option><option>Akwa Ibom State</option>
+            <option>Anambra State</option><option>Bauchi State</option><option>Bayelsa State</option>
+            <option>Benue State</option><option>Borno State</option><option>Cross River State</option>
+            <option>Delta State</option><option>Ebonyi State</option><option>Edo State</option>
+            <option>Ekiti State</option><option>Enugu State</option><option>FCT Abuja</option>
+            <option>Gombe State</option><option>Imo State</option><option>Jigawa State</option>
+            <option>Kaduna State</option><option>Kano State</option><option>Katsina State</option>
+            <option>Kebbi State</option><option>Kogi State</option><option>Kwara State</option>
+            <option>Lagos State</option><option>Nassarawa State</option><option>Niger State</option>
+            <option>Ogun State</option><option>Ondo State</option><option>Osun State</option>
+            <option>Oyo State</option><option>Plateau State</option><option>Rivers State</option>
+            <option>Sokoto State</option><option>Taraba State</option><option>Yobe State</option>
+            <option>Zamfara State</option>
+          </select>
+          <select class="search-input" style="width:auto;padding:8px 12px;min-width:0;font-size:12px" id="filterCadre" onchange="applyMemberFilters()">
+            <option value="">All Cadres</option>
+            <option>Technician</option><option>Technologist</option><option>Officer</option>
+          </select>
+          <select class="search-input" style="width:auto;padding:8px 12px;min-width:0;font-size:12px" id="filterCategory" onchange="applyMemberFilters()">
+            <option value="">All Categories</option>
+            <option>Affiliate</option><option>Full</option><option>Associate</option><option>Fellow</option><option>Honorary</option>
+          </select>
+          <select class="search-input" style="width:auto;padding:8px 12px;min-width:0;font-size:12px" id="filterQualification" onchange="applyMemberFilters()">
+            <option value="">All Qualifications</option>
+            <option>PD/ND</option><option>HND</option><option>BHIM</option><option>MSC/MHIM</option><option>PHD</option>
+          </select>
+          <select class="search-input" style="width:auto;padding:8px 12px;min-width:0;font-size:12px" id="filterFinancial" onchange="applyMemberFilters()">
+            <option value="">All Financial Status</option>
+            <option value="financial">Financial</option>
+            <option value="non-financial">Non-Financial</option>
+          </select>
+          <button class="btn-sm btn-outline" style="padding:8px 12px;font-size:12px" onclick="clearMemberFilters()"><i class="fas fa-times"></i> Clear Filters</button>
         </div>
         <div class="card">
           <div class="table-wrap" id="membersTable">
@@ -958,6 +1023,37 @@ tbody tr:hover td { background: var(--gray-50); }
         <div id="idCardPanel" style="max-width:500px"></div>
       </div>
 
+      <!-- JOB PORTAL (member) -->
+      <div class="section" id="sec-job-portal">
+        <div class="page-header">
+          <h1 class="page-title">Job Portal</h1>
+          <p class="page-sub">Browse and post healthcare job opportunities</p>
+        </div>
+        <div style="margin-bottom:16px">
+          <button class="btn-sm btn-green" onclick="openPostJob()"><i class="fas fa-plus"></i> Post a Job</button>
+        </div>
+        <div id="jobPortalList">
+          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+        </div>
+      </div>
+
+      <!-- JOB APPROVALS (admin) -->
+      <div class="section" id="sec-job-approvals">
+        <div class="page-header">
+          <h1 class="page-title">Job Approvals</h1>
+          <p class="page-sub">Review and approve member-submitted job listings</p>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📋 Pending Job Listings</span>
+            <button class="btn-sm btn-outline" onclick="loadJobApprovals()"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          <div id="jobApprovalsList">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -983,8 +1079,7 @@ tbody tr:hover td { background: var(--gray-50); }
 // ═══════════════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════════════
-const API          = 'api'; // relative — same server
-const FLW_PUB_KEY  = 'FLWPUBK_TEST-213ec04132197ad19b7c7489d7aaf173-X'; // ← replace with live key
+const API = 'api'; // relative — same server
 
 // ═══════════════════════════════════════════════════════════
 //  STATE
@@ -1042,20 +1137,37 @@ async function handleLogin() {
   }
 }
 
+function updateRegPricing() {
+  const cat  = document.getElementById('regCategory')?.value;
+  const note = document.getElementById('regPricingNote');
+  if (!note) return;
+  if (!cat) { note.style.display = 'none'; return; }
+  note.style.display = 'block';
+  note.innerHTML = cat === 'Affiliate'
+    ? '💡 <b>Affiliate Membership:</b> One-time payment of ₦1,000'
+    : `💡 <b>${cat} Membership:</b> ₦1,200/month or ₦12,000/annually`;
+}
+
 async function handleRegister() {
   const btn  = document.getElementById('regBtn');
   const body = {
-    name:      document.getElementById('regName').value.trim(),
-    email:     document.getElementById('regEmail').value.trim(),
-    phone:     document.getElementById('regPhone').value.trim(),
-    state:     document.getElementById('regState').value,
-    workplace: document.getElementById('regWorkplace').value.trim(),
-    password:  document.getElementById('regPass').value,
+    name:                  document.getElementById('regName').value.trim(),
+    email:                 document.getElementById('regEmail').value.trim(),
+    phone:                 document.getElementById('regPhone').value.trim(),
+    state:                 document.getElementById('regState').value,
+    workplace:             document.getElementById('regWorkplace').value.trim(),
+    membership_category:   document.getElementById('regCategory').value,
+    professional_cadre:    document.getElementById('regCadre').value,
+    present_qualification: document.getElementById('regQualification').value,
+    password:              document.getElementById('regPass').value,
   };
-  for (const [k, v] of Object.entries(body)) {
-    if (!v) { showToast('Please fill all fields', 'error'); return; }
+  if (!body.name || !body.email || !body.state || !body.password) {
+    showToast('Please fill all required fields', 'error'); return;
   }
-  if (body.password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+  if (!body.membership_category)   { showToast('Please select a Membership Category', 'error'); return; }
+  if (!body.professional_cadre)    { showToast('Please select a Professional Cadre', 'error'); return; }
+  if (!body.present_qualification) { showToast('Please select your Present Qualification', 'error'); return; }
+  if (body.password.length < 8)    { showToast('Password must be at least 8 characters', 'error'); return; }
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account…';
   try {
@@ -1139,6 +1251,7 @@ function buildSidebar() {
     { sec: 'dashboard',          icon: 'fa-gauge-high',       label: 'Dashboard' },
     { sec: 'members',            icon: 'fa-users',            label: 'Members' },
     { sec: 'pending-approvals',  icon: 'fa-user-clock',       label: 'Pending Approvals', badge: true },
+    { sec: 'job-approvals',      icon: 'fa-briefcase',        label: 'Job Approvals' },
     { sec: 'dues',               icon: 'fa-money-bill-wave',  label: 'Dues & Arrears' },
     { sec: 'courses-admin',      icon: 'fa-graduation-cap',   label: 'Courses (LMS)' },
     { sec: 'events-admin',       icon: 'fa-calendar-star',    label: 'Events' },
@@ -1151,6 +1264,7 @@ function buildSidebar() {
     { sec: 'my-dues',     icon: 'fa-receipt',       label: 'My Dues' },
     { sec: 'my-courses',  icon: 'fa-book-open',     label: 'My Courses' },
     { sec: 'my-certs',    icon: 'fa-certificate',   label: 'Certifications' },
+    { sec: 'job-portal',  icon: 'fa-briefcase',     label: 'Job Portal' },
     { sec: 'id-card',     icon: 'fa-id-card',       label: 'My ID Card' },
   ];
 
@@ -1196,10 +1310,12 @@ function navigate(sec) {
     'events-admin':      loadAdminEvents,
     'access':            loadAccessControl,
     'pending-approvals': loadPendingApprovals,
+    'job-approvals':     loadJobApprovals,
     'member-home':       loadMemberDashboard,
     'my-dues':           loadMyDues,
     'my-courses':        loadMyCourses,
     'my-certs':          loadMyCerts,
+    'job-portal':        loadJobPortal,
     'id-card':           loadIdCard,
     'website':           loadWebsiteControl,
   };
@@ -1332,15 +1448,39 @@ async function loadMembers(q = '') {
   } catch(e) { showToast(e.message, 'error'); }
 }
 
+function applyMemberFilters() {
+  const state     = document.getElementById('filterState')?.value     || '';
+  const cadre     = document.getElementById('filterCadre')?.value     || '';
+  const category  = document.getElementById('filterCategory')?.value  || '';
+  const qual      = document.getElementById('filterQualification')?.value || '';
+  const financial = document.getElementById('filterFinancial')?.value || '';
+
+  let filtered = _allMembers;
+  if (state)    filtered = filtered.filter(m => m.state === state);
+  if (cadre)    filtered = filtered.filter(m => m.professional_cadre === cadre);
+  if (category) filtered = filtered.filter(m => m.membership_category === category);
+  if (qual)     filtered = filtered.filter(m => m.present_qualification === qual);
+  if (financial === 'financial')     filtered = filtered.filter(m => m.dues?.status === 'paid');
+  if (financial === 'non-financial') filtered = filtered.filter(m => m.dues?.status !== 'paid');
+
+  renderMembersTable(filtered);
+}
+
+function clearMemberFilters() {
+  ['filterState','filterCadre','filterCategory','filterQualification','filterFinancial']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  renderMembersTable(_allMembers);
+}
+
 function renderMembersTable(members) {
   if (!members.length) {
-    document.getElementById('membersTable').innerHTML = '<div class="empty-state"><i class="fas fa-users-slash"></i><h3>No members found</h3><p>Try a different search term.</p></div>';
+    document.getElementById('membersTable').innerHTML = '<div class="empty-state"><i class="fas fa-users-slash"></i><h3>No members found</h3><p>Try a different search term or clear filters.</p></div>';
     return;
   }
   document.getElementById('membersTable').innerHTML = `
     <table>
       <thead><tr>
-        <th>Member</th><th>Contact</th><th>State</th><th>Status</th><th>Dues</th>
+        <th>Member</th><th>Contact</th><th>State</th><th>Category / Cadre</th><th>Status</th><th>Dues</th>
         ${CURRENT_USER.role === 'admin' ? '<th>Actions</th>' : ''}
       </tr></thead>
       <tbody>${members.map(m => `
@@ -1354,6 +1494,10 @@ function renderMembersTable(members) {
             <div style="font-size:11px;color:var(--gray-500)">${esc(m.phone || '—')}</div>
           </td>
           <td style="font-size:12px">${esc(m.state)}</td>
+          <td style="font-size:12px">
+            <div>${esc(m.membership_category || '—')}</div>
+            <div style="font-size:11px;color:var(--gray-500)">${esc(m.professional_cadre || '—')}</div>
+          </td>
           <td>${m.active ? '<span class="badge badge-green">✓ Active</span>' : '<span class="badge badge-yellow">⏳ Pending</span>'}</td>
           <td>
             <span class="badge ${duesBadgeClass(m.dues?.status)}">${duesLabel(m.dues?.status)}</span>
@@ -1574,21 +1718,28 @@ async function loadPendingApprovals() {
     }
     document.getElementById('pendingTable').innerHTML = `
       <table>
-        <thead><tr><th>Member</th><th>State</th><th>Registered</th><th>Payment Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Member</th><th>State / Category</th><th>Registered</th><th>Payment Type</th><th>Proof</th><th>Actions</th></tr></thead>
         <tbody>${rows.map(m => `
           <tr>
             <td>
               <div style="font-weight:600">${esc(m.name)}</div>
               <div style="font-size:11px;color:var(--gray-500)">${esc(m.email)}</div>
             </td>
-            <td style="font-size:12px">${esc(m.state)}</td>
-            <td style="font-size:11px;color:var(--gray-500)">${fmtDate(m.join_date)}
-              ${m.payment_initiated_at ? `<div style="color:var(--amber)">💳 ${fmtDate(m.payment_initiated_at)}</div>` : ''}
+            <td style="font-size:12px">
+              <div>${esc(m.state)}</div>
+              <div style="font-size:11px;color:var(--gray-500)">${esc(m.membership_category || '—')}</div>
+            </td>
+            <td style="font-size:11px;color:var(--gray-500)">${fmtDate(m.join_date)}</td>
+            <td>
+              ${m.payment_type === 'chapter'
+                ? '<span class="badge badge-blue">🏛️ Chapter</span>'
+                : '<span class="badge badge-green">💳 Individual</span>'}
             </td>
             <td>
-              ${m.flw_status === 'pending'  ? '<span class="badge badge-yellow">⏳ Payment Initiated</span>' :
-                m.flw_status === 'failed'   ? '<span class="badge badge-red">❌ Payment Failed</span>' :
-                '<span class="badge badge-gray">📝 No Payment Yet</span>'}
+              ${m.proof_file
+                ? `<a href="uploads/payments/${esc(m.proof_file)}" target="_blank" style="font-size:11px;color:var(--blue);text-decoration:underline"><i class="fas fa-file-alt"></i> View Proof</a>`
+                : '<span style="font-size:11px;color:var(--gray-500)">—</span>'}
+              ${m.pay_status === 'pending' ? '<div style="font-size:10px;color:var(--amber);margin-top:2px">⏳ Awaiting review</div>' : ''}
             </td>
             <td>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -2578,21 +2729,85 @@ async function updateProgress(id) {
 //  CERTS
 // ═══════════════════════════════════════════════════════════
 async function loadMyCerts() {
+  const panel = document.getElementById('myCertsPanel');
+  panel.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
   try {
-    const courses = await api('courses', 'mine');
-    const completed = courses.filter(c => c.completed);
-    if (!completed.length) {
-      document.getElementById('myCertsPanel').innerHTML = '<div class="empty-state"><i class="fas fa-certificate"></i><h3>No certifications yet</h3><p>Complete a course to earn your first certificate.</p></div>';
-      return;
+    const [courses, certStatus] = await Promise.all([
+      api('courses', 'mine'),
+      api('payment_manual', 'cert_status&user_id=' + CURRENT_USER.id).catch(() => ({ status: 'none' }))
+    ]);
+    const completed   = courses.filter(c => c.completed);
+    const certApproved = certStatus?.status === 'approved';
+    const certPending  = certStatus?.status === 'pending';
+
+    // ── Membership Certificate Card ──
+    let memberCertHtml = `<div class="card" style="margin-bottom:20px"><div class="card-header"><span class="card-title">🏅 Membership Certificate</span></div><div class="card-body">`;
+
+    if (certApproved) {
+      memberCertHtml += `
+        <div style="background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden">
+          <div style="position:absolute;right:20px;top:20px;font-size:50px;opacity:.1">🏅</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.7;text-transform:uppercase;margin-bottom:8px">Official Membership Certificate</div>
+          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:4px">Association of Health Records &amp; Information Management Professionals of Nigeria</div>
+          <div style="font-size:12px;opacity:.8;margin-bottom:4px">This certifies that <b>${esc(CURRENT_USER.name)}</b> is a registered member of AHRIMPN</div>
+          <div style="font-size:11px;opacity:.7;margin-bottom:16px">Member ID: ${esc(CURRENT_USER.member_id || '')}</div>
+          <button type="button" style="background:#fff;color:var(--green);border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Certificate
+          </button>
+        </div>`;
+    } else if (certPending) {
+      memberCertHtml += `
+        <div style="background:var(--gold-pale);border:1px solid #fde68a;border-radius:10px;padding:20px;text-align:center">
+          <div style="font-size:32px;margin-bottom:8px">⏳</div>
+          <div style="font-weight:700;color:var(--amber);font-size:14px">Payment Under Review</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:6px">Your payment proof has been submitted. The admin will verify and unlock your certificate shortly.</div>
+        </div>`;
+    } else {
+      memberCertHtml += `
+        <div style="text-align:center;padding:8px 0 4px">
+          <div style="font-size:36px;margin-bottom:10px">🏅</div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:6px">Access Your Official Membership Certificate</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:18px">A one-time non-refundable fee of <b>₦2,000</b> is required to access and print your official membership certificate.</div>
+          ${BANK_DETAILS_HTML}
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;text-align:left">Amount: <b style="color:var(--green)">₦2,000</b> (one-time, non-refundable)</div>
+          <div style="margin-bottom:14px;text-align:left">
+            <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:6px">Upload Payment Proof</label>
+            <input type="file" id="certPayProof" accept=".pdf,.jpg,.jpeg,.png"
+              style="width:100%;font-size:12px;padding:8px;border:1.5px solid var(--border);border-radius:8px"/>
+          </div>
+          <button type="button" class="btn-sm btn-green" style="width:100%;justify-content:center" onclick="submitCertPaymentProof()">
+            <i class="fas fa-upload"></i> Submit Payment Proof
+          </button>
+        </div>`;
     }
-    document.getElementById('myCertsPanel').innerHTML = completed.map(c => `
-      <div style="background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden">
-        <div style="position:absolute;right:20px;top:20px;font-size:40px;opacity:.15">🏆</div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.7;text-transform:uppercase;margin-bottom:8px">Certificate of Completion</div>
-        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:4px">${esc(c.cert_title || c.title)}</div>
-        <div style="font-size:12px;opacity:.7">Awarded ${fmtDate(c.completed_date)} · AHRIMPN</div>
-      </div>
-    `).join('');
+    memberCertHtml += '</div></div>';
+
+    // ── Course Certificates ──
+    const courseCertsHtml = completed.length
+      ? completed.map(c => `
+          <div style="background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden">
+            <div style="position:absolute;right:20px;top:20px;font-size:40px;opacity:.15">🏆</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.7;text-transform:uppercase;margin-bottom:8px">Certificate of Completion</div>
+            <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:4px">${esc(c.cert_title || c.title)}</div>
+            <div style="font-size:12px;opacity:.7">Awarded ${fmtDate(c.completed_date)} · AHRIMPN</div>
+          </div>`).join('')
+      : '<div class="empty-state" style="margin-top:4px"><i class="fas fa-certificate"></i><h3>No course certifications yet</h3><p>Complete a course to earn your first certificate.</p></div>';
+
+    panel.innerHTML = memberCertHtml + courseCertsHtml;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function submitCertPaymentProof() {
+  const fileInput = document.getElementById('certPayProof');
+  if (!fileInput?.files[0]) { showToast('Please upload your payment proof', 'error'); return; }
+  try {
+    const fd = new FormData();
+    fd.append('user_id', CURRENT_USER.id);
+    fd.append('purpose', 'certificate');
+    fd.append('proof',   fileInput.files[0]);
+    await uploadFile('payment_manual', 'upload_proof', fd);
+    showToast('Payment proof submitted! Certificate will be unlocked after admin review.', 'success');
+    loadMyCerts();
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -2644,241 +2859,333 @@ async function loadIdCard() {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  PAYMENT — REGISTRATION FLOW (Flutterwave)
+//  PAYMENT — REGISTRATION FLOW (Bank Transfer)
 // ═══════════════════════════════════════════════════════════
+
+// File upload helper (multipart/form-data)
+async function uploadFile(file, action, formData) {
+  const url = `${API}/${file}.php?action=${action}`;
+  const res = await fetch(url, {
+    method:  'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN },
+    body:    formData,
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message || 'Upload failed');
+  return data.data;
+}
+
+const BANK_DETAILS_HTML = `
+  <div style="background:var(--blue-pale);border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">UBA Bank Transfer Details</div>
+    <div style="display:grid;gap:7px;font-size:13px">
+      <div><span style="color:var(--gray-500)">Bank:</span> <b>UBA (United Bank for Africa)</b></div>
+      <div><span style="color:var(--gray-500)">Account Name:</span> <b>Association of Health Records and Information Management Practitioners</b></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="color:var(--gray-500)">Account No:</span>
+        <b style="font-size:17px;color:var(--green);letter-spacing:.05em">1020190306</b>
+        <button type="button" onclick="navigator.clipboard.writeText('1020190306').then(()=>showToast('Copied!','success'))"
+          style="font-size:11px;padding:3px 8px;border:1px solid var(--green);border-radius:5px;background:none;color:var(--green);cursor:pointer">Copy</button>
+      </div>
+    </div>
+  </div>`;
+
 function showRegistrationPaymentStep() {
+  const cat        = CURRENT_USER.membership_category || 'Full';
+  const isAffiliate = cat === 'Affiliate';
+  const amountText = isAffiliate ? '₦1,000 (one-time)' : '₦1,200/month or ₦12,000/annually';
+
   const overlay = document.createElement('div');
   overlay.id = 'paymentScreen';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;overflow-y:auto';
   overlay.innerHTML = `
-    <div class="payment-card">
-      <div style="text-align:center;margin-bottom:28px">
-        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-mid));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:30px">🏥</div>
-        <h2 style="font-family:'Fraunces',serif;font-size:22px;color:var(--green);margin-bottom:6px">Account Created! ✅</h2>
-        <p style="font-size:13px;color:var(--gray-500)">Welcome, ${esc(CURRENT_USER.name)}. Choose a plan to activate your membership.</p>
+    <div style="background:#fff;border-radius:24px;padding:36px 32px;width:100%;max-width:500px;box-shadow:0 40px 80px rgba(0,0,0,.35)">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-mid));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px">🏥</div>
+        <h2 style="font-family:'Fraunces',serif;font-size:21px;color:var(--green);margin-bottom:6px">Account Created! ✅</h2>
+        <p style="font-size:13px;color:var(--gray-500)">Welcome, <b>${esc(CURRENT_USER.name)}</b>. How would you like to pay your dues?</p>
+        <div style="margin-top:8px;padding:7px 12px;background:var(--green-pale);border-radius:8px;font-size:12px;color:var(--green);font-weight:600">${esc(cat)} Membership — ${amountText}</div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-        <div class="plan-option selected" id="plan-monthly" onclick="selectPaymentPlan('monthly')">
-          <div style="font-size:22px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦1,200</div>
-          <div style="font-size:13px;font-weight:600;color:var(--gray-700);margin-top:4px">Monthly</div>
-          <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Billed monthly</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+        <div id="pay-chapter" onclick="selectPaymentMethod('chapter')"
+          style="cursor:pointer;border:2px solid var(--border);border-radius:14px;padding:18px;text-align:center;transition:.2s">
+          <div style="font-size:26px;margin-bottom:6px">🏛️</div>
+          <div style="font-size:13px;font-weight:700;color:var(--dark)">Pay by Chapter</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:3px">Chapter admin activates your account</div>
         </div>
-        <div class="plan-option" id="plan-annual" onclick="selectPaymentPlan('annual')" style="position:relative">
-          <div class="plan-badge">SAVE ₦2,400</div>
-          <div style="font-size:22px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦12,000</div>
-          <div style="font-size:13px;font-weight:600;color:var(--gray-700);margin-top:4px">Annual</div>
-          <div style="font-size:11px;color:var(--gray-500);margin-top:2px">12 months upfront</div>
+        <div id="pay-individual" onclick="selectPaymentMethod('individual')"
+          style="cursor:pointer;border:2px solid var(--green);border-radius:14px;padding:18px;text-align:center;background:var(--green-pale);transition:.2s">
+          <div style="font-size:26px;margin-bottom:6px">💳</div>
+          <div style="font-size:13px;font-weight:700;color:var(--green)">Pay Individually</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:3px">Transfer & upload proof</div>
         </div>
       </div>
-      <div id="payStatus" style="display:none;margin-bottom:14px;padding:12px;border-radius:8px;font-size:13px;text-align:center;font-weight:600"></div>
-      <button id="payNowBtn" onclick="initiateFlutterwavePayment()"
-        style="width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s">
-        <i class="fas fa-lock"></i> Pay with Flutterwave
+
+      <div id="payMethodDetails"></div>
+
+      <button id="payProceedBtn" type="button" onclick="proceedWithPayment()"
+        style="width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
+        <i class="fas fa-arrow-right"></i> Continue
       </button>
-      <p style="text-align:center;font-size:11px;color:var(--gray-500);margin-top:10px">
-        Secured by Flutterwave · Card · Bank Transfer · USSD
-      </p>
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);text-align:center">
-        <button onclick="proceedToPendingPortal()"
-          style="background:none;border:none;font-size:12px;color:var(--gray-500);cursor:pointer;text-decoration:underline">
-          Pay later — enter portal (membership pending)
-        </button>
-      </div>
     </div>`;
   document.body.appendChild(overlay);
-  window._selectedPlan = 'monthly';
+  window._regPaymentMethod = 'individual';
+  showPayMethodDetails('individual');
 }
 
-// FIX: Define this function — was called but never existed
-function proceedToPendingPortal() {
-  const screen = document.getElementById('paymentScreen');
-  if (screen) screen.remove();
-  launchApp();
-  showToast('You can pay anytime from your dashboard.', 'warning');
-}
-
-function selectPaymentPlan(plan) {
-  window._selectedPlan = plan;
-  ['monthly', 'annual'].forEach(p => {
-    const el = document.getElementById('plan-' + p);
+function selectPaymentMethod(method) {
+  window._regPaymentMethod = method;
+  const styles = {
+    chapter:    { border: '2px solid var(--border)',  background: '#fff' },
+    individual: { border: '2px solid var(--green)', background: 'var(--green-pale)' },
+  };
+  ['chapter', 'individual'].forEach(m => {
+    const el = document.getElementById('pay-' + m);
     if (!el) return;
-    el.classList.toggle('selected', p === plan);
+    const s = (m === method) ? styles[method] : styles[m === 'chapter' ? 'individual' : 'chapter'];
+    el.style.border     = (m === method) ? (method === 'individual' ? '2px solid var(--green)' : '2px solid var(--green)') : '2px solid var(--border)';
+    el.style.background = (m === method) ? 'var(--green-pale)' : '#fff';
   });
+  showPayMethodDetails(method);
 }
 
-async function initiateFlutterwavePayment() {
-  const btn      = document.getElementById('payNowBtn');
-  const statusEl = document.getElementById('payStatus');
-  btn.disabled   = true;
-  btn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Generating payment link…';
-
-  try {
-    const result = await api('payment', 'initiate', 'POST', {
-      user_id: CURRENT_USER.id,
-      plan:    window._selectedPlan || 'monthly',
-    });
-
-    window._currentTxRef = result.tx_ref;
-
-    FlutterwaveCheckout({
-      public_key:      FLW_PUB_KEY,
-      tx_ref:          result.tx_ref,
-      amount:          window._selectedPlan === 'annual' ? 12000 : 1200,
-      currency:        'NGN',
-      payment_options: 'card,banktransfer,ussd',
-      customer:        { email: CURRENT_USER.email, name: CURRENT_USER.name },
-      customizations:  {
-        title:       'AHRIMPN Membership Dues',
-        description: (window._selectedPlan === 'annual' ? '12-month' : '1-month') + ' membership dues',
-        logo:        '',
-      },
-      callback: async function(data) {
-        if (data.status === 'successful' || data.status === 'completed') {
-          setPayStatus('loading', '⏳ Verifying payment…');
-          try {
-            await verifyPaymentAfterCheckout(data.transaction_id, data.tx_ref);
-          } catch(e) {
-            setPayStatus('error', '⚠️ ' + e.message + '. Contact support if funds were deducted.');
-          }
-        } else {
-          setPayStatus('warning', '⚠️ Payment was not completed. Please try again.');
-        }
-      },
-      onclose: function() {
-        btn.disabled  = false;
-        btn.innerHTML = '<i class="fas fa-lock"></i> Pay with Flutterwave';
-      },
-    });
-  } catch(e) {
-    setPayStatus('error', '❌ ' + e.message);
-    btn.disabled  = false;
-    btn.innerHTML = '<i class="fas fa-lock"></i> Pay with Flutterwave';
-  }
-}
-
-function setPayStatus(type, msg) {
-  const el = document.getElementById('payStatus') || document.getElementById('modalPayStatus');
+function showPayMethodDetails(method) {
+  const el = document.getElementById('payMethodDetails');
   if (!el) return;
-  el.style.display = 'block';
-  const bg = { loading: '#ecfdf5', error: '#fef2f2', warning: '#fffbeb', success: '#ecfdf5' };
-  const fg = { loading: '#065f46', error: '#991b1b', warning: '#92400e', success: '#065f46' };
-  el.style.cssText = `display:block;padding:12px;border-radius:8px;font-size:13px;text-align:center;font-weight:600;background:${bg[type]};color:${fg[type]}`;
-  el.innerHTML = msg;
-}
-
-async function verifyPaymentAfterCheckout(transactionId, txRef) {
-  const res = await api('payment', 'verify&transaction_id=' + transactionId + '&tx_ref=' + txRef);
-  if (res.status === 'success' || res.status === 'already_verified') {
-    CURRENT_USER.active = 1;
-    sessionStorage.setItem('ahrimpn_user', JSON.stringify(CURRENT_USER));
-    setPayStatus('success', '✅ Payment verified! Membership activated.');
-    setTimeout(() => {
-      const screen = document.getElementById('paymentScreen');
-      if (screen) screen.remove();
-      launchApp();
-      showToast('Welcome! Your membership is now active 🎉', 'success');
-    }, 1500);
+  if (method === 'chapter') {
+    el.innerHTML = `
+      <div style="background:var(--gold-pale);border:1px solid #fde68a;border-radius:10px;padding:13px;font-size:12px;color:#92400e;margin-bottom:16px">
+        <b>Chapter Payment:</b> Your account stays pending until your chapter administrator manually activates your membership. You can access a limited portal view while waiting.
+      </div>`;
+  } else {
+    const cat = CURRENT_USER.membership_category || 'Full';
+    const isAffiliate = cat === 'Affiliate';
+    el.innerHTML = `
+      ${BANK_DETAILS_HTML}
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px">Amount: <b>${isAffiliate ? '₦1,000 (one-time)' : '₦1,200 (monthly) or ₦12,000 (annual)'}</b></div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:6px">Upload Payment Proof <span style="color:var(--red)">*</span></label>
+        <input type="file" id="regPayProof" accept=".pdf,.jpg,.jpeg,.png"
+          style="width:100%;font-size:12px;padding:8px;border:1.5px solid var(--border);border-radius:8px"/>
+        <div style="font-size:10px;color:var(--gray-500);margin-top:4px">PDF, JPG or PNG · Max 5 MB</div>
+      </div>`;
   }
 }
 
-// Payment instructions for members already in portal
-function showPaymentInstructions() {
-  showModal('💳 Activate Membership', `
-    <div style="text-align:center;padding:8px 0 20px">
-      <div style="font-size:40px;margin-bottom:10px">💳</div>
-      <h3 style="font-size:17px;font-weight:700;color:var(--green);margin-bottom:6px;font-family:'Fraunces',serif">Complete Your Membership</h3>
-      <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px">Choose a plan and pay securely via Flutterwave</p>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
-      <div class="plan-option selected" id="modal-plan-monthly" onclick="selectModalPlan('monthly')">
-        <div style="font-size:20px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦1,200</div>
-        <div style="font-size:12px;font-weight:600;color:var(--gray-700);margin-top:4px">Monthly</div>
-      </div>
-      <div class="plan-option" id="modal-plan-annual" onclick="selectModalPlan('annual')" style="position:relative">
-        <div class="plan-badge">SAVE ₦2,400</div>
-        <div style="font-size:20px;font-weight:800;color:var(--green);font-family:'Fraunces',serif">₦12,000</div>
-        <div style="font-size:12px;font-weight:600;color:var(--gray-700);margin-top:4px">Annual</div>
-      </div>
-    </div>
-    <div id="modalPayStatus" style="display:none;margin-bottom:12px"></div>
-    <div class="form-actions" style="justify-content:center;flex-direction:column;gap:10px">
-      <button class="btn-sm btn-green" id="modalPayBtn" onclick="initiateModalPayment()" style="width:100%;justify-content:center">
-        <i class="fas fa-lock"></i> Pay Securely with Flutterwave
-      </button>
-      <button class="btn-sm btn-outline" onclick="closeModal()" style="justify-content:center">Close</button>
-    </div>
-    <p style="text-align:center;font-size:11px;color:var(--gray-500);margin-top:10px">Card · Bank Transfer · USSD</p>
-  `);
-  window._modalPlan = 'monthly';
-}
-
-function selectModalPlan(plan) {
-  window._modalPlan = plan;
-  ['monthly', 'annual'].forEach(p => {
-    const el = document.getElementById('modal-plan-' + p);
-    if (!el) return;
-    el.classList.toggle('selected', p === plan);
-  });
-}
-
-async function initiateModalPayment() {
-  const btn = document.getElementById('modalPayBtn');
+async function proceedWithPayment() {
+  const method = window._regPaymentMethod;
+  const btn = document.getElementById('payProceedBtn');
   btn.disabled  = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading…';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
   try {
-    const result = await api('payment', 'initiate', 'POST', {
-      user_id: CURRENT_USER.id,
-      plan:    window._modalPlan || 'monthly',
-    });
-    FlutterwaveCheckout({
-      public_key:      FLW_PUB_KEY,
-      tx_ref:          result.tx_ref,
-      amount:          window._modalPlan === 'annual' ? 12000 : 1200,
-      currency:        'NGN',
-      payment_options: 'card,banktransfer,ussd',
-      customer:        { email: CURRENT_USER.email, name: CURRENT_USER.name },
-      customizations:  { title: 'AHRIMPN Membership Dues', description: 'Membership dues' },
-      callback: async function(data) {
-        if (data.status === 'successful' || data.status === 'completed') {
-          setPayStatus('loading', '⏳ Verifying…');
-          try {
-            await verifyPaymentAfterCheckout(data.transaction_id, data.tx_ref);
-            closeModal();
-          } catch(e) { showToast(e.message, 'error'); }
-        }
-      },
-      onclose: function() {
-        btn.disabled  = false;
-        btn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Flutterwave';
-      },
-    });
+    if (method === 'chapter') {
+      await api('payment_manual', 'record_chapter', 'POST', { user_id: CURRENT_USER.id });
+      document.getElementById('paymentScreen').remove();
+      launchApp();
+      showToast('Account submitted. Your chapter will activate your membership.', 'warning');
+    } else {
+      const fileInput = document.getElementById('regPayProof');
+      if (!fileInput?.files[0]) {
+        showToast('Please upload your payment proof', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue';
+        return;
+      }
+      const fd = new FormData();
+      fd.append('user_id', CURRENT_USER.id);
+      fd.append('purpose', 'registration');
+      fd.append('proof',   fileInput.files[0]);
+      await uploadFile('payment_manual', 'upload_proof', fd);
+      document.getElementById('paymentScreen').remove();
+      launchApp();
+      showToast('Payment proof uploaded! Account will be activated after admin review.', 'success');
+    }
   } catch(e) {
     showToast(e.message, 'error');
     btn.disabled  = false;
-    btn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely with Flutterwave';
+    btn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue';
   }
 }
 
-// Handle ?payment=success redirect from Flutterwave callback
-function checkPaymentRedirect() {
-  const params    = new URLSearchParams(window.location.search);
-  const payResult = params.get('payment');
-  if (!payResult) return;
-  window.history.replaceState({}, '', window.location.pathname);
-  if (payResult === 'success') {
-    setTimeout(() => showToast('Payment successful! Membership activated ✅', 'success'), 800);
-    if (TOKEN && CURRENT_USER) {
-      api('members', 'get&id=' + CURRENT_USER.id).then(u => {
-        if (u) {
-          CURRENT_USER = { ...CURRENT_USER, ...u };
-          sessionStorage.setItem('ahrimpn_user', JSON.stringify(CURRENT_USER));
-          const banner = document.getElementById('pendingBanner');
-          if (banner && CURRENT_USER.active) banner.style.display = 'none';
-        }
-      }).catch(() => {});
-    }
-  } else if (payResult === 'failed') {
-    setTimeout(() => showToast('Payment not completed. Try again from your dashboard.', 'error'), 800);
+// Payment instructions for members already in portal (dues)
+function showPaymentInstructions() {
+  showModal('💳 Pay Membership Dues', `
+    ${BANK_DETAILS_HTML}
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px">Transfer <b>₦1,200</b> (monthly) or <b>₦12,000</b> (annual) to the account above, then upload your proof below.</div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:6px">Upload Payment Proof</label>
+      <input type="file" id="modalPayProof" accept=".pdf,.jpg,.jpeg,.png"
+        style="width:100%;font-size:12px;padding:8px;border:1.5px solid var(--border);border-radius:8px"/>
+    </div>
+    <div id="modalPayStatus" style="display:none;margin-bottom:12px"></div>
+    <div class="form-actions" style="flex-direction:column;gap:10px">
+      <button type="button" class="btn-sm btn-green" id="modalPayBtn" onclick="submitDuesPaymentProof()" style="width:100%;justify-content:center">
+        <i class="fas fa-upload"></i> Submit Payment Proof
+      </button>
+      <button type="button" class="btn-sm btn-outline" onclick="closeModal()" style="justify-content:center">Close</button>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--gray-500);margin-top:10px">Your account will be fully activated after admin verification.</p>
+  `);
+}
+
+async function submitDuesPaymentProof() {
+  const btn = document.getElementById('modalPayBtn');
+  const fileInput = document.getElementById('modalPayProof');
+  if (!fileInput?.files[0]) { showToast('Please upload your payment proof', 'error'); return; }
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+  try {
+    const fd = new FormData();
+    fd.append('user_id', CURRENT_USER.id);
+    fd.append('purpose', 'dues');
+    fd.append('proof',   fileInput.files[0]);
+    await uploadFile('payment_manual', 'upload_proof', fd);
+    closeModal();
+    showToast('Payment proof submitted! Membership will be activated after review.', 'success');
+  } catch(e) {
+    showToast(e.message, 'error');
+    btn.disabled  = false;
+    btn.innerHTML = '<i class="fas fa-upload"></i> Submit Payment Proof';
   }
+}
+
+function checkPaymentRedirect() { /* no-op: Flutterwave removed */ }
+
+// ═══════════════════════════════════════════════════════════
+//  JOB PORTAL
+// ═══════════════════════════════════════════════════════════
+async function loadJobPortal() {
+  document.getElementById('jobPortalList').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const jobs = await api('jobs', 'list');
+    if (!jobs.length) {
+      document.getElementById('jobPortalList').innerHTML = '<div class="empty-state"><i class="fas fa-briefcase"></i><h3>No job listings yet</h3><p>Be the first to post a vacancy.</p></div>';
+      return;
+    }
+    document.getElementById('jobPortalList').innerHTML = jobs.map(j => `
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-weight:700;font-size:15px;margin-bottom:4px">${esc(j.title)}</div>
+              <div style="font-size:12px;color:var(--gray-500)">${esc(j.company)}${j.location ? ' · ' + esc(j.location) : ''}</div>
+            </div>
+            <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--blue-pale);color:var(--blue);white-space:nowrap">${esc(j.job_type)}</span>
+          </div>
+          <div style="font-size:13px;color:var(--gray-700);margin-top:10px;line-height:1.6">${esc(j.description).substring(0, 320)}${j.description.length > 320 ? '…' : ''}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:8px">Posted by ${esc(j.poster_name)} · ${fmtDate(j.created_at)}</div>
+        </div>
+      </div>`).join('');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openPostJob() {
+  showModal('Post a Job Listing', `
+    <div class="form-grid">
+      <div class="form-field form-full"><label>Job Title <span style="color:var(--red)">*</span></label>
+        <input id="jobTitle" placeholder="e.g. Health Records Officer"/>
+      </div>
+      <div class="form-field"><label>Company / Institution <span style="color:var(--red)">*</span></label>
+        <input id="jobCompany" placeholder="e.g. Lagos University Teaching Hospital"/>
+      </div>
+      <div class="form-field"><label>Location</label>
+        <input id="jobLocation" placeholder="e.g. Lagos, Nigeria"/>
+      </div>
+      <div class="form-field"><label>Job Type</label>
+        <select id="jobType">
+          <option>Full-time</option><option>Part-time</option><option>Contract</option>
+          <option>Internship</option><option>Volunteer</option>
+        </select>
+      </div>
+      <div class="form-field form-full"><label>Description <span style="color:var(--red)">*</span></label>
+        <textarea id="jobDesc" rows="5" style="resize:vertical;width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit"
+          placeholder="Job description, requirements, how to apply…"></textarea>
+      </div>
+    </div>
+    <div style="background:var(--gold-pale);border:1px solid #fde68a;border-radius:8px;padding:10px;font-size:12px;color:#92400e;margin-bottom:14px">
+      <i class="fas fa-info-circle"></i> Your listing will be reviewed by an admin before going live on the portal.
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button type="button" class="btn-sm btn-green" onclick="submitJob()"><i class="fas fa-paper-plane"></i> Submit for Review</button>
+    </div>
+  `);
+}
+
+async function submitJob() {
+  const title   = document.getElementById('jobTitle')?.value.trim();
+  const company = document.getElementById('jobCompany')?.value.trim();
+  const desc    = document.getElementById('jobDesc')?.value.trim();
+  if (!title || !company || !desc) { showToast('Title, company and description are required', 'error'); return; }
+  try {
+    await api('jobs', 'create', 'POST', {
+      title, company,
+      location:    document.getElementById('jobLocation')?.value.trim(),
+      job_type:    document.getElementById('jobType')?.value,
+      description: desc,
+    });
+    closeModal();
+    showToast('Job listing submitted for review!', 'success');
+    loadJobPortal();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── Job Approvals (admin) ──
+async function loadJobApprovals() {
+  document.getElementById('jobApprovalsList').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const jobs = await api('jobs', 'pending');
+    if (!jobs.length) {
+      document.getElementById('jobApprovalsList').innerHTML = '<div class="empty-state"><i class="fas fa-check-double"></i><h3>All clear!</h3><p>No pending job listings.</p></div>';
+      return;
+    }
+    document.getElementById('jobApprovalsList').innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Job Title</th><th>Company</th><th>Posted By</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody>${jobs.map(j => `
+            <tr>
+              <td>
+                <div style="font-weight:600">${esc(j.title)}</div>
+                <div style="font-size:11px;color:var(--gray-500)">${esc(j.location || '—')}</div>
+              </td>
+              <td style="font-size:12px">${esc(j.company)}</td>
+              <td style="font-size:12px">${esc(j.poster_name)}<br><span style="font-size:10px;color:var(--gray-500)">${esc(j.poster_member_id)}</span></td>
+              <td><span class="badge badge-blue">${esc(j.job_type)}</span></td>
+              <td style="font-size:11px;color:var(--gray-500)">${fmtDate(j.created_at)}</td>
+              <td>
+                <div style="display:flex;gap:6px">
+                  <button type="button" class="btn-sm btn-green" style="padding:6px 12px;font-size:11px" onclick="approveJob(${j.id})">
+                    <i class="fas fa-check"></i> Approve
+                  </button>
+                  <button type="button" class="btn-sm btn-red" style="padding:6px 10px;font-size:11px" onclick="rejectJob(${j.id})">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function approveJob(id) {
+  try {
+    await api('jobs', 'approve', 'POST', { id });
+    showToast('Job listing approved and published!', 'success');
+    loadJobApprovals();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function rejectJob(id) {
+  if (!confirm('Reject and remove this job listing?')) return;
+  try {
+    await api('jobs', 'reject', 'POST', { id });
+    showToast('Job listing rejected', 'warning');
+    loadJobApprovals();
+  } catch(e) { showToast(e.message, 'error'); }
 }
 
 // ═══════════════════════════════════════════════════════════

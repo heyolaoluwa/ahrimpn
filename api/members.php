@@ -16,7 +16,8 @@ if ($method === 'GET' && $action === 'list') {
     $search = '%' . trim($_GET['q'] ?? '') . '%';
     $stmt   = $db->prepare("
         SELECT u.id, u.member_id, u.name, u.email, u.phone, u.state, u.workplace,
-               u.role, u.join_date, u.active, u.activated_at,
+               u.membership_category, u.professional_cadre, u.present_qualification,
+               u.payment_type, u.role, u.join_date, u.active, u.activated_at,
                COALESCE(SUM(p.amount), 0) AS total_paid
         FROM users u
         LEFT JOIN dues_payments p ON p.user_id = u.id
@@ -98,13 +99,16 @@ elseif ($method === 'POST' && $action === 'add') {
     requireRole($user, 'admin');
     $b = body();
 
-    $name      = trim($b['name']      ?? '');
-    $email     = trim($b['email']     ?? '');
-    $phone     = trim($b['phone']     ?? '');
-    $state     = trim($b['state']     ?? '');
-    $workplace = trim($b['workplace'] ?? '');
-    $joinDate  = $b['join_date']  ?? date('Y-m-d');
-    $pass      = $b['password']   ?? 'ahrimpn2025';
+    $name          = trim($b['name']                   ?? '');
+    $email         = trim($b['email']                  ?? '');
+    $phone         = trim($b['phone']                  ?? '');
+    $state         = trim($b['state']                  ?? '');
+    $workplace     = trim($b['workplace']              ?? '');
+    $category      = trim($b['membership_category']    ?? 'Full');
+    $cadre         = trim($b['professional_cadre']     ?? '');
+    $qualification = trim($b['present_qualification']  ?? '');
+    $joinDate      = $b['join_date']  ?? date('Y-m-d');
+    $pass          = $b['password']   ?? 'ahrimpn2025';
 
     if (!$name || !$email || !$state) {
         fail('Name, email and state are required');
@@ -122,9 +126,11 @@ elseif ($method === 'POST' && $action === 'add') {
     // Admin-added members are activated immediately
     $db->prepare("
         INSERT INTO users (member_id, name, email, password_hash, phone, state, workplace,
+                           membership_category, professional_cadre, present_qualification,
                            role, join_date, active, activated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'member', ?, 1, ?)
-    ")->execute([$memberId, $name, $email, $hash, $phone, $state, $workplace, $joinDate, $joinDate]);
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', ?, 1, ?)
+    ")->execute([$memberId, $name, $email, $hash, $phone, $state, $workplace,
+                 $category, $cadre, $qualification, $joinDate, $joinDate]);
 
     ok(['member_id' => $memberId], "Member {$name} added successfully");
 }
@@ -173,17 +179,18 @@ elseif ($method === 'POST' && $action === 'promote') {
 elseif ($method === 'GET' && $action === 'pending') {
     requireRole($user, 'admin', 'executive');
     $stmt = $db->query("
-        SELECT u.*,
-               fp.tx_ref, fp.amount AS flw_amount, fp.plan_type,
-               fp.status AS flw_status, fp.created_at AS payment_initiated_at
+        SELECT u.id, u.member_id, u.name, u.email, u.phone, u.state,
+               u.membership_category, u.professional_cadre, u.present_qualification,
+               u.payment_type, u.join_date, u.active,
+               mp.id AS payment_id, mp.proof_file, mp.purpose,
+               mp.status AS pay_status, mp.created_at AS payment_uploaded_at
         FROM users u
-        LEFT JOIN flw_pending_payments fp ON fp.user_id = u.id
-            AND fp.status IN ('pending', 'failed')
-            AND fp.created_at = (
-                SELECT MAX(fp2.created_at)
-                FROM flw_pending_payments fp2
-                WHERE fp2.user_id = u.id
-                  AND fp2.status IN ('pending', 'failed')
+        LEFT JOIN manual_payments mp ON mp.user_id = u.id
+            AND mp.status = 'pending'
+            AND mp.created_at = (
+                SELECT MAX(mp2.created_at)
+                FROM manual_payments mp2
+                WHERE mp2.user_id = u.id AND mp2.status = 'pending'
             )
         WHERE u.active = 0 AND u.role = 'member'
         ORDER BY u.id DESC
@@ -200,7 +207,7 @@ elseif ($method === 'POST' && $action === 'approve_payment') {
         fail('Member ID required');
     }
 
-    // Activate
+    // Activate member account
     $db->prepare('UPDATE users SET active = 1, activated_at = NOW() WHERE id = ?')->execute([$id]);
 
     $type   = $b['payment_type'] ?? 'monthly';
@@ -215,12 +222,14 @@ elseif ($method === 'POST' && $action === 'approve_payment') {
         $b['notes'] ?? 'Manual approval by admin: ' . $user['name'],
     ]);
 
-    // Mark any pending Flutterwave record as admin-verified
+    // Mark any pending manual payment proof as approved
     $db->prepare("
-        UPDATE flw_pending_payments
-        SET status = 'admin_verified', verified_by = ?, verified_at = NOW()
-        WHERE user_id = ? AND status IN ('pending', 'failed')
-    ")->execute([$user['id'], $id]);
+        UPDATE manual_payments
+        SET status = 'approved', reviewed_by = ?, reviewed_at = NOW(),
+            notes = CONCAT(IFNULL(notes,''), ' | Admin approved: ', ?)
+        WHERE user_id = ? AND status = 'pending'
+          AND purpose IN ('registration', 'dues')
+    ")->execute([$user['id'], $user['name'], $id]);
 
     ok(null, 'Membership activated and payment recorded');
 }
@@ -233,7 +242,7 @@ elseif ($method === 'POST' && $action === 'reject') {
         fail('Member ID required');
     }
 
-    $db->prepare("DELETE FROM flw_pending_payments WHERE user_id = ?")->execute([$id]);
+    $db->prepare("DELETE FROM manual_payments WHERE user_id = ?")->execute([$id]);
     $db->prepare("DELETE FROM sessions WHERE user_id = ?")->execute([$id]);
     $db->prepare("DELETE FROM users WHERE id = ? AND active = 0 AND role = 'member'")->execute([$id]);
 

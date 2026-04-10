@@ -57,7 +57,9 @@ function requireAuth(): array {
     $sql = "SELECT s.user_id, s.expires_at,
                    u.id, u.member_id, u.name, u.email,
                    u.role, u.state, u.workplace, u.join_date,
-                   u.active, u.phone, u.activated_at
+                   u.active, u.phone, u.activated_at,
+                   u.membership_category, u.professional_cadre,
+                   u.present_qualification, u.payment_type
             FROM sessions s
             JOIN users u ON u.id = s.user_id
             WHERE s.token = ? AND s.expires_at > NOW()

@@ -49,12 +49,28 @@ elseif ($method === 'POST' && $action === 'register') {
     $workplace = trim($b['workplace'] ?? '');
     $pass      =      $b['password']  ?? '';
 
+    $category      = trim($b['membership_category']   ?? '');
+    $cadre         = trim($b['professional_cadre']    ?? '');
+    $qualification = trim($b['present_qualification'] ?? '');
+    $paymentType   = trim($b['payment_type']          ?? 'individual');
+
     // Validate required fields
     if (!$name)  fail('Full name is required');
     if (!$email) fail('Email address is required');
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) fail('Invalid email address');
     if (!$state) fail('State is required');
+    if (!$category) fail('Membership category is required');
+    if (!$cadre)    fail('Professional cadre is required');
+    if (!$qualification) fail('Present qualification is required');
     if (strlen($pass) < 8) fail('Password must be at least 8 characters');
+
+    $allowedCategories = ['Affiliate', 'Full', 'Associate', 'Fellow', 'Honorary'];
+    $allowedCadres     = ['Technician', 'Technologist', 'Officer'];
+    $allowedQuals      = ['PD/ND', 'HND', 'BHIM', 'MSC/MHIM', 'PHD'];
+    if (!in_array($category, $allowedCategories))      fail('Invalid membership category');
+    if (!in_array($cadre, $allowedCadres))             fail('Invalid professional cadre');
+    if (!in_array($qualification, $allowedQuals))      fail('Invalid qualification');
+    if (!in_array($paymentType, ['chapter','individual'])) $paymentType = 'individual';
 
     // Check email not already taken
     $chk = $db->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
@@ -69,9 +85,11 @@ elseif ($method === 'POST' && $action === 'register') {
     $db->prepare("
         INSERT INTO users
             (member_id, name, email, password_hash, phone, state, workplace,
+             membership_category, professional_cadre, present_qualification, payment_type,
              role, join_date, active, activated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'member', CURDATE(), 0, NULL)
-    ")->execute([$memberId, $name, $email, $hash, $phone, $state, $workplace]);
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'member', CURDATE(), 0, NULL)
+    ")->execute([$memberId, $name, $email, $hash, $phone, $state, $workplace,
+                 $category, $cadre, $qualification, $paymentType]);
 
     $userId = (int) $db->lastInsertId();
 
