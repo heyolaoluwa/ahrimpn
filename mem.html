@@ -6,6 +6,7 @@
 <title>AHRIMPN — Member & Admin Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Oswald:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <!-- Flutterwave removed: payments now via manual bank transfer -->
 <style>
@@ -362,6 +363,56 @@ tbody tr:hover td { background: var(--gray-50); }
   animation: modalIn .25s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes modalIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+.modal-wide { max-width: 920px !important; }
+
+/* ─── Hero Editor ─────────────────────────────────────────── */
+.htabs { display:flex; gap:4px; background:var(--gray-100); border-radius:10px; padding:4px; margin-bottom:20px; }
+.htab  { flex:1; padding:8px 6px; border:none; border-radius:7px; font-size:12px; font-weight:600;
+         background:none; color:var(--gray-500); cursor:pointer; transition:.2s; }
+.htab.active { background:var(--white); color:var(--green); box-shadow:var(--shadow-sm); }
+.htab:hover:not(.active) { color:var(--dark); }
+.hpanel { display:none; }
+.hpanel.active { display:block; }
+.hrow  { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.hrow3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+@media(max-width:620px) { .hrow,.hrow3 { grid-template-columns:1fr 1fr; } }
+.hfield label { display:block; font-size:11px; font-weight:700; color:var(--gray-600);
+                text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+.hfield input[type=color] { width:44px; height:36px; padding:2px; border:1.5px solid var(--border);
+                             border-radius:8px; cursor:pointer; }
+.color-row { display:flex; gap:8px; align-items:center; }
+.color-row .form-input { flex:1; }
+.swatch-row { display:flex; gap:5px; flex-wrap:wrap; margin-top:6px; }
+.swatch { width:22px; height:22px; border-radius:4px; border:2px solid transparent;
+          cursor:pointer; box-shadow:0 0 0 1px rgba(0,0,0,.15); flex-shrink:0;
+          transition:transform .15s; }
+.swatch:hover { transform:scale(1.2); }
+.bgtype-row { display:flex; gap:8px; margin-bottom:16px; }
+.bgtype-btn { flex:1; padding:10px; border:2px solid var(--border); border-radius:10px;
+              background:none; font-size:12px; font-weight:600; color:var(--gray-500);
+              cursor:pointer; transition:.2s; display:flex; flex-direction:column;
+              align-items:center; gap:4px; }
+.bgtype-btn i { font-size:18px; }
+.bgtype-btn.active { border-color:var(--green); color:var(--green); background:var(--green-pale); }
+.upload-drop { border:2px dashed var(--border); border-radius:12px; padding:28px 20px;
+               text-align:center; cursor:pointer; transition:.2s; margin-top:8px; }
+.upload-drop:hover { border-color:var(--green); background:var(--green-pale); }
+.upload-drop i { font-size:28px; color:var(--gray-300); margin-bottom:8px; display:block; }
+.upload-drop p { font-size:12px; color:var(--gray-500); margin:0; }
+.upload-drop strong { color:var(--green); }
+.media-preview-wrap { position:relative; margin-top:10px; border-radius:10px; overflow:hidden; }
+.media-preview-wrap img, .media-preview-wrap video { width:100%; max-height:160px; object-fit:cover; display:block; }
+.media-remove-btn { position:absolute; top:6px; right:6px; background:rgba(0,0,0,.6);
+                    color:#fff; border:none; border-radius:50%; width:26px; height:26px;
+                    cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center; }
+.upload-progress { height:5px; background:var(--gray-200); border-radius:99px; margin-top:8px; overflow:hidden; }
+.upload-progress-bar { height:100%; background:var(--green-light); border-radius:99px;
+                       width:0%; transition:width .2s; }
+.hero-live-preview { border-radius:12px; overflow:hidden; min-height:130px; position:relative;
+                     margin-bottom:20px; transition:background .3s; }
+.hero-live-preview .prev-overlay { position:absolute; inset:0; pointer-events:none; transition:.3s; }
+.hero-live-preview .prev-content { position:relative; z-index:1; padding:20px 24px; text-align:center; }
+
 .modal-head {
   padding: 20px 24px; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; background: var(--white); z-index: 1;
@@ -1340,9 +1391,11 @@ function showToast(msg, type = 'info') {
 // ═══════════════════════════════════════════════════════════
 //  MODAL
 // ═══════════════════════════════════════════════════════════
-function showModal(title, bodyHtml) {
+function showModal(title, bodyHtml, wide = false) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalBody').innerHTML    = bodyHtml;
+  const modal = document.querySelector('.modal');
+  modal.classList.toggle('modal-wide', wide);
   document.getElementById('modalOverlay').classList.add('open');
 }
 function closeModal() {
@@ -2078,20 +2131,36 @@ async function loadWebsiteControl() {
       ? msgs.map((m,i) => `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span>${esc(m)}</span><span style="color:var(--gray-400);font-size:11px">#${i+1}</span></div>`).join('')
       : '<p class="preview-note">No ticker messages configured</p>';
 
-    // Hero preview
-    const h = site.hero || {};
-    const heroBg   = h.bg_color   || '#064E3B';
-    const heroText = h.text_color || '#ffffff';
-    const heroHSize = h.headline_size || '2.4rem';
-    const heroSSize = h.subtitle_size || '1rem';
+    // Hero preview — supports both old flat and new per-element structure
+    const h    = site.hero || {};
+    const bgC  = h.bg_color || '#064E3B';
+    const bgT  = h.bg_type  || 'color';
+    const bCfg = (typeof h.badge    === 'object') ? h.badge    : { text: h.badge    || '', color:'#ffffff', font:'DM Sans',   size:'0.7rem', weight:'700' };
+    const hCfg = (typeof h.headline === 'object') ? h.headline : { text: h.headline || '—', color:'#ffffff', font:'Fraunces', size:'2.6rem', weight:'700' };
+    const sCfg = (typeof h.subtitle === 'object') ? h.subtitle : { text: h.subtitle || '', color:'rgba(255,255,255,.85)', font:'DM Sans', size:'1rem', weight:'500' };
+
+    const previewBg = bgT==='image' && h.bg_image
+      ? `background:url('${esc(h.bg_image)}') center/cover;`
+      : `background:${esc(bgC)};`;
+    const overlayHtml = bgT!=='color'
+      ? `<div style="position:absolute;inset:0;background:${esc(bgC)};opacity:${parseFloat(h.bg_overlay||0.75)};border-radius:10px"></div>` : '';
+    const mediaBadge = bgT==='video' ? `<span style="font-size:9px;background:rgba(255,255,255,.15);padding:2px 6px;border-radius:4px;margin-left:6px">VIDEO BG</span>` : '';
+
     document.getElementById('heroPreview').innerHTML = `
-      <div style="background:${esc(heroBg)};color:${esc(heroText)};border-radius:10px;padding:16px;margin-bottom:10px">
-        ${h.badge ? `<div style="display:inline-block;background:rgba(255,255,255,.15);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;letter-spacing:.05em">${esc(h.badge)}</div>` : ''}
-        <div style="font-family:'Fraunces',serif;font-size:${esc(heroHSize)};font-weight:700;line-height:1.2;margin-bottom:6px">${esc(h.headline || '—')}</div>
-        <div style="font-size:${esc(heroSSize)};opacity:.85">${esc(h.subtitle || '—')}</div>
+      <div style="${previewBg}border-radius:10px;padding:18px;position:relative;overflow:hidden;min-height:80px">
+        ${overlayHtml}
+        <div style="position:relative;z-index:1">
+          ${bCfg.text ? `<div style="display:inline-block;background:rgba(255,255,255,.15);padding:2px 10px;border-radius:20px;margin-bottom:7px;
+            font-family:'${esc(bCfg.font)}',sans-serif;font-size:${esc(bCfg.size)};font-weight:${esc(bCfg.weight)};
+            color:${esc(bCfg.color)};letter-spacing:.08em;text-transform:uppercase">${esc(bCfg.text)}</div>` : ''}
+          <div style="font-family:'${esc(hCfg.font)}',serif;font-size:${esc(hCfg.size)};font-weight:${esc(hCfg.weight)};
+            color:${esc(hCfg.color)};line-height:1.2;margin-bottom:5px">${esc(hCfg.text)}</div>
+          <div style="font-family:'${esc(sCfg.font)}',sans-serif;font-size:${esc(sCfg.size)};font-weight:${esc(sCfg.weight)};
+            color:${esc(sCfg.color)};line-height:1.4">${esc(sCfg.text)}</div>
+        </div>
       </div>
-      <div style="font-size:11px;color:var(--gray-500)">
-        BG: <b>${esc(heroBg)}</b> · Text: <b>${esc(heroText)}</b> · Headline: <b>${esc(heroHSize)}</b> · Subtitle: <b>${esc(heroSSize)}</b>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:8px">
+        BG: <b>${esc(bgT)}</b> ${mediaBadge} · Headline font: <b>${esc(hCfg.font)}</b> · Headline size: <b>${esc(hCfg.size)}</b>
       </div>`;
 
     // Announcements preview
@@ -2139,169 +2208,458 @@ async function saveTicker() {
   } catch(e) { showToast(e.message, 'error'); }
 }
 
+// ═══════════════════════════════════════════════════════════
+//  HERO EDITOR — full per-element styling + media upload
+// ═══════════════════════════════════════════════════════════
+
+// ── Constants shared across hero editor functions ─────────
+const HERO_FONTS = [
+  ['DM Sans','DM Sans'],['Fraunces','Fraunces (Serif)'],
+  ['Montserrat','Montserrat'],['Poppins','Poppins'],
+  ['Playfair Display','Playfair Display'],['Oswald','Oswald'],
+  ['Inter','Inter'],['Lato','Lato'],
+  ['Georgia','Georgia (Web-safe)'],['Arial','Arial (Web-safe)'],
+];
+const HERO_WEIGHTS = [
+  ['300','Light 300'],['400','Regular 400'],['500','Medium 500'],
+  ['600','Semi-Bold 600'],['700','Bold 700'],['800','Extra-Bold 800'],['900','Black 900'],
+];
+const HERO_ANIMS = [
+  ['fade-up','Fade Up'],['fade-in','Fade In'],
+  ['slide-left','Slide from Left'],['slide-right','Slide from Right'],
+  ['zoom-in','Zoom In'],['bounce','Bounce In'],
+  ['glow','Glow Pulse'],['typewriter','Typewriter'],['none','No Animation'],
+];
+const HERO_TRANSFORMS = [['none','None'],['uppercase','UPPERCASE'],['capitalize','Capitalize'],['lowercase','lowercase']];
+const HERO_SPACINGS   = [['-0.05em','Tight'],['normal','Normal'],['0.05em','Wide'],['0.1em','Wider'],['0.15em','Widest']];
+
+// ── Build one element's styling panel ─────────────────────
+function heroElemPanel(pfx, label, cfg, sizes) {
+  cfg = (cfg && typeof cfg === 'object') ? cfg : {};
+  const color  = cfg.color     || '#ffffff';
+  const font   = cfg.font      || (pfx === 'headline' ? 'Fraunces' : 'DM Sans');
+  const size   = cfg.size      || (pfx === 'headline' ? '3rem' : pfx === 'badge' ? '0.7rem' : '1rem');
+  const weight = cfg.weight    || (pfx === 'headline' ? '700' : pfx === 'badge' ? '700' : '500');
+  const style  = cfg.style     || 'normal';
+  const tfm    = cfg.transform || (pfx === 'badge' ? 'uppercase' : 'none');
+  const space  = cfg.spacing   || (pfx === 'badge' ? '0.1em' : 'normal');
+  const anim   = cfg.anim      || 'fade-up';
+  const text   = typeof cfg === 'string' ? cfg : (cfg.text || '');
+
+  // only badge/headline/subtitle text input row differs
+  const textInput = (pfx === 'subtitle')
+    ? `<textarea id="${pfx}Text" class="form-input" rows="3" style="resize:vertical" oninput="heroPreviewUpdate()">${esc(text)}</textarea>`
+    : `<input id="${pfx}Text" class="form-input" value="${esc(text)}" oninput="heroPreviewUpdate()"/>`;
+
+  const swatches = ['#ffffff','#f1f5f9','#d1fae5','#fef9c3','#D4AF37','#10B981','#064E3B','#0f172a','#1d4ed8','#7c2d12'].map(c =>
+    `<button type="button" class="swatch" title="${c}" style="background:${c};border-color:${c===color?'var(--green)':'transparent'}"
+      onclick="heroSetColor('${pfx}','${c}')"></button>`
+  ).join('');
+
+  return `
+    <div class="hfield" style="margin-bottom:14px">
+      <label>${label} Text</label>${textInput}
+    </div>
+    <div class="hrow3">
+      <div class="hfield">
+        <label>Colour</label>
+        <div class="color-row">
+          <input type="color" id="${pfx}ColorPick" value="${/^#[0-9a-fA-F]{6}$/.test(color)?color:'#ffffff'}"
+            oninput="heroSyncColor('${pfx}ColorPick','${pfx}ColorHex')"/>
+          <input id="${pfx}ColorHex" class="form-input" value="${esc(color)}" placeholder="#ffffff"
+            oninput="heroSyncColor('${pfx}ColorHex','${pfx}ColorPick')"/>
+        </div>
+        <div class="swatch-row">${swatches}</div>
+      </div>
+      <div class="hfield">
+        <label>Font Family</label>
+        <select id="${pfx}Font" class="form-input" onchange="heroPreviewUpdate()">
+          ${HERO_FONTS.map(([v,l]) => `<option value="${v}" ${font===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="hfield">
+        <label>Font Size</label>
+        <select id="${pfx}Size" class="form-input" onchange="heroPreviewUpdate()">
+          ${sizes.map(([v,l]) => `<option value="${v}" ${size===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="hfield">
+        <label>Weight</label>
+        <select id="${pfx}Weight" class="form-input" onchange="heroPreviewUpdate()">
+          ${HERO_WEIGHTS.map(([v,l]) => `<option value="${v}" ${weight===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="hfield">
+        <label>Style</label>
+        <select id="${pfx}Style" class="form-input" onchange="heroPreviewUpdate()">
+          <option value="normal" ${style==='normal'?'selected':''}>Normal</option>
+          <option value="italic" ${style==='italic'?'selected':''}>Italic</option>
+        </select>
+      </div>
+      <div class="hfield">
+        <label>Transform</label>
+        <select id="${pfx}Transform" class="form-input" onchange="heroPreviewUpdate()">
+          ${HERO_TRANSFORMS.map(([v,l]) => `<option value="${v}" ${tfm===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="hfield">
+        <label>Letter Spacing</label>
+        <select id="${pfx}Spacing" class="form-input" onchange="heroPreviewUpdate()">
+          ${HERO_SPACINGS.map(([v,l]) => `<option value="${v}" ${space===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="hfield">
+        <label>Entrance Animation</label>
+        <select id="${pfx}Anim" class="form-input">
+          ${HERO_ANIMS.map(([v,l]) => `<option value="${v}" ${anim===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+    </div>`;
+}
+
+// ── Main editor modal ─────────────────────────────────────
 function editHero() {
   api('content', 'site').then(site => {
-    const h = site.hero || {};
-    const heroBg    = h.bg_color        || '#064E3B';
-    const heroText  = h.text_color      || '#ffffff';
-    const heroHSize = h.headline_size   || '2.4rem';
-    const heroSSize = h.subtitle_size   || '1rem';
+    const h   = site.hero || {};
+    const bgT = h.bg_type    || 'color';
+    const bgC = h.bg_color   || '#064E3B';
+    const bgO = Math.round(parseFloat(h.bg_overlay ?? 0.75) * 100);
+
+    // Normalise old flat-string badge/headline/subtitle into objects
+    const bCfg = (typeof h.badge    === 'object') ? h.badge    : { text: h.badge    || 'Proudly Serving 5,000+ Members Nationwide' };
+    const hCfg = (typeof h.headline === 'object') ? h.headline : { text: h.headline || 'Health Information Managers — Guardians of Integrity' };
+    const sCfg = (typeof h.subtitle === 'object') ? h.subtitle : { text: h.subtitle || 'Empowering Health Information Management Practitioners across Nigeria.' };
+
+    const badgeSizes    = [['0.6rem','XS'],['0.7rem','SM (default)'],['0.75rem','MD'],['0.85rem','LG'],['1rem','XL']];
+    const headlineSizes = [['1.6rem','SM'],['2rem','MD'],['2.6rem','LG'],['3rem','XL (default)'],['3.5rem','2XL'],['4rem','3XL'],['4.8rem','4XL']];
+    const subtitleSizes = [['0.85rem','XS'],['0.95rem','SM'],['1rem','MD (default)'],['1.1rem','LG'],['1.25rem','XL'],['1.4rem','2XL']];
+
+    const bgSwatches = ['#064E3B','#0f172a','#1d4ed8','#7c2d12','#78350f','#1e1b4b','#134e4a','#4a044e','#000000','#ffffff'].map(c =>
+      `<button type="button" class="swatch" title="${c}" style="background:${c};border-color:${c===bgC?'var(--gold)':'transparent'}"
+        onclick="heroBgSwatch('${c}')"></button>`
+    ).join('');
+
+    const mediaPreviewHtml = (h.bg_image || h.bg_video)
+      ? `<div class="media-preview-wrap" id="heroMediaPreview">
+           ${h.bg_video
+             ? `<video src="${esc(h.bg_video)}" muted autoplay loop playsinline style="width:100%;max-height:160px;object-fit:cover;border-radius:10px"></video>`
+             : `<img src="${esc(h.bg_image)}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px">`}
+           <button type="button" class="media-remove-btn" onclick="heroRemoveMedia()" title="Remove">✕</button>
+         </div>`
+      : `<div id="heroMediaPreview"></div>`;
 
     showModal('Edit Hero Section', `
-      <p style="font-size:12px;color:var(--gray-500);margin-bottom:16px">Updates the main banner on the public homepage.</p>
+      <input type="hidden" id="heroBgMediaUrl"  value="${esc(h.bg_image || h.bg_video || '')}"/>
+      <input type="hidden" id="heroBgMediaType" value="${h.bg_video ? 'video' : (h.bg_image ? 'image' : '')}"/>
+      <input type="file" id="heroMediaFileInput" accept="image/*,video/mp4,video/webm" style="display:none"
+             onchange="heroHandleUpload(this)"/>
 
-      <div class="form-grid">
-        <div class="form-field form-full">
-          <label>Badge Text <span style="color:var(--gray-400);font-size:11px">(small pill above headline)</span></label>
-          <input id="heroBadge" class="form-input" value="${esc(h.badge || 'Proudly Serving 5,000+ Members Nationwide')}"/>
-        </div>
-        <div class="form-field form-full">
-          <label>Headline</label>
-          <input id="heroHeadline" class="form-input" value="${esc(h.headline || 'Health Information Managers — Guardians of Integrity')}"/>
-        </div>
-        <div class="form-field form-full">
-          <label>Subtitle</label>
-          <textarea id="heroSubtitle" class="form-input" rows="3" style="resize:vertical">${esc(h.subtitle || 'Empowering Health Information Management Practitioners across Nigeria.')}</textarea>
-        </div>
+      <!-- TABS -->
+      <div class="htabs">
+        <button class="htab active" id="htab-bg"       onclick="heroTab('bg')">       <i class="fas fa-image"></i> Background</button>
+        <button class="htab"        id="htab-badge"    onclick="heroTab('badge')">    <i class="fas fa-tag"></i> Badge</button>
+        <button class="htab"        id="htab-headline" onclick="heroTab('headline')"> <i class="fas fa-heading"></i> Headline</button>
+        <button class="htab"        id="htab-subtitle" onclick="heroTab('subtitle')"> <i class="fas fa-align-left"></i> Subtitle</button>
       </div>
 
-      <div style="border-top:1px solid var(--border);margin:16px 0;padding-top:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:12px">🎨 Colours &amp; Typography</div>
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Background Colour</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input type="color" id="heroBgColor" value="${esc(heroBg)}"
-                style="width:44px;height:38px;padding:2px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer"/>
-              <input id="heroBgHex" class="form-input" value="${esc(heroBg)}" placeholder="#064E3B"
-                style="flex:1" oninput="syncColorPicker('heroBgColor','heroBgHex')"/>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-              ${[['#064E3B','Forest Green'],['#0f172a','Dark Navy'],['#1d4ed8','Royal Blue'],['#7c2d12','Deep Red'],['#78350f','Amber Brown'],['#1e1b4b','Indigo'],['#134e4a','Teal'],['#000000','Black']].map(([c,n]) =>
-                `<button type="button" title="${n}" onclick="setHeroColor('${c}')"
-                  style="width:24px;height:24px;border-radius:5px;background:${c};border:2px solid ${c === heroBg ? '#fff' : 'transparent'};cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.2)"></button>`
-              ).join('')}
-            </div>
+      <!-- PANEL: Background -->
+      <div class="hpanel active" id="hpanel-bg">
+        <div class="bgtype-row">
+          <button class="bgtype-btn ${bgT==='color'?'active':''}" id="bgt-color" data-type="color" onclick="heroBgType('color')">
+            <i class="fas fa-palette"></i>Solid Color</button>
+          <button class="bgtype-btn ${bgT==='image'?'active':''}" id="bgt-image" data-type="image" onclick="heroBgType('image')">
+            <i class="fas fa-image"></i>Image</button>
+          <button class="bgtype-btn ${bgT==='video'?'active':''}" id="bgt-video" data-type="video" onclick="heroBgType('video')">
+            <i class="fas fa-video"></i>Video</button>
+        </div>
+
+        <!-- Colour always visible -->
+        <div class="hfield" style="margin-bottom:14px">
+          <label>Background Colour <span style="color:var(--gray-400);font-size:10px">(overlay colour for image/video)</span></label>
+          <div class="color-row">
+            <input type="color" id="heroBgColorPick" value="${/^#[0-9a-fA-F]{6}$/.test(bgC)?bgC:'#064E3B'}"
+              oninput="heroSyncColor('heroBgColorPick','heroBgColorHex')"/>
+            <input id="heroBgColorHex" class="form-input" value="${esc(bgC)}" placeholder="#064E3B"
+              oninput="heroSyncColor('heroBgColorHex','heroBgColorPick')"/>
           </div>
-          <div class="form-field">
-            <label>Text Colour</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input type="color" id="heroTextColor" value="${esc(heroText)}"
-                style="width:44px;height:38px;padding:2px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer"/>
-              <input id="heroTextHex" class="form-input" value="${esc(heroText)}" placeholder="#ffffff"
-                style="flex:1" oninput="syncColorPicker('heroTextColor','heroTextHex')"/>
-            </div>
-            <div style="display:flex;gap:6px;margin-top:8px">
-              ${[['#ffffff','White'],['#f9fafb','Off-white'],['#d1fae5','Mint'],['#fef9c3','Pale Yellow'],['#0f172a','Dark']].map(([c,n]) =>
-                `<button type="button" title="${n}" onclick="setHeroTextColor('${c}')"
-                  style="width:24px;height:24px;border-radius:5px;background:${c};border:2px solid ${c === heroText ? '#064E3B' : 'transparent'};cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.2)"></button>`
-              ).join('')}
-            </div>
+          <div class="swatch-row">${bgSwatches}</div>
+        </div>
+
+        <!-- Overlay opacity (image/video only) -->
+        <div id="heroOverlayRow" style="display:${bgT!=='color'?'block':'none'};margin-bottom:14px">
+          <div class="hfield">
+            <label>Overlay Opacity — <span id="heroOverlayVal">${bgO}</span>%</label>
+            <input type="range" id="heroBgOverlay" min="0" max="100" value="${bgO}"
+              style="width:100%;accent-color:var(--green)"
+              oninput="document.getElementById('heroOverlayVal').textContent=this.value;heroPreviewUpdate()"/>
           </div>
-          <div class="form-field">
-            <label>Headline Font Size</label>
-            <select id="heroHSize" class="form-input">
-              ${[['1.8rem','Small'],['2.1rem','Medium'],['2.4rem','Large (default)'],['2.8rem','X-Large'],['3.2rem','2XL'],['3.8rem','3XL']].map(([v,l]) =>
-                `<option value="${v}" ${heroHSize === v ? 'selected' : ''}>${l} (${v})</option>`
-              ).join('')}
-            </select>
+        </div>
+
+        <!-- Media upload (image/video only) -->
+        <div id="heroMediaRow" style="display:${bgT!=='color'?'block':'none'}">
+          ${mediaPreviewHtml}
+          <div class="upload-drop" onclick="document.getElementById('heroMediaFileInput').click()" id="heroUploadDrop">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p><strong>Click to upload</strong> image or video</p>
+            <p style="margin-top:4px;font-size:11px">JPEG · PNG · WEBP · GIF · MP4 · WEBM &nbsp;|&nbsp; Max 100 MB</p>
           </div>
-          <div class="form-field">
-            <label>Subtitle Font Size</label>
-            <select id="heroSSize" class="form-input">
-              ${[['0.85rem','Small'],['1rem','Normal (default)'],['1.1rem','Medium'],['1.25rem','Large'],['1.4rem','X-Large']].map(([v,l]) =>
-                `<option value="${v}" ${heroSSize === v ? 'selected' : ''}>${l} (${v})</option>`
-              ).join('')}
-            </select>
+          <div class="upload-progress" id="heroUploadProgress" style="display:none">
+            <div class="upload-progress-bar" id="heroUploadBar"></div>
           </div>
         </div>
       </div>
 
-      <!-- live preview -->
-      <div style="margin-top:4px;margin-bottom:16px">
-        <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Preview</div>
-        <div id="heroLivePreview" style="border-radius:12px;padding:20px;overflow:hidden">
-          <div style="display:inline-block;background:rgba(255,255,255,.15);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;letter-spacing:.05em" id="prevBadge">${esc(h.badge || '')}</div>
-          <div style="font-family:'Fraunces',serif;font-weight:700;line-height:1.2;margin-bottom:8px" id="prevHeadline">${esc(h.headline || '')}</div>
-          <div style="opacity:.85" id="prevSubtitle">${esc(h.subtitle || '')}</div>
+      <!-- PANEL: Badge -->
+      <div class="hpanel" id="hpanel-badge">
+        ${heroElemPanel('badge', 'Badge', bCfg, badgeSizes)}
+      </div>
+
+      <!-- PANEL: Headline -->
+      <div class="hpanel" id="hpanel-headline">
+        ${heroElemPanel('headline', 'Headline', hCfg, headlineSizes)}
+      </div>
+
+      <!-- PANEL: Subtitle -->
+      <div class="hpanel" id="hpanel-subtitle">
+        ${heroElemPanel('subtitle', 'Subtitle', sCfg, subtitleSizes)}
+      </div>
+
+      <!-- LIVE PREVIEW -->
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">
+          Live Preview
+        </div>
+        <div class="hero-live-preview" id="heroLivePreview">
+          <div class="prev-overlay" id="prevOverlay"></div>
+          <div class="prev-content" id="prevContent"></div>
         </div>
       </div>
 
-      <div style="display:flex;gap:10px;justify-content:flex-end">
+      <!-- ACTIONS -->
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
         <button type="button" class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="button" class="btn-sm btn-green" onclick="saveHero()"><i class="fas fa-save"></i> Save Hero</button>
-      </div>`);
+        <button type="button" class="btn-sm btn-green" onclick="saveHero()">
+          <i class="fas fa-save"></i> Save &amp; Publish
+        </button>
+      </div>`, true /* wide modal */);
 
-    // Wire up live preview updates
-    updateHeroPreview();
-    ['heroBadge','heroHeadline','heroSubtitle','heroBgColor','heroTextColor','heroHSize','heroSSize'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('input', updateHeroPreview);
-    });
+    heroPreviewUpdate();
+    // Wire all inputs to preview
+    document.querySelectorAll('#modalBody input, #modalBody select, #modalBody textarea')
+      .forEach(el => el.addEventListener('input', heroPreviewUpdate));
+
   }).catch(() => showToast('Could not load hero content', 'error'));
 }
 
-function syncColorPicker(pickerId, hexId) {
-  const hex = document.getElementById(hexId)?.value;
-  if (/^#[0-9a-fA-F]{6}$/.test(hex)) {
-    const picker = document.getElementById(pickerId);
-    if (picker) picker.value = hex;
+// ── Tab switching ─────────────────────────────────────────
+function heroTab(name) {
+  document.querySelectorAll('.htab').forEach(t  => t.classList.remove('active'));
+  document.querySelectorAll('.hpanel').forEach(p => p.classList.remove('active'));
+  document.getElementById('htab-'   + name)?.classList.add('active');
+  document.getElementById('hpanel-' + name)?.classList.add('active');
+}
+
+// ── Background type toggle ────────────────────────────────
+function heroBgType(type) {
+  ['color','image','video'].forEach(t => {
+    document.getElementById('bgt-' + t)?.classList.toggle('active', t === type);
+  });
+  const showMedia = type !== 'color';
+  document.getElementById('heroOverlayRow').style.display = showMedia ? 'block' : 'none';
+  document.getElementById('heroMediaRow').style.display   = showMedia ? 'block' : 'none';
+  // Update hidden input so saveHero knows the type
+  document.getElementById('heroBgMediaType').dataset.bgtype = type;
+  heroPreviewUpdate();
+}
+
+// ── Background swatch ─────────────────────────────────────
+function heroBgSwatch(color) {
+  const pick = document.getElementById('heroBgColorPick');
+  const hex  = document.getElementById('heroBgColorHex');
+  if (pick && /^#[0-9a-fA-F]{6}$/.test(color)) pick.value = color;
+  if (hex)  hex.value = color;
+  heroPreviewUpdate();
+}
+
+// ── Per-element colour swatch ─────────────────────────────
+function heroSetColor(pfx, color) {
+  const pick = document.getElementById(pfx + 'ColorPick');
+  const hex  = document.getElementById(pfx + 'ColorHex');
+  if (pick && /^#[0-9a-fA-F]{6}$/.test(color)) pick.value = color;
+  if (hex)  hex.value = color;
+  heroPreviewUpdate();
+}
+
+// ── Bidirectional colour/hex sync ─────────────────────────
+function heroSyncColor(srcId, dstId) {
+  const src = document.getElementById(srcId);
+  const dst = document.getElementById(dstId);
+  if (!src || !dst) return;
+  const v = src.value;
+  if (srcId.endsWith('Hex')) {
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) dst.value = v;
+  } else {
+    dst.value = v;
   }
-  updateHeroPreview();
+  heroPreviewUpdate();
 }
 
-function setHeroColor(color) {
-  const p = document.getElementById('heroBgColor');
-  const h = document.getElementById('heroBgHex');
-  if (p) p.value = color;
-  if (h) h.value = color;
-  updateHeroPreview();
+// ── Live preview renderer ─────────────────────────────────
+function heroPreviewUpdate() {
+  const preview = document.getElementById('heroLivePreview');
+  const content = document.getElementById('prevContent');
+  const overlay = document.getElementById('prevOverlay');
+  if (!preview || !content) return;
+
+  const bgType    = document.querySelector('.bgtype-btn.active')?.dataset?.type
+                    || document.getElementById('heroBgMediaType')?.dataset?.bgtype
+                    || 'color';
+  const bgColor   = document.getElementById('heroBgColorHex')?.value  || '#064E3B';
+  const bgOverlay = (document.getElementById('heroBgOverlay')?.value  || 75) / 100;
+  const mediaUrl  = document.getElementById('heroBgMediaUrl')?.value  || '';
+  const mediaType = document.getElementById('heroBgMediaType')?.value || '';
+
+  function getElem(pfx) {
+    return {
+      text:      document.getElementById(pfx + 'Text')?.value       || '',
+      color:     document.getElementById(pfx + 'ColorHex')?.value   || '#ffffff',
+      font:      document.getElementById(pfx + 'Font')?.value       || 'DM Sans',
+      size:      document.getElementById(pfx + 'Size')?.value       || '1rem',
+      weight:    document.getElementById(pfx + 'Weight')?.value     || '400',
+      style:     document.getElementById(pfx + 'Style')?.value      || 'normal',
+      transform: document.getElementById(pfx + 'Transform')?.value  || 'none',
+      spacing:   document.getElementById(pfx + 'Spacing')?.value    || 'normal',
+    };
+  }
+  const b = getElem('badge');
+  const h = getElem('headline');
+  const s = getElem('subtitle');
+
+  // Background
+  if (bgType === 'image' && mediaUrl) {
+    preview.style.backgroundImage    = `url('${mediaUrl}')`;
+    preview.style.backgroundSize     = 'cover';
+    preview.style.backgroundPosition = 'center';
+    preview.style.background         = '';
+    overlay.style.background = bgColor;
+    overlay.style.opacity    = bgOverlay;
+  } else if (bgType === 'video' && mediaUrl) {
+    preview.style.backgroundImage = 'none';
+    preview.style.background      = bgColor;
+    overlay.style.background      = 'none';
+    overlay.style.opacity         = '1';
+  } else {
+    preview.style.backgroundImage = 'none';
+    preview.style.background      = bgColor;
+    overlay.style.background      = 'none';
+    overlay.style.opacity         = '1';
+  }
+
+  function elemStyle(cfg) {
+    return `font-family:'${cfg.font}',sans-serif;font-size:${cfg.size};font-weight:${cfg.weight};`
+         + `font-style:${cfg.style};text-transform:${cfg.transform};letter-spacing:${cfg.spacing};color:${cfg.color}`;
+  }
+
+  content.innerHTML = `
+    ${b.text ? `<div style="display:inline-block;background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;margin-bottom:10px;${elemStyle(b)}">${esc(b.text)}</div><br>` : ''}
+    ${h.text ? `<div style="line-height:1.2;margin-bottom:8px;${elemStyle(h)}">${esc(h.text)}</div>` : ''}
+    ${s.text ? `<div style="line-height:1.5;opacity:.95;${elemStyle(s)}">${esc(s.text)}</div>` : ''}`;
 }
 
-function setHeroTextColor(color) {
-  const p = document.getElementById('heroTextColor');
-  const h = document.getElementById('heroTextHex');
-  if (p) p.value = color;
-  if (h) h.value = color;
-  updateHeroPreview();
+// ── Upload hero media file ────────────────────────────────
+async function heroHandleUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const progress = document.getElementById('heroUploadProgress');
+  const bar      = document.getElementById('heroUploadBar');
+  if (progress) progress.style.display = 'block';
+  if (bar) bar.style.width = '0%';
+
+  try {
+    // Fake progress pulse while uploading
+    let pct = 0;
+    const iv = setInterval(() => { pct = Math.min(pct + 8, 85); if (bar) bar.style.width = pct + '%'; }, 200);
+
+    const fd = new FormData();
+    fd.append('file', file);
+    const res  = await fetch(`${API}/content.php?action=upload_hero_media`, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + TOKEN },
+      body: fd,
+    });
+    const data = await res.json();
+    clearInterval(iv);
+
+    if (!data.success) throw new Error(data.message || 'Upload failed');
+
+    if (bar) bar.style.width = '100%';
+    setTimeout(() => { if (progress) progress.style.display = 'none'; }, 600);
+
+    // Store URL + type
+    document.getElementById('heroBgMediaUrl').value  = data.data.url;
+    document.getElementById('heroBgMediaType').value = data.data.media_type;
+
+    // Show preview thumbnail
+    const wrap = document.getElementById('heroMediaPreview');
+    if (wrap) {
+      wrap.innerHTML = data.data.media_type === 'video'
+        ? `<div class="media-preview-wrap"><video src="${esc(data.data.url)}" muted autoplay loop playsinline
+             style="width:100%;max-height:160px;object-fit:cover;border-radius:10px"></video>
+             <button type="button" class="media-remove-btn" onclick="heroRemoveMedia()">✕</button></div>`
+        : `<div class="media-preview-wrap"><img src="${esc(data.data.url)}"
+             style="width:100%;max-height:160px;object-fit:cover;border-radius:10px">
+             <button type="button" class="media-remove-btn" onclick="heroRemoveMedia()">✕</button></div>`;
+    }
+    heroPreviewUpdate();
+    showToast('Media uploaded successfully', 'success');
+  } catch(e) {
+    if (progress) progress.style.display = 'none';
+    showToast(e.message, 'error');
+  }
+  input.value = '';
 }
 
-function updateHeroPreview() {
-  const bg      = document.getElementById('heroBgColor')?.value  || '#064E3B';
-  const text    = document.getElementById('heroTextColor')?.value || '#ffffff';
-  const hSize   = document.getElementById('heroHSize')?.value    || '2.4rem';
-  const sSize   = document.getElementById('heroSSize')?.value    || '1rem';
-  const badge   = document.getElementById('heroBadge')?.value    || '';
-  const hl      = document.getElementById('heroHeadline')?.value || '';
-  const sub     = document.getElementById('heroSubtitle')?.value || '';
-
-  const wrap = document.getElementById('heroLivePreview');
-  if (wrap) { wrap.style.background = bg; wrap.style.color = text; }
-  const pBadge = document.getElementById('prevBadge');
-  if (pBadge) pBadge.textContent = badge;
-  const pHl = document.getElementById('prevHeadline');
-  if (pHl) { pHl.textContent = hl; pHl.style.fontSize = hSize; }
-  const pSub = document.getElementById('prevSubtitle');
-  if (pSub) { pSub.textContent = sub; pSub.style.fontSize = sSize; }
-
-  // Also sync hex input if color picker changed directly
-  const bgHex = document.getElementById('heroBgHex');
-  if (bgHex && bgHex.value !== bg) bgHex.value = bg;
-  const textHex = document.getElementById('heroTextHex');
-  if (textHex && textHex.value !== text) textHex.value = text;
+function heroRemoveMedia() {
+  document.getElementById('heroBgMediaUrl').value  = '';
+  document.getElementById('heroBgMediaType').value = '';
+  const wrap = document.getElementById('heroMediaPreview');
+  if (wrap) wrap.innerHTML = '';
+  heroPreviewUpdate();
 }
 
+// ── Save hero ─────────────────────────────────────────────
 async function saveHero() {
+  function getElemCfg(pfx) {
+    return {
+      text:      (document.getElementById(pfx + 'Text')?.value      || '').trim(),
+      color:     document.getElementById(pfx + 'ColorHex')?.value   || '#ffffff',
+      font:      document.getElementById(pfx + 'Font')?.value       || 'DM Sans',
+      size:      document.getElementById(pfx + 'Size')?.value       || '1rem',
+      weight:    document.getElementById(pfx + 'Weight')?.value     || '400',
+      style:     document.getElementById(pfx + 'Style')?.value      || 'normal',
+      transform: document.getElementById(pfx + 'Transform')?.value  || 'none',
+      spacing:   document.getElementById(pfx + 'Spacing')?.value    || 'normal',
+      anim:      document.getElementById(pfx + 'Anim')?.value       || 'fade-up',
+    };
+  }
+
+  const activeBgBtn = document.querySelector('.bgtype-btn.active');
+  const bgType = activeBgBtn ? (activeBgBtn.id.replace('bgt-','')) : 'color';
+
   const val = {
-    badge:         document.getElementById('heroBadge').value.trim(),
-    headline:      document.getElementById('heroHeadline').value.trim(),
-    subtitle:      document.getElementById('heroSubtitle').value.trim(),
-    bg_color:      document.getElementById('heroBgColor')?.value   || '#064E3B',
-    text_color:    document.getElementById('heroTextColor')?.value || '#ffffff',
-    headline_size: document.getElementById('heroHSize')?.value     || '2.4rem',
-    subtitle_size: document.getElementById('heroSSize')?.value     || '1rem',
+    bg_type:    bgType,
+    bg_color:   document.getElementById('heroBgColorHex')?.value  || '#064E3B',
+    bg_overlay: (document.getElementById('heroBgOverlay')?.value  || 75) / 100,
+    bg_image:   bgType === 'image' ? (document.getElementById('heroBgMediaUrl')?.value || '') : '',
+    bg_video:   bgType === 'video' ? (document.getElementById('heroBgMediaUrl')?.value || '') : '',
+    badge:    getElemCfg('badge'),
+    headline: getElemCfg('headline'),
+    subtitle: getElemCfg('subtitle'),
   };
-  if (!val.headline) { showToast('Headline is required', 'error'); return; }
+
+  if (!val.headline.text) { showToast('Headline text is required', 'error'); return; }
+
   try {
     await api('content', 'update_site', 'POST', { key: 'hero', value: val });
     closeModal();

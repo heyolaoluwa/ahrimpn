@@ -13,6 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+  <!-- Extra hero fonts (loaded on demand by CMS) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Oswald:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -87,6 +89,25 @@
       content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
       opacity: .5;
+    }
+
+    /* ── Hero CMS Animations ── */
+    .hero-fade-up     { animation: fadeUp .85s ease-out both; }
+    .hero-fade-in     { animation: heroFadeIn .85s ease-out both; }
+    .hero-slide-left  { animation: heroSlideLeft .85s ease-out both; }
+    .hero-slide-right { animation: heroSlideRight .85s ease-out both; }
+    .hero-zoom-in     { animation: heroZoomIn .75s ease-out both; }
+    .hero-bounce      { animation: heroBounce .9s cubic-bezier(.34,1.56,.64,1) both; }
+    .hero-glow        { animation: fadeUp .85s ease-out both, heroGlow 2.8s 1s ease-in-out infinite; }
+    .hero-typewriter  { overflow: hidden; }
+    @keyframes heroFadeIn    { from{opacity:0} to{opacity:1} }
+    @keyframes heroSlideLeft { from{opacity:0;transform:translateX(-56px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes heroSlideRight{ from{opacity:0;transform:translateX(56px)}  to{opacity:1;transform:translateX(0)} }
+    @keyframes heroZoomIn    { from{opacity:0;transform:scale(.75)}        to{opacity:1;transform:scale(1)} }
+    @keyframes heroBounce    { 0%{opacity:0;transform:scale(.3)} 55%{opacity:1;transform:scale(1.12)} 80%{transform:scale(.93)} 100%{opacity:1;transform:scale(1)} }
+    @keyframes heroGlow      {
+      0%,100%{text-shadow:0 0 12px rgba(212,175,55,.35),0 0 24px rgba(212,175,55,.15)}
+      50%    {text-shadow:0 0 24px rgba(212,175,55,.9),0 0 48px rgba(212,175,55,.45),0 0 72px rgba(212,175,55,.2)}
     }
 
     /* Mobile menu link stagger */
@@ -233,14 +254,20 @@
   <!-- CMS colour overlay (sits above slider, controlled by admin) -->
   <div id="heroColorOverlay" class="absolute inset-0 pointer-events-none" style="background:transparent;transition:background .4s;z-index:2"></div>
 
-  <!-- Background Slider -->
+  <!-- CMS video background (hidden until admin sets one) -->
+  <div id="heroVideoBg" class="absolute inset-0 w-full h-full hidden" style="z-index:1">
+    <video id="heroBgVideo" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+    <div id="heroVideoOverlay" class="absolute inset-0" style="background:#064E3B;opacity:.75"></div>
+  </div>
+
+  <!-- Background Slider (hidden when video bg is active) -->
   <div id="slider-container" class="absolute inset-0 w-full h-full">
     <div class="slider-slide absolute inset-0 transition-opacity duration-1000 opacity-100">
-      <img src="1.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Conference"/>
+      <img id="heroSlide1" src="1.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Conference"/>
       <div class="absolute inset-0 bg-gradient-to-r from-brand-green/85 via-brand-green/60 to-brand-dark/70"></div>
     </div>
     <div class="slider-slide absolute inset-0 transition-opacity duration-1000 opacity-0">
-      <img src="3.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Members"/>
+      <img id="heroSlide2" src="3.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Members"/>
       <div class="absolute inset-0 bg-gradient-to-r from-brand-green/85 via-brand-green/60 to-brand-dark/70"></div>
     </div>
   </div>
@@ -253,7 +280,7 @@
   <div class="relative z-10 container mx-auto px-6 text-center">
     <div class="max-w-5xl mx-auto flex flex-col items-center">
 
-      <div class="inline-flex items-center gap-2 px-5 py-2 mb-8 rounded-full bg-white/10 border border-white/25 text-white text-xs backdrop-blur-md animate-fade-up">
+      <div id="heroBadgeWrapper" class="inline-flex items-center gap-2 px-5 py-2 mb-8 rounded-full bg-white/10 border border-white/25 text-white text-xs backdrop-blur-md animate-fade-up">
         <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse-slow"></span>
         <span id="heroBadge" class="font-semibold uppercase tracking-widest">Proudly Serving 5,000+ Members Nationwide</span>
       </div>
@@ -970,50 +997,122 @@ document.addEventListener('keydown', function(e) {
     if (!data.success) return;
     const site = data.data || {};
 
-    // Ticker
+    // ── Ticker ──────────────────────────────────────────
     const msgs = site.ticker_messages;
     if (Array.isArray(msgs) && msgs.length) {
       const ticker = document.getElementById('tickerText');
       if (ticker) ticker.textContent = msgs.join('   ·   ');
     }
 
-    // Hero
+    // ── Hero ─────────────────────────────────────────────
     const h = site.hero;
-    if (h && typeof h === 'object') {
-      const badge    = document.getElementById('heroBadge');
-      const headline = document.getElementById('heroHeadline');
-      const subtitle = document.getElementById('heroSubtitle');
-      const overlay  = document.getElementById('heroColorOverlay');
+    if (!h || typeof h !== 'object') return;
 
-      if (badge    && h.badge)    badge.textContent    = h.badge;
-      if (subtitle && h.subtitle) subtitle.textContent = h.subtitle;
-      if (headline && h.headline) {
-        // keep gold italic span for last part if " — " separator present
-        const parts = h.headline.split(' — ');
-        if (parts.length >= 2) {
-          headline.innerHTML = parts[0] + ' —<br/><span class="text-brand-gold italic">' + parts.slice(1).join(' — ') + '</span>';
-        } else {
-          headline.textContent = h.headline;
-        }
-      }
+    const badgeEl    = document.getElementById('heroBadge');
+    const badgeWrap  = document.getElementById('heroBadgeWrapper');
+    const headlineEl = document.getElementById('heroHeadline');
+    const subtitleEl = document.getElementById('heroSubtitle');
+    const overlay    = document.getElementById('heroColorOverlay');
 
-      // Apply saved background colour via the CMS overlay
-      if (overlay && h.bg_color) {
-        overlay.style.background = h.bg_color;
-        overlay.style.opacity    = '0.82';
-      }
-
-      // Apply saved text colour to hero text elements
-      if (h.text_color) {
-        if (headline) headline.style.color = h.text_color;
-        if (subtitle) subtitle.style.color = h.text_color;
-        if (badge)    badge.style.color    = h.text_color;
-      }
-
-      // Apply saved font sizes
-      if (headline && h.headline_size) headline.style.fontSize = h.headline_size;
-      if (subtitle && h.subtitle_size) subtitle.style.fontSize = h.subtitle_size;
+    // ── helpers ──────────────────────────────────────────
+    // Apply per-element style object to a DOM element
+    function applyStyle(el, cfg) {
+      if (!el || !cfg || typeof cfg !== 'object') return;
+      if (cfg.color)     el.style.color          = cfg.color;
+      if (cfg.font)      el.style.fontFamily      = `'${cfg.font}', sans-serif`;
+      if (cfg.size)      el.style.fontSize        = cfg.size;
+      if (cfg.weight)    el.style.fontWeight      = cfg.weight;
+      if (cfg.style)     el.style.fontStyle       = cfg.style;
+      if (cfg.transform) el.style.textTransform   = cfg.transform;
+      if (cfg.spacing)   el.style.letterSpacing   = cfg.spacing;
     }
+
+    // Remove default Tailwind animation, add CMS one with delay
+    function applyAnim(el, animName, delay) {
+      if (!el) return;
+      el.classList.remove('animate-fade-up');
+      el.style.animationDelay = '';
+      if (!animName || animName === 'none') { el.style.opacity = '1'; return; }
+      if (animName === 'typewriter') {
+        const full = el.textContent;
+        el.textContent = '';
+        el.style.opacity = '1';
+        let i = 0;
+        const iv = setInterval(() => { el.textContent += full[i++]; if (i >= full.length) clearInterval(iv); }, 45);
+        return;
+      }
+      el.style.animationDelay = delay || '0s';
+      el.classList.add('hero-' + animName);
+    }
+
+    // Read element config — supports old flat string OR new object
+    function cfg(key, textFallback) {
+      const v = h[key];
+      if (!v)              return { text: textFallback };
+      if (typeof v === 'string') return { text: v };
+      return v; // already an object
+    }
+
+    const bCfg = cfg('badge',    '');
+    const hCfg = cfg('headline', '');
+    const sCfg = cfg('subtitle', '');
+
+    // ── Text content ─────────────────────────────────────
+    if (badgeEl   && bCfg.text) badgeEl.textContent   = bCfg.text;
+    if (subtitleEl && sCfg.text) subtitleEl.textContent = sCfg.text;
+    if (headlineEl && hCfg.text) {
+      const parts = hCfg.text.split(' — ');
+      if (parts.length >= 2) {
+        headlineEl.innerHTML = parts[0] + ' —<br/><span class="text-brand-gold italic">' + parts.slice(1).join(' — ') + '</span>';
+      } else {
+        headlineEl.textContent = hCfg.text;
+      }
+    }
+
+    // ── Per-element styles ────────────────────────────────
+    applyStyle(badgeEl,    bCfg);
+    applyStyle(headlineEl, hCfg);
+    applyStyle(subtitleEl, sCfg);
+
+    // ── Backwards-compat flat fields ─────────────────────
+    if (!hCfg.color && h.text_color) {
+      if (headlineEl) headlineEl.style.color = h.text_color;
+      if (subtitleEl) subtitleEl.style.color = h.text_color;
+      if (badgeEl)    badgeEl.style.color    = h.text_color;
+    }
+    if (!hCfg.size && h.headline_size && headlineEl) headlineEl.style.fontSize = h.headline_size;
+    if (!sCfg.size && h.subtitle_size && subtitleEl) subtitleEl.style.fontSize = h.subtitle_size;
+
+    // ── Background ────────────────────────────────────────
+    const bgType    = h.bg_type || 'color';
+    const bgColor   = h.bg_color || '#064E3B';
+    const bgOverlay = parseFloat(h.bg_overlay ?? 0.75);
+
+    if (bgType === 'video' && h.bg_video) {
+      const videoBg    = document.getElementById('heroVideoBg');
+      const videoEl    = document.getElementById('heroBgVideo');
+      const videoOverEl = document.getElementById('heroVideoOverlay');
+      const slider     = document.getElementById('slider-container');
+      if (videoEl)     { videoEl.src = h.bg_video; videoEl.load(); }
+      if (videoOverEl) { videoOverEl.style.background = bgColor; videoOverEl.style.opacity = bgOverlay; }
+      if (videoBg)     videoBg.classList.remove('hidden');
+      if (slider)      slider.style.display = 'none';
+    } else if (bgType === 'image' && h.bg_image) {
+      const s1 = document.getElementById('heroSlide1');
+      const s2 = document.getElementById('heroSlide2');
+      if (s1) s1.src = h.bg_image;
+      if (s2) s2.src = h.bg_image;
+      if (overlay) { overlay.style.background = bgColor; overlay.style.opacity = bgOverlay; }
+    } else if (bgColor && overlay) {
+      overlay.style.background = bgColor;
+      overlay.style.opacity    = '0.82';
+    }
+
+    // ── Entrance animations ───────────────────────────────
+    applyAnim(badgeWrap,  bCfg.anim, '0s');
+    applyAnim(headlineEl, hCfg.anim, '0.15s');
+    applyAnim(subtitleEl, sCfg.anim, '0.3s');
+
   } catch(_) { /* silently fall back to hardcoded defaults */ }
 })();
 </script>

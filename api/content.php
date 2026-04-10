@@ -74,4 +74,35 @@ elseif ($method === 'POST' && $action === 'update_site') {
     ok(null, 'Content updated');
 }
 
+// ── UPLOAD HERO MEDIA ────────────────────────────────────────
+elseif ($method === 'POST' && $action === 'upload_hero_media') {
+    requireRole($user, 'admin');
+    if (empty($_FILES['file'])) fail('No file received');
+    $file = $_FILES['file'];
+    if ($file['error'] !== UPLOAD_ERR_OK) fail('Upload error code: ' . $file['error']);
+
+    $mime    = mime_content_type($file['tmp_name']);
+    $images  = ['image/jpeg','image/png','image/gif','image/webp'];
+    $videos  = ['video/mp4','video/webm','video/ogg','video/quicktime'];
+    $isImage = in_array($mime, $images);
+    $isVideo = in_array($mime, $videos);
+    if (!$isImage && !$isVideo) fail('Allowed: JPEG, PNG, WEBP, GIF, MP4, WEBM');
+
+    $maxBytes = $isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
+    if ($file['size'] > $maxBytes) fail($isVideo ? 'Video max 100 MB' : 'Image max 10 MB');
+
+    $uploadDir = __DIR__ . '/../uploads/hero/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+    $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $filename = 'hero_' . bin2hex(random_bytes(8)) . '.' . $ext;
+    if (!move_uploaded_file($file['tmp_name'], $uploadDir . $filename))
+        fail('Could not save file — check server write permissions');
+
+    ok([
+        'url'        => '/uploads/hero/' . $filename,
+        'media_type' => $isVideo ? 'video' : 'image',
+    ], 'Uploaded successfully');
+}
+
 else fail('Unknown action');
