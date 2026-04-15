@@ -1105,6 +1105,35 @@ tbody tr:hover td { background: var(--gray-50); }
         </div>
       </div>
 
+      <!-- CERTIFICATE PAYMENTS (admin) -->
+      <div class="section" id="sec-cert-payments">
+        <div class="page-header">
+          <h1 class="page-title">Certificate Payments</h1>
+          <p class="page-sub">Review payment proofs and issue official membership certificates</p>
+        </div>
+
+        <!-- Pending queue -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <span class="card-title">⏳ Pending Certificate Payments</span>
+            <button class="btn-sm btn-outline" onclick="loadCertPayments()"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          <div class="table-wrap" id="certPendingTable">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+
+        <!-- Approved / issued -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">✅ Issued Certificates</span>
+          </div>
+          <div class="table-wrap" id="certApprovedTable">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -1303,6 +1332,7 @@ function buildSidebar() {
     { sec: 'members',            icon: 'fa-users',            label: 'Members' },
     { sec: 'pending-approvals',  icon: 'fa-user-clock',       label: 'Pending Approvals', badge: true },
     { sec: 'job-approvals',      icon: 'fa-briefcase',        label: 'Job Approvals' },
+    { sec: 'cert-payments',      icon: 'fa-certificate',      label: 'Certificate Payments' },
     { sec: 'dues',               icon: 'fa-money-bill-wave',  label: 'Dues & Arrears' },
     { sec: 'courses-admin',      icon: 'fa-graduation-cap',   label: 'Courses (LMS)' },
     { sec: 'events-admin',       icon: 'fa-calendar-star',    label: 'Events' },
@@ -1362,6 +1392,7 @@ function navigate(sec) {
     'access':            loadAccessControl,
     'pending-approvals': loadPendingApprovals,
     'job-approvals':     loadJobApprovals,
+    'cert-payments':     loadCertPayments,
     'member-home':       loadMemberDashboard,
     'my-dues':           loadMyDues,
     'my-courses':        loadMyCourses,
@@ -3443,6 +3474,295 @@ async function updateProgress(id) {
 }
 
 // ═══════════════════════════════════════════════════════════
+//  ADMIN — CERTIFICATE PAYMENTS
+// ═══════════════════════════════════════════════════════════
+async function loadCertPayments() {
+  const pendingEl  = document.getElementById('certPendingTable');
+  const approvedEl = document.getElementById('certApprovedTable');
+  if (!pendingEl || !approvedEl) return;
+  pendingEl.innerHTML  = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  approvedEl.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+  try {
+    const [pending, approved] = await Promise.all([
+      api('payment_manual', 'list_cert_payments&status=pending'),
+      api('payment_manual', 'list_cert_payments&status=approved'),
+    ]);
+
+    // ── Pending table ──
+    if (!pending.length) {
+      pendingEl.innerHTML = '<div class="empty-state"><i class="fas fa-certificate"></i><h3>No pending payments</h3><p>All certificate payment proofs have been reviewed.</p></div>';
+    } else {
+      pendingEl.innerHTML = `
+        <table class="data-table">
+          <thead><tr><th>Member</th><th>Member ID</th><th>Email</th><th>Amount</th><th>Submitted</th><th>Proof</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${pending.map(r => `
+              <tr>
+                <td><b>${esc(r.member_name)}</b></td>
+                <td><code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">${esc(r.member_id||'—')}</code></td>
+                <td style="font-size:12px;color:var(--gray-500)">${esc(r.email)}</td>
+                <td>₦${Number(r.amount).toLocaleString()}</td>
+                <td style="font-size:12px">${fmtDate(r.created_at)}</td>
+                <td>
+                  <a href="${API.replace('/api','')}/uploads/payments/${esc(r.proof_file)}" target="_blank"
+                     style="color:var(--green);font-size:12px;font-weight:600">
+                    <i class="fas fa-file-alt"></i> View Proof
+                  </a>
+                </td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn-sm btn-green" style="font-size:11px;padding:5px 10px"
+                      onclick="approveCertPayment(${r.id},'${esc(r.member_name)}','${esc(r.member_id||'')}','${esc(r.cert_number)}')">
+                      <i class="fas fa-check"></i> Approve &amp; Issue
+                    </button>
+                    <button class="btn-sm" style="font-size:11px;padding:5px 10px;background:var(--red-pale);color:var(--red);border:1px solid var(--red)"
+                      onclick="rejectCertPayment(${r.id})">
+                      <i class="fas fa-times"></i> Reject
+                    </button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // ── Approved table ──
+    if (!approved.length) {
+      approvedEl.innerHTML = '<div class="empty-state"><i class="fas fa-award"></i><h3>No certificates issued yet</h3><p>Approved certificates will appear here.</p></div>';
+    } else {
+      approvedEl.innerHTML = `
+        <table class="data-table">
+          <thead><tr><th>Member</th><th>Member ID</th><th>Cert Number</th><th>Issued</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${approved.map(r => `
+              <tr>
+                <td><b>${esc(r.member_name)}</b></td>
+                <td><code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">${esc(r.member_id||'—')}</code></td>
+                <td style="font-size:12px;color:var(--green);font-weight:600">${esc(r.cert_number)}</td>
+                <td style="font-size:12px">${fmtDate(r.reviewed_at)}</td>
+                <td>
+                  <button class="btn-sm btn-outline" style="font-size:11px;padding:5px 10px"
+                    onclick="openCertPreview('${esc(r.member_name)}','${esc(r.member_id||'')}','${esc(r.cert_number)}','${esc(r.reviewed_at)}')">
+                    <i class="fas fa-eye"></i> Preview / Print
+                  </button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function approveCertPayment(id, memberName, memberId, certNumber) {
+  if (!confirm(`Approve certificate payment for ${memberName}?\n\nThis will mark the payment as approved and allow the member to download their official certificate.`)) return;
+  try {
+    await api('payment_manual', 'approve', 'POST', { id });
+    showToast(`Certificate approved for ${memberName}!`, 'success');
+    loadCertPayments();
+    // Immediately open the certificate preview for admin to print
+    openCertPreview(memberName, memberId, certNumber, new Date().toISOString());
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function rejectCertPayment(id) {
+  showModal('Reject Certificate Payment', `
+    <p style="font-size:13px;color:var(--gray-500);margin-bottom:14px">Provide a reason so the member knows what to correct and resubmit.</p>
+    <textarea id="rejectNotes" class="form-input" rows="3" placeholder="e.g. Payment amount does not match, please resubmit with correct amount..." style="resize:vertical"></textarea>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+      <button class="btn-sm btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer"
+        onclick="confirmRejectCert(${id})">
+        <i class="fas fa-times"></i> Reject Payment
+      </button>
+    </div>`);
+}
+
+async function confirmRejectCert(id) {
+  const notes = document.getElementById('rejectNotes')?.value.trim() || 'Payment proof rejected by admin.';
+  try {
+    await api('payment_manual', 'reject', 'POST', { id, notes });
+    closeModal();
+    showToast('Payment rejected. Member will need to resubmit.', 'success');
+    loadCertPayments();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── Certificate preview / print ─────────────────────────────
+function openCertPreview(memberName, memberId, certNumber, issueDate) {
+  // Remove any existing overlay
+  document.getElementById('certOverlay')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'certOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:20px';
+  overlay.innerHTML = `
+    <div style="background:#fff;width:min(95vw,900px);max-height:92vh;overflow-y:auto;border-radius:16px;box-shadow:0 32px 80px rgba(0,0,0,.5)">
+      <div style="position:sticky;top:0;background:#fff;z-index:1;padding:14px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;border-radius:16px 16px 0 0">
+        <span style="font-weight:700;font-size:13px;color:#064E3B;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-certificate" style="color:#D4AF37"></i> Certificate Preview
+        </span>
+        <div style="display:flex;gap:8px">
+          <button onclick="printCertificate()" style="background:#D4AF37;color:#0f172a;border:none;border-radius:6px;padding:9px 18px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.04em;display:flex;align-items:center;gap:6px">
+            <i class="fas fa-print"></i> Print / Save as PDF
+          </button>
+          <button onclick="document.getElementById('certOverlay').remove()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:6px;padding:9px 14px;font-size:12px;cursor:pointer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div style="padding:32px 40px 40px">
+        ${generateCertHtml(memberName, memberId, certNumber, issueDate)}
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function generateCertHtml(memberName, memberId, certNumber, issueDate) {
+  const dateStr = issueDate
+    ? new Date(issueDate).toLocaleDateString('en-NG', { day:'numeric', month:'long', year:'numeric' })
+    : new Date().toLocaleDateString('en-NG', { day:'numeric', month:'long', year:'numeric' });
+
+  return `
+    <div id="certBody" style="
+      font-family:'Fraunces',Georgia,serif;
+      background:#fff;
+      padding:56px 60px;
+      border:14px solid #064E3B;
+      position:relative;
+      text-align:center;
+      box-shadow:0 4px 32px rgba(0,0,0,.08);
+    ">
+      <!-- Inner gold border -->
+      <div style="position:absolute;inset:10px;border:2px solid #D4AF37;pointer-events:none"></div>
+
+      <!-- Corner ornaments -->
+      <div style="position:absolute;top:18px;left:18px;width:44px;height:44px;border-top:3px solid #D4AF37;border-left:3px solid #D4AF37;border-radius:2px 0 0 0"></div>
+      <div style="position:absolute;top:18px;right:18px;width:44px;height:44px;border-top:3px solid #D4AF37;border-right:3px solid #D4AF37;border-radius:0 2px 0 0"></div>
+      <div style="position:absolute;bottom:18px;left:18px;width:44px;height:44px;border-bottom:3px solid #D4AF37;border-left:3px solid #D4AF37;border-radius:0 0 0 2px"></div>
+      <div style="position:absolute;bottom:18px;right:18px;width:44px;height:44px;border-bottom:3px solid #D4AF37;border-right:3px solid #D4AF37;border-radius:0 0 2px 0"></div>
+
+      <!-- Header: logo + name -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px">
+        <div style="width:64px;height:64px;background:#064E3B;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+          <span style="color:#D4AF37;font-size:9px;font-weight:900;letter-spacing:.04em;line-height:1.3;text-align:center">AHRIM<br>PN</span>
+        </div>
+        <div style="text-align:left">
+          <div style="font-family:'DM Sans',Arial,sans-serif;font-size:10px;font-weight:700;color:#064E3B;letter-spacing:.1em;text-transform:uppercase;line-height:1.7">
+            Association of Health Records and Information<br>Management Professionals of Nigeria
+          </div>
+        </div>
+      </div>
+
+      <!-- Ornamental divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+        <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#D4AF37 60%)"></div>
+        <span style="color:#D4AF37;font-size:18px">❧</span>
+        <div style="color:#064E3B;font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;font-family:'DM Sans',sans-serif">Est. 1982</div>
+        <span style="color:#D4AF37;font-size:18px">❧</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,#D4AF37 60%)"></div>
+      </div>
+
+      <!-- Title -->
+      <div style="font-family:'DM Sans',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:#D4AF37;text-transform:uppercase;margin-bottom:6px">Certificate of Membership</div>
+      <div style="font-size:13px;color:#6b7280;font-family:'DM Sans',sans-serif;margin-bottom:20px;font-style:italic">This is to certify that</div>
+
+      <!-- Awardee name -->
+      <div style="font-size:clamp(28px,4vw,40px);font-weight:900;color:#064E3B;line-height:1.1;padding-bottom:10px;margin:0 20px 6px;border-bottom:2px solid #D4AF37">
+        ${esc(memberName)}
+      </div>
+
+      <!-- Body -->
+      <div style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#374151;line-height:1.9;max-width:540px;margin:18px auto 22px">
+        is a duly registered member of the <strong style="color:#064E3B">Association of Health Records and Information Management Professionals of Nigeria (AHRIMPN)</strong> and is entitled to all the rights, privileges, and professional obligations of full membership.
+      </div>
+
+      <!-- Member ID badge -->
+      <div style="display:inline-flex;align-items:center;gap:14px;background:#f0fdf4;border:1.5px solid #064E3B;border-radius:8px;padding:12px 28px;margin-bottom:32px">
+        <i class="fas fa-id-badge" style="color:#064E3B;font-size:20px"></i>
+        <div style="text-align:left">
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;color:#064E3B;text-transform:uppercase">Membership ID</div>
+          <div style="font-size:22px;font-weight:900;color:#064E3B;letter-spacing:.06em;line-height:1.1">${esc(memberId || 'N/A')}</div>
+        </div>
+      </div>
+
+      <!-- Signatures row -->
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:end;margin-bottom:24px">
+
+        <!-- President signature -->
+        <div style="text-align:center">
+          <div style="font-family:'Fraunces',Georgia,serif;font-size:22px;font-style:italic;color:#064E3B;margin-bottom:2px;line-height:1">Abiodun Y. Afolabi</div>
+          <div style="width:100%;height:1px;background:#374151;margin-bottom:6px"></div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#374151">National President</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:#6b7280;margin-top:1px">AHRIMPN</div>
+        </div>
+
+        <!-- Seal -->
+        <div style="text-align:center;padding:0 16px">
+          <div style="width:80px;height:80px;border-radius:50%;border:3px solid #064E3B;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 6px;background:#f0fdf4;position:relative">
+            <div style="position:absolute;inset:4px;border-radius:50%;border:1px dashed #D4AF37"></div>
+            <span style="font-family:'DM Sans',sans-serif;font-size:7px;font-weight:900;letter-spacing:.06em;color:#064E3B;text-align:center;line-height:1.4;position:relative">OFFICIAL<br>SEAL<br><span style="color:#D4AF37;font-size:9px">✦</span></span>
+          </div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:8px;letter-spacing:.08em;color:#6b7280;text-transform:uppercase">AHRIMPN</div>
+        </div>
+
+        <!-- Secretary signature -->
+        <div style="text-align:center">
+          <div style="font-family:'Fraunces',Georgia,serif;font-size:22px;font-style:italic;color:#064E3B;margin-bottom:2px;line-height:1">National Secretary</div>
+          <div style="width:100%;height:1px;background:#374151;margin-bottom:6px"></div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#374151">National Secretary</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:#6b7280;margin-top:1px">AHRIMPN</div>
+        </div>
+      </div>
+
+      <!-- Footer bar -->
+      <div style="background:#064E3B;border-radius:6px;padding:10px 20px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.6);letter-spacing:.06em;text-transform:uppercase">
+          Cert No: <span style="color:#D4AF37;font-weight:700">${esc(certNumber)}</span>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.6);letter-spacing:.06em;text-transform:uppercase">
+          Date Issued: <span style="color:#fff;font-weight:600">${dateStr}</span>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.6);letter-spacing:.06em;text-transform:uppercase">
+          Valid Indefinitely
+        </div>
+      </div>
+    </div>`;
+}
+
+function printCertificate() {
+  const certEl = document.getElementById('certBody');
+  if (!certEl) return;
+  const win = window.open('', '_blank', 'width=960,height=700');
+  win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>AHRIMPN — Certificate of Membership</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&family=Fraunces:ital,wght@0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#e5e7eb;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:30px;font-family:'DM Sans',Arial,sans-serif}
+    #certBody{max-width:860px;width:100%}
+    @media print{
+      body{background:#fff;padding:0;display:block}
+      #certBody{max-width:100%;box-shadow:none}
+      @page{size:A4 portrait;margin:8mm}
+    }
+  </style>
+</head>
+<body>
+${certEl.outerHTML}
+<script>
+  document.fonts.ready.then(()=>{ setTimeout(()=>{ window.print(); }, 400); });
+<\/script>
+</body>
+</html>`);
+  win.document.close();
+}
+
+// ═══════════════════════════════════════════════════════════
 //  CERTS
 // ═══════════════════════════════════════════════════════════
 async function loadMyCerts() {
@@ -3456,20 +3776,32 @@ async function loadMyCerts() {
     const completed   = courses.filter(c => c.completed);
     const certApproved = certStatus?.status === 'approved';
     const certPending  = certStatus?.status === 'pending';
+    const certPayId    = certStatus?.id || null;
 
     // ── Membership Certificate Card ──
     let memberCertHtml = `<div class="card" style="margin-bottom:20px"><div class="card-header"><span class="card-title">🏅 Membership Certificate</span></div><div class="card-body">`;
 
     if (certApproved) {
+      const certNum    = certStatus.cert_number || '';
+      const issueDate  = certStatus.reviewed_at || certStatus.created_at || new Date().toISOString();
+      const safeOnClick = `openCertPreview('${esc(CURRENT_USER.name).replace(/'/g,"\\'")}','${esc(CURRENT_USER.member_id||'')}','${esc(certNum)}','${esc(issueDate)}')`;
       memberCertHtml += `
-        <div style="background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;border-radius:14px;padding:24px;position:relative;overflow:hidden">
-          <div style="position:absolute;right:20px;top:20px;font-size:50px;opacity:.1">🏅</div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.7;text-transform:uppercase;margin-bottom:8px">Official Membership Certificate</div>
-          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:4px">Association of Health Records &amp; Information Management Professionals of Nigeria</div>
-          <div style="font-size:12px;opacity:.8;margin-bottom:4px">This certifies that <b>${esc(CURRENT_USER.name)}</b> is a registered member of AHRIMPN</div>
-          <div style="font-size:11px;opacity:.7;margin-bottom:16px">Member ID: ${esc(CURRENT_USER.member_id || '')}</div>
-          <button type="button" style="background:#fff;color:var(--green);border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer" onclick="window.print()">
-            <i class="fas fa-print"></i> Print Certificate
+        <div style="background:linear-gradient(135deg,#064E3B,#065f46);color:#fff;border-radius:14px;padding:28px;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-10px;top:-10px;width:120px;height:120px;border-radius:50%;background:rgba(212,175,55,.08)"></div>
+          <div style="position:absolute;right:30px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:rgba(212,175,55,.05)"></div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:.2em;color:#D4AF37;text-transform:uppercase;margin-bottom:10px">
+            <i class="fas fa-check-circle" style="margin-right:4px"></i>Certificate Ready
+          </div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:4px">Official Membership Certificate</div>
+          <div style="font-size:12px;opacity:.75;margin-bottom:4px">Issued to <b>${esc(CURRENT_USER.name)}</b></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <div style="font-size:11px;opacity:.65">Member ID: <b style="color:#D4AF37">${esc(CURRENT_USER.member_id||'')}</b></div>
+            ${certNum ? `<div style="font-size:11px;opacity:.65">Cert No: <b style="color:#D4AF37">${esc(certNum)}</b></div>` : ''}
+          </div>
+          <button type="button"
+            style="background:#D4AF37;color:#0f172a;border:none;border-radius:8px;padding:12px 24px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.04em;display:inline-flex;align-items:center;gap:8px"
+            onclick="${safeOnClick}">
+            <i class="fas fa-certificate"></i> View &amp; Print Certificate
           </button>
         </div>`;
     } else if (certPending) {

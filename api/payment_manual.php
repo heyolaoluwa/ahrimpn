@@ -93,7 +93,10 @@ elseif ($method === 'GET' && $action === 'cert_status') {
     }
 
     $stmt = $db->prepare("
-        SELECT id, status, created_at, reviewed_at
+        SELECT id, status, created_at, reviewed_at,
+               CONCAT('AHRIMPN/CERT/',
+                 YEAR(COALESCE(reviewed_at, created_at)),
+                 '/', LPAD(id, 5, '0')) AS cert_number
         FROM manual_payments
         WHERE user_id = ? AND purpose = 'certificate'
         ORDER BY created_at DESC
@@ -103,6 +106,37 @@ elseif ($method === 'GET' && $action === 'cert_status') {
     $row = $stmt->fetch();
 
     ok($row ?: ['status' => 'none'], 'Certificate payment status');
+}
+
+// ── LIST CERT PAYMENTS (admin) — all statuses, cert purpose only ────────────
+elseif ($method === 'GET' && $action === 'list_cert_payments') {
+    $user = requireAuth();
+    requireRole($user, 'admin', 'executive');
+
+    $status = $_GET['status'] ?? '';
+    $sql = "
+        SELECT mp.id, mp.user_id, mp.amount, mp.status, mp.proof_file,
+               mp.created_at, mp.reviewed_at,
+               u.name      AS member_name,
+               u.member_id AS member_id,
+               u.email,
+               CONCAT(
+                 'AHRIMPN/CERT/',
+                 YEAR(COALESCE(mp.reviewed_at, mp.created_at)),
+                 '/',
+                 LPAD(mp.id, 5, '0')
+               ) AS cert_number
+        FROM manual_payments mp
+        JOIN users u ON u.id = mp.user_id
+        WHERE mp.purpose = 'certificate'
+    ";
+    $params = [];
+    if ($status) { $sql .= " AND mp.status = ?"; $params[] = $status; }
+    $sql .= " ORDER BY mp.created_at DESC";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    ok($stmt->fetchAll());
 }
 
 // ── LIST ALL PENDING PROOFS (admin) ─────────────────────────────────────────
