@@ -3622,6 +3622,9 @@ function generateCertHtml(memberName, memberId, certNumber, issueDate) {
     ? new Date(issueDate).toLocaleDateString('en-NG', { day:'numeric', month:'long', year:'numeric' })
     : new Date().toLocaleDateString('en-NG', { day:'numeric', month:'long', year:'numeric' });
 
+  // Absolute URL so the logo resolves in both the overlay and the print window
+  const logoUrl = new URL('ahrimpn logo.png', window.location.href).href;
+
   return `
     <div id="certBody" style="
       font-family:'Fraunces',Georgia,serif;
@@ -3641,11 +3644,11 @@ function generateCertHtml(memberName, memberId, certNumber, issueDate) {
       <div style="position:absolute;bottom:18px;left:18px;width:44px;height:44px;border-bottom:3px solid #D4AF37;border-left:3px solid #D4AF37;border-radius:0 0 0 2px"></div>
       <div style="position:absolute;bottom:18px;right:18px;width:44px;height:44px;border-bottom:3px solid #D4AF37;border-right:3px solid #D4AF37;border-radius:0 0 2px 0"></div>
 
-      <!-- Header: logo + name -->
+      <!-- Header: logo + association name -->
       <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px">
-        <div style="width:64px;height:64px;background:#064E3B;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="color:#D4AF37;font-size:9px;font-weight:900;letter-spacing:.04em;line-height:1.3;text-align:center">AHRIM<br>PN</span>
-        </div>
+        <img src="${logoUrl}" alt="AHRIMPN Logo"
+             style="width:72px;height:72px;object-fit:contain;flex-shrink:0"
+             onerror="this.style.display='none'"/>
         <div style="text-align:left">
           <div style="font-family:'DM Sans',Arial,sans-serif;font-size:10px;font-weight:700;color:#064E3B;letter-spacing:.1em;text-transform:uppercase;line-height:1.7">
             Association of Health Records and Information<br>Management Professionals of Nigeria
@@ -3707,10 +3710,10 @@ function generateCertHtml(memberName, memberId, certNumber, issueDate) {
 
         <!-- Secretary signature -->
         <div style="text-align:center">
-          <div style="font-family:'Fraunces',Georgia,serif;font-size:22px;font-style:italic;color:#064E3B;margin-bottom:2px;line-height:1">National Secretary</div>
+          <div style="font-family:'Fraunces',Georgia,serif;font-size:22px;font-style:italic;color:#064E3B;margin-bottom:2px;line-height:1">Suleiman Muazu</div>
           <div style="width:100%;height:1px;background:#374151;margin-bottom:6px"></div>
           <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#374151">National Secretary</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:#6b7280;margin-top:1px">AHRIMPN</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:#6b7280;margin-top:1px">Mr Suleiman Muazu</div>
         </div>
       </div>
 
