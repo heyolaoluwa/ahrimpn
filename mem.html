@@ -2329,6 +2329,11 @@ function editHero() {
     const bCfg = (typeof h.badge    === 'object') ? h.badge    : { text: h.badge    || 'Proudly Serving 5,000+ Members Nationwide' };
     const hCfg = (typeof h.headline === 'object') ? h.headline : { text: h.headline || 'Health Information Managers — Guardians of Integrity' };
     const sCfg = (typeof h.subtitle === 'object') ? h.subtitle : { text: h.subtitle || 'Empowering Health Information Management Practitioners across Nigeria.' };
+    // Tagline, CTAs, Stats panel
+    const tCfg = (h.tagline && typeof h.tagline === 'object') ? h.tagline : { text: h.tagline || 'Guardians of Healthcare Integrity', color: 'rgba(255,255,255,0.7)', show: true };
+    const c1   = h.cta1 || { text: 'Become a Member', url: 'mem.html',    show: true };
+    const c2   = h.cta2 || { text: 'Learn More',       url: 'about.html', show: true };
+    const sp   = h.stats_panel || { show: true, box_title: "Nigeria's Premier HIM Body", box_sub: 'Established & Recognized', trust_text: "Accredited by Nigeria's Federal Ministry of Health", stat1:{num:'36',lbl:'State Chapters'}, stat2:{num:'5K+',lbl:'Members'}, stat3:{num:'44',lbl:'Conferences'}, stat4:{num:'10K+',lbl:'Students'} };
 
     const badgeSizes    = [['0.6rem','XS'],['0.7rem','SM (default)'],['0.75rem','MD'],['0.85rem','LG'],['1rem','XL']];
     const headlineSizes = [['1.6rem','SM'],['2rem','MD'],['2.6rem','LG'],['3rem','XL (default)'],['3.5rem','2XL'],['4rem','3XL'],['4.8rem','4XL']];
@@ -2359,7 +2364,10 @@ function editHero() {
         <button class="htab active" id="htab-bg"       onclick="heroTab('bg')">       <i class="fas fa-image"></i> Background</button>
         <button class="htab"        id="htab-badge"    onclick="heroTab('badge')">    <i class="fas fa-tag"></i> Badge</button>
         <button class="htab"        id="htab-headline" onclick="heroTab('headline')"> <i class="fas fa-heading"></i> Headline</button>
+        <button class="htab"        id="htab-tagline"  onclick="heroTab('tagline')">  <i class="fas fa-quote-right"></i> Tagline</button>
         <button class="htab"        id="htab-subtitle" onclick="heroTab('subtitle')"> <i class="fas fa-align-left"></i> Subtitle</button>
+        <button class="htab"        id="htab-buttons"  onclick="heroTab('buttons')">  <i class="fas fa-hand-pointer"></i> Buttons</button>
+        <button class="htab"        id="htab-stats"    onclick="heroTab('stats')">    <i class="fas fa-chart-bar"></i> Stats Panel</button>
       </div>
 
       <!-- PANEL: Background -->
@@ -2422,6 +2430,127 @@ function editHero() {
       <!-- PANEL: Subtitle -->
       <div class="hpanel" id="hpanel-subtitle">
         ${heroElemPanel('subtitle', 'Subtitle', sCfg, subtitleSizes)}
+      </div>
+
+      <!-- PANEL: Tagline -->
+      <div class="hpanel" id="hpanel-tagline">
+        <p style="font-size:11px;color:var(--gray-400);margin-bottom:12px">The italic accent line displayed between the headline and subtitle.</p>
+        <div class="hfield" style="margin-bottom:12px">
+          <label>Tagline Text</label>
+          <input id="taglineText" class="form-input" value="${esc(tCfg.text || '')}" oninput="heroPreviewUpdate()"/>
+        </div>
+        <div class="hrow3">
+          <div class="hfield">
+            <label>Colour</label>
+            <div class="color-row">
+              <input type="color" id="taglineColorPick" value="${/^#[0-9a-fA-F]{6}$/.test(tCfg.color||'')?tCfg.color:'#ffffff'}"
+                oninput="heroSyncColor('taglineColorPick','taglineColorHex')"/>
+              <input id="taglineColorHex" class="form-input" value="${esc(tCfg.color||'rgba(255,255,255,0.7)')}"
+                oninput="heroSyncColor('taglineColorHex','taglineColorPick')"/>
+            </div>
+          </div>
+          <div class="hfield">
+            <label>Visible</label>
+            <select id="taglineShow" class="form-input" onchange="heroPreviewUpdate()">
+              <option value="true"  ${tCfg.show!==false?'selected':''}>Show</option>
+              <option value="false" ${tCfg.show===false?'selected':''}>Hide</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: Buttons -->
+      <div class="hpanel" id="hpanel-buttons">
+        <p style="font-size:11px;color:var(--gray-400);margin-bottom:14px">Configure the two call-to-action buttons on the hero.</p>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">
+            <i class="fas fa-star" style="margin-right:6px"></i>Primary Button (Gold)
+          </div>
+          <div class="hrow3">
+            <div class="hfield">
+              <label>Button Text</label>
+              <input id="cta1Text" class="form-input" value="${esc(c1.text||'Become a Member')}" oninput="heroPreviewUpdate()"/>
+            </div>
+            <div class="hfield">
+              <label>Link URL</label>
+              <input id="cta1Url" class="form-input" value="${esc(c1.url||'mem.html')}" placeholder="mem.html or https://..."/>
+            </div>
+            <div class="hfield">
+              <label>Visible</label>
+              <select id="cta1Show" class="form-input">
+                <option value="true"  ${c1.show!==false?'selected':''}>Show</option>
+                <option value="false" ${c1.show===false?'selected':''}>Hide</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">
+            <i class="fas fa-play" style="margin-right:6px"></i>Secondary Button (Outlined)
+          </div>
+          <div class="hrow3">
+            <div class="hfield">
+              <label>Button Text</label>
+              <input id="cta2Text" class="form-input" value="${esc(c2.text||'Learn More')}" oninput="heroPreviewUpdate()"/>
+            </div>
+            <div class="hfield">
+              <label>Link URL</label>
+              <input id="cta2Url" class="form-input" value="${esc(c2.url||'about.html')}" placeholder="about.html or https://..."/>
+            </div>
+            <div class="hfield">
+              <label>Visible</label>
+              <select id="cta2Show" class="form-input">
+                <option value="true"  ${c2.show!==false?'selected':''}>Show</option>
+                <option value="false" ${c2.show===false?'selected':''}>Hide</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: Stats Panel -->
+      <div class="hpanel" id="hpanel-stats">
+        <p style="font-size:11px;color:var(--gray-400);margin-bottom:14px">Controls the statistics card shown on the right side of the hero (desktop only).</p>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">Panel Visibility & Labels</div>
+          <div class="hrow3">
+            <div class="hfield">
+              <label>Show Panel</label>
+              <select id="statsPanelShow" class="form-input">
+                <option value="true"  ${sp.show!==false?'selected':''}>Show</option>
+                <option value="false" ${sp.show===false?'selected':''}>Hide</option>
+              </select>
+            </div>
+            <div class="hfield">
+              <label>Box Title</label>
+              <input id="statsBoxTitle" class="form-input" value="${esc(sp.box_title||"Nigeria's Premier HIM Body")}"/>
+            </div>
+            <div class="hfield">
+              <label>Box Subtitle</label>
+              <input id="statsBoxSub" class="form-input" value="${esc(sp.box_sub||'Established & Recognized')}"/>
+            </div>
+            <div class="hfield" style="grid-column:1/-1">
+              <label>Trust Strip Text</label>
+              <input id="statsTrustText" class="form-input" value="${esc(sp.trust_text||"Accredited by Nigeria's Federal Ministry of Health")}"/>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em">4 Statistics</div>
+          <div class="hrow3">
+            ${[1,2,3,4].map(i => {
+              const s = sp['stat'+i] || {};
+              return `<div class="hfield">
+                <label>Stat ${i} — Value</label>
+                <input id="stat${i}Num" class="form-input" value="${esc(s.num||'')}"/>
+              </div>
+              <div class="hfield">
+                <label>Stat ${i} — Label</label>
+                <input id="stat${i}Lbl" class="form-input" value="${esc(s.lbl||'')}"/>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
       </div>
 
       <!-- LIVE PREVIEW -->
@@ -2656,6 +2785,31 @@ async function saveHero() {
     badge:    getElemCfg('badge'),
     headline: getElemCfg('headline'),
     subtitle: getElemCfg('subtitle'),
+    tagline: {
+      text:  (document.getElementById('taglineText')?.value  || '').trim(),
+      color: document.getElementById('taglineColorHex')?.value || 'rgba(255,255,255,0.7)',
+      show:  document.getElementById('taglineShow')?.value !== 'false',
+    },
+    cta1: {
+      text: (document.getElementById('cta1Text')?.value || '').trim(),
+      url:  (document.getElementById('cta1Url')?.value  || '').trim(),
+      show: document.getElementById('cta1Show')?.value !== 'false',
+    },
+    cta2: {
+      text: (document.getElementById('cta2Text')?.value || '').trim(),
+      url:  (document.getElementById('cta2Url')?.value  || '').trim(),
+      show: document.getElementById('cta2Show')?.value !== 'false',
+    },
+    stats_panel: {
+      show:       document.getElementById('statsPanelShow')?.value !== 'false',
+      box_title:  (document.getElementById('statsBoxTitle')?.value   || '').trim(),
+      box_sub:    (document.getElementById('statsBoxSub')?.value     || '').trim(),
+      trust_text: (document.getElementById('statsTrustText')?.value  || '').trim(),
+      stat1: { num: (document.getElementById('stat1Num')?.value||'').trim(), lbl: (document.getElementById('stat1Lbl')?.value||'').trim() },
+      stat2: { num: (document.getElementById('stat2Num')?.value||'').trim(), lbl: (document.getElementById('stat2Lbl')?.value||'').trim() },
+      stat3: { num: (document.getElementById('stat3Num')?.value||'').trim(), lbl: (document.getElementById('stat3Lbl')?.value||'').trim() },
+      stat4: { num: (document.getElementById('stat4Num')?.value||'').trim(), lbl: (document.getElementById('stat4Lbl')?.value||'').trim() },
+    },
   };
 
   if (!val.headline.text) { showToast('Headline text is required', 'error'); return; }

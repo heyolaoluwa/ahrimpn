@@ -379,10 +379,10 @@
           Professionals
         </h1>
 
-        <!-- Divider tag -->
-        <div class="flex items-center gap-3 mb-6" style="animation:heroSlideUp .8s .35s ease-out both;opacity:0;animation-fill-mode:both">
+        <!-- Divider tag / Tagline -->
+        <div id="heroTaglineWrapper" class="flex items-center gap-3 mb-6" style="animation:heroSlideUp .8s .35s ease-out both;opacity:0;animation-fill-mode:both">
           <div style="height:1px;width:36px;background:#D4AF37;opacity:.7"></div>
-          <span class="font-heading italic text-white/70 text-lg tracking-wide">Guardians of Healthcare Integrity</span>
+          <span id="heroTagline" class="font-heading italic text-white/70 text-lg tracking-wide">Guardians of Healthcare Integrity</span>
         </div>
 
         <!-- Subtitle -->
@@ -394,11 +394,11 @@
 
         <!-- CTAs -->
         <div class="flex flex-wrap gap-4 mb-12" style="animation:heroSlideUp .8s .55s ease-out both;opacity:0;animation-fill-mode:both">
-          <a href="mem.html" class="hero-cta-primary">
+          <a id="heroCta1" href="mem.html" class="hero-cta-primary">
             Become a Member <i class="fas fa-arrow-right text-xs"></i>
           </a>
-          <a href="about.html" class="hero-cta-secondary">
-            <i class="fas fa-play text-xs"></i> Learn More
+          <a id="heroCta2" href="about.html" class="hero-cta-secondary">
+            <i class="fas fa-play text-xs"></i> <span id="heroCta2Text">Learn More</span>
           </a>
         </div>
 
@@ -410,7 +410,7 @@
       </div>
 
       <!-- RIGHT — stat chips (desktop only) -->
-      <div class="hidden lg:flex flex-col gap-5 items-end" style="animation:heroSlideUp .9s .65s ease-out both;opacity:0;animation-fill-mode:both">
+      <div id="heroRightPanel" class="hidden lg:flex flex-col gap-5 items-end" style="animation:heroSlideUp .9s .65s ease-out both;opacity:0;animation-fill-mode:both">
 
         <!-- Large feature box -->
         <div style="background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:16px;padding:36px 40px;backdrop-filter:blur(14px);width:100%;max-width:380px">
@@ -419,26 +419,26 @@
               <i class="fas fa-trophy text-brand-dark text-base"></i>
             </div>
             <div>
-              <div class="text-white font-bold text-sm">Nigeria's Premier HIM Body</div>
-              <div class="text-white/50 text-xs">Established & Recognized</div>
+              <div id="heroStatBoxTitle" class="text-white font-bold text-sm">Nigeria's Premier HIM Body</div>
+              <div id="heroStatBoxSub" class="text-white/50 text-xs">Established & Recognized</div>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="hero-stat-chip" style="animation-delay:.7s">
-              <span class="hero-stat-num">36</span>
-              <span class="hero-stat-lbl">State Chapters</span>
+              <span id="heroStat1Num" class="hero-stat-num">36</span>
+              <span id="heroStat1Lbl" class="hero-stat-lbl">State Chapters</span>
             </div>
             <div class="hero-stat-chip" style="animation-delay:.8s">
-              <span class="hero-stat-num">5K+</span>
-              <span class="hero-stat-lbl">Members</span>
+              <span id="heroStat2Num" class="hero-stat-num">5K+</span>
+              <span id="heroStat2Lbl" class="hero-stat-lbl">Members</span>
             </div>
             <div class="hero-stat-chip" style="animation-delay:.9s">
-              <span class="hero-stat-num">44</span>
-              <span class="hero-stat-lbl">Conferences</span>
+              <span id="heroStat3Num" class="hero-stat-num">44</span>
+              <span id="heroStat3Lbl" class="hero-stat-lbl">Conferences</span>
             </div>
             <div class="hero-stat-chip" style="animation-delay:1s">
-              <span class="hero-stat-num">10K+</span>
-              <span class="hero-stat-lbl">Students</span>
+              <span id="heroStat4Num" class="hero-stat-num">10K+</span>
+              <span id="heroStat4Lbl" class="hero-stat-lbl">Students</span>
             </div>
           </div>
         </div>
@@ -446,7 +446,7 @@
         <!-- Trust strip -->
         <div class="flex items-center gap-3" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 20px;width:100%;max-width:380px;backdrop-filter:blur(10px)">
           <i class="fas fa-check-circle text-brand-gold text-lg"></i>
-          <span class="text-white/80 text-sm">Accredited by Nigeria's Federal Ministry of Health</span>
+          <span id="heroTrustText" class="text-white/80 text-sm">Accredited by Nigeria's Federal Ministry of Health</span>
         </div>
       </div>
 
@@ -1260,6 +1260,44 @@ document.addEventListener('keydown', function(e) {
     applyAnim(badgeWrap,  bCfg.anim, '0s');
     applyAnim(headlineEl, hCfg.anim, '0.15s');
     applyAnim(subtitleEl, sCfg.anim, '0.3s');
+
+    // ── Tagline ───────────────────────────────────────────
+    const tgl     = h.tagline || {};
+    const taglineEl   = document.getElementById('heroTagline');
+    const taglineWrap = document.getElementById('heroTaglineWrapper');
+    if (taglineEl && tgl.text)  taglineEl.textContent = tgl.text;
+    if (taglineEl && tgl.color) taglineEl.style.color = tgl.color;
+    if (taglineWrap && tgl.show === false) taglineWrap.style.display = 'none';
+
+    // ── CTA Buttons ───────────────────────────────────────
+    const cta1El = document.getElementById('heroCta1');
+    const cta2El = document.getElementById('heroCta2');
+    const cta2TxtEl = document.getElementById('heroCta2Text');
+    const c1 = h.cta1 || {};
+    const c2 = h.cta2 || {};
+    if (cta1El) {
+      if (c1.text) cta1El.childNodes[0].textContent = c1.text + ' ';
+      if (c1.url)  cta1El.href = c1.url;
+      if (c1.show === false) cta1El.style.display = 'none';
+    }
+    if (cta2El) {
+      if (c2.url)  cta2El.href = c2.url;
+      if (c2.show === false) cta2El.style.display = 'none';
+    }
+    if (cta2TxtEl && c2.text) cta2TxtEl.textContent = c2.text;
+
+    // ── Stats panel ───────────────────────────────────────
+    const sp = h.stats_panel || {};
+    const rightPanel = document.getElementById('heroRightPanel');
+    if (rightPanel && sp.show === false) rightPanel.style.display = 'none';
+    function setTxt(id, val) { const el = document.getElementById(id); if (el && val) el.textContent = val; }
+    setTxt('heroStatBoxTitle', sp.box_title);
+    setTxt('heroStatBoxSub',   sp.box_sub);
+    setTxt('heroTrustText',    sp.trust_text);
+    if (sp.stat1) { setTxt('heroStat1Num', sp.stat1.num); setTxt('heroStat1Lbl', sp.stat1.lbl); }
+    if (sp.stat2) { setTxt('heroStat2Num', sp.stat2.num); setTxt('heroStat2Lbl', sp.stat2.lbl); }
+    if (sp.stat3) { setTxt('heroStat3Num', sp.stat3.num); setTxt('heroStat3Lbl', sp.stat3.lbl); }
+    if (sp.stat4) { setTxt('heroStat4Num', sp.stat4.num); setTxt('heroStat4Lbl', sp.stat4.lbl); }
 
   } catch(_) { /* silently fall back to hardcoded defaults */ }
 })();
