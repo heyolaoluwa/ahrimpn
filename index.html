@@ -110,6 +110,81 @@
       50%    {text-shadow:0 0 24px rgba(212,175,55,.9),0 0 48px rgba(212,175,55,.45),0 0 72px rgba(212,175,55,.2)}
     }
 
+    /* ── Hero redesign ── */
+    @keyframes heroLineGrow { from{width:0;opacity:0} to{width:64px;opacity:1} }
+    @keyframes heroSlideUp  { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes heroCounterUp{ from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes diagonalDrift{ 0%{transform:skewX(-12deg) translateX(0)} 100%{transform:skewX(-12deg) translateX(6px)} }
+    @keyframes goldPulse    { 0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,.4)} 50%{box-shadow:0 0 0 10px rgba(212,175,55,0)} }
+
+    .hero-accent-line { animation: heroLineGrow .9s .4s ease-out both; }
+    .hero-title-word  { display:inline-block; animation: heroSlideUp .8s ease-out both; }
+    .hero-cta-primary {
+      background: #D4AF37;
+      color: #0f172a;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 18px 40px;
+      border-radius: 4px;
+      font-size: .875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all .25s;
+      box-shadow: 0 8px 32px rgba(212,175,55,.35);
+      animation: goldPulse 3s 1.5s ease-in-out infinite;
+    }
+    .hero-cta-primary:hover { background:#fff; transform:translateY(-3px); box-shadow:0 16px 40px rgba(212,175,55,.5); }
+    .hero-cta-secondary {
+      border: 2px solid rgba(255,255,255,.55);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 16px 36px;
+      border-radius: 4px;
+      font-size: .875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all .25s;
+      backdrop-filter: blur(8px);
+    }
+    .hero-cta-secondary:hover { background:rgba(255,255,255,.12); border-color:#fff; transform:translateY(-3px); }
+
+    .hero-stat-chip {
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 8px;
+      padding: 14px 20px;
+      backdrop-filter: blur(10px);
+      animation: heroCounterUp .6s ease-out both;
+    }
+    .hero-stat-num { font-size:1.5rem; font-weight:800; color:#D4AF37; font-family:'Fraunces',serif; line-height:1; }
+    .hero-stat-lbl { font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.6); }
+
+    .hero-badge-pill {
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 18px 6px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(212,175,55,.4);
+      background: rgba(212,175,55,.08);
+      backdrop-filter: blur(12px);
+      animation: heroSlideUp .7s ease-out both;
+    }
+    .hero-badge-dot {
+      width:28px; height:28px; border-radius:50%;
+      background:#D4AF37; display:flex; align-items:center; justify-content:center;
+    }
+
+    /* diagonal overlay slice */
+    #heroSlice {
+      position:absolute; bottom:-1px; left:0; right:0; z-index:5; pointer-events:none;
+      overflow:hidden; line-height:0;
+    }
+
     /* Mobile menu link stagger */
     .mobile-nav-link { transition: opacity .3s, transform .3s; opacity: 0; transform: translateX(20px); }
     #mobileMenu.open .mobile-nav-link { opacity: 1; transform: translateX(0); }
@@ -249,81 +324,154 @@
 <!-- ═══════════════════════════════════════
      HERO
 ═══════════════════════════════════════ -->
-<section id="home" class="relative w-full min-h-[88vh] flex items-center justify-center overflow-hidden bg-brand-dark pt-8 pb-28 md:pb-20">
+<section id="home" class="relative w-full min-h-screen flex items-center overflow-hidden bg-brand-dark" style="padding-top:80px;padding-bottom:100px;">
 
-  <!-- CMS colour overlay (sits above slider, controlled by admin) -->
-  <div id="heroColorOverlay" class="absolute inset-0 pointer-events-none" style="background:transparent;transition:background .4s;z-index:2"></div>
+  <!-- CMS colour overlay -->
+  <div id="heroColorOverlay" class="absolute inset-0 pointer-events-none" style="background:transparent;transition:background .4s;z-index:4"></div>
 
-  <!-- CMS video background (hidden until admin sets one) -->
+  <!-- CMS video background -->
   <div id="heroVideoBg" class="absolute inset-0 w-full h-full hidden" style="z-index:1">
     <video id="heroBgVideo" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
     <div id="heroVideoOverlay" class="absolute inset-0" style="background:#064E3B;opacity:.75"></div>
   </div>
 
-  <!-- Background Slider (hidden when video bg is active) -->
-  <div id="slider-container" class="absolute inset-0 w-full h-full">
+  <!-- Background Slider -->
+  <div id="slider-container" class="absolute inset-0 w-full h-full" style="z-index:1">
     <div class="slider-slide absolute inset-0 transition-opacity duration-1000 opacity-100">
       <img id="heroSlide1" src="1.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Conference"/>
-      <div class="absolute inset-0 bg-gradient-to-r from-brand-green/85 via-brand-green/60 to-brand-dark/70"></div>
+      <!-- bold two-tone gradient: deep green left, dark right -->
+      <div class="absolute inset-0" style="background:linear-gradient(105deg,#064E3B 0%,rgba(6,78,59,.82) 45%,rgba(15,23,42,.88) 100%)"></div>
     </div>
     <div class="slider-slide absolute inset-0 transition-opacity duration-1000 opacity-0">
       <img id="heroSlide2" src="3.jpg" class="w-full h-full object-cover md:animate-zoom-slow" alt="AHRIMPN Members"/>
-      <div class="absolute inset-0 bg-gradient-to-r from-brand-green/85 via-brand-green/60 to-brand-dark/70"></div>
+      <div class="absolute inset-0" style="background:linear-gradient(105deg,#064E3B 0%,rgba(6,78,59,.82) 45%,rgba(15,23,42,.88) 100%)"></div>
     </div>
   </div>
 
-  <!-- Decorative geometric accent -->
-  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-brand-dark/30 to-transparent pointer-events-none"></div>
-  <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-brand-gold/5 blur-3xl pointer-events-none"></div>
+  <!-- Ambient glow orbs -->
+  <div class="absolute top-1/4 left-1/3 w-[560px] h-[560px] rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(212,175,55,.09) 0%,transparent 70%);z-index:3"></div>
+  <div class="absolute bottom-0 right-0 w-[420px] h-[420px] rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(16,185,129,.07) 0%,transparent 70%);z-index:3"></div>
 
-  <!-- Hero Content -->
-  <div class="relative z-10 container mx-auto px-6 text-center">
-    <div class="max-w-5xl mx-auto flex flex-col items-center">
+  <!-- Vertical rule accent left -->
+  <div class="hidden lg:block absolute left-0 top-0 bottom-0 w-1.5 pointer-events-none" style="background:linear-gradient(to bottom,transparent,#D4AF37 30%,#D4AF37 70%,transparent);z-index:5;opacity:.6"></div>
 
-      <div id="heroBadgeWrapper" class="inline-flex items-center gap-2 px-5 py-2 mb-8 rounded-full bg-white/10 border border-white/25 text-white text-xs backdrop-blur-md animate-fade-up">
-        <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse-slow"></span>
-        <span id="heroBadge" class="font-semibold uppercase tracking-widest">Proudly Serving 5,000+ Members Nationwide</span>
+  <!-- ── Hero Content ── -->
+  <div class="relative container mx-auto px-6 lg:px-16" style="z-index:6">
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+      <!-- LEFT — copy -->
+      <div>
+        <!-- Badge pill -->
+        <div id="heroBadgeWrapper" class="hero-badge-pill mb-8">
+          <span class="hero-badge-dot"><i class="fas fa-shield-halved text-brand-dark text-xs"></i></span>
+          <span id="heroBadge" class="text-white font-bold uppercase tracking-widest text-xs">Proudly Serving 5,000+ Members Nationwide</span>
+        </div>
+
+        <!-- Gold accent line -->
+        <div class="hero-accent-line mb-5" style="height:4px;width:64px;background:#D4AF37;border-radius:2px"></div>
+
+        <!-- Headline -->
+        <h1 id="heroHeadline"
+            class="font-heading font-bold text-white leading-none mb-6 tracking-tight"
+            style="font-size:clamp(2.6rem,5.5vw,4.5rem);line-height:1.05;text-shadow:0 4px 32px rgba(0,0,0,.4)">
+          Health Information<br/>
+          <span style="color:#D4AF37">Management</span><br/>
+          Professionals
+        </h1>
+
+        <!-- Divider tag -->
+        <div class="flex items-center gap-3 mb-6" style="animation:heroSlideUp .8s .35s ease-out both;opacity:0;animation-fill-mode:both">
+          <div style="height:1px;width:36px;background:#D4AF37;opacity:.7"></div>
+          <span class="font-heading italic text-white/70 text-lg tracking-wide">Guardians of Healthcare Integrity</span>
+        </div>
+
+        <!-- Subtitle -->
+        <p id="heroSubtitle"
+           class="text-white/75 leading-relaxed mb-10 font-normal"
+           style="font-size:clamp(1rem,1.6vw,1.15rem);max-width:540px;animation:heroSlideUp .8s .45s ease-out both;opacity:0;animation-fill-mode:both">
+          Empowering Health Information Management Practitioners across Nigeria through professional development, digital innovation, and policy advocacy.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex flex-wrap gap-4 mb-12" style="animation:heroSlideUp .8s .55s ease-out both;opacity:0;animation-fill-mode:both">
+          <a href="mem.html" class="hero-cta-primary">
+            Become a Member <i class="fas fa-arrow-right text-xs"></i>
+          </a>
+          <a href="about.html" class="hero-cta-secondary">
+            <i class="fas fa-play text-xs"></i> Learn More
+          </a>
+        </div>
+
+        <!-- Slide dots -->
+        <div class="flex items-center gap-3">
+          <button class="slide-dot transition-all" data-slide="0" aria-label="Slide 1" style="width:32px;height:4px;border-radius:2px;background:#D4AF37;border:none;cursor:pointer"></button>
+          <button class="slide-dot transition-all" data-slide="1" aria-label="Slide 2" style="width:12px;height:4px;border-radius:2px;background:rgba(255,255,255,.3);border:none;cursor:pointer"></button>
+        </div>
       </div>
 
-      <h1 id="heroHeadline" class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-white mb-6 leading-tight tracking-tight drop-shadow-2xl animate-fade-up" style="animation-delay:.1s">
-        Health Information Managers —<br/>
-        <span class="text-brand-gold italic">Guardians of Integrity</span>
-      </h1>
+      <!-- RIGHT — stat chips (desktop only) -->
+      <div class="hidden lg:flex flex-col gap-5 items-end" style="animation:heroSlideUp .9s .65s ease-out both;opacity:0;animation-fill-mode:both">
 
-      <p id="heroSubtitle" class="text-base sm:text-lg md:text-xl text-white/85 mb-10 leading-relaxed max-w-2xl font-medium animate-fade-up" style="animation-delay:.2s">
-        Empowering Health Information Management Practitioners across Nigeria through professional development, digital innovation, and policy advocacy.
-      </p>
+        <!-- Large feature box -->
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:16px;padding:36px 40px;backdrop-filter:blur(14px);width:100%;max-width:380px">
+          <div class="flex items-center gap-3 mb-6">
+            <div style="width:40px;height:40px;border-radius:8px;background:#D4AF37;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-trophy text-brand-dark text-base"></i>
+            </div>
+            <div>
+              <div class="text-white font-bold text-sm">Nigeria's Premier HIM Body</div>
+              <div class="text-white/50 text-xs">Established & Recognized</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="hero-stat-chip" style="animation-delay:.7s">
+              <span class="hero-stat-num">36</span>
+              <span class="hero-stat-lbl">State Chapters</span>
+            </div>
+            <div class="hero-stat-chip" style="animation-delay:.8s">
+              <span class="hero-stat-num">5K+</span>
+              <span class="hero-stat-lbl">Members</span>
+            </div>
+            <div class="hero-stat-chip" style="animation-delay:.9s">
+              <span class="hero-stat-num">44</span>
+              <span class="hero-stat-lbl">Conferences</span>
+            </div>
+            <div class="hero-stat-chip" style="animation-delay:1s">
+              <span class="hero-stat-num">10K+</span>
+              <span class="hero-stat-lbl">Students</span>
+            </div>
+          </div>
+        </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 items-center justify-center animate-fade-up" style="animation-delay:.3s">
-        <a href="mem.html"
-           class="w-full sm:w-auto bg-brand-gold text-brand-dark font-bold px-10 py-4 rounded-xl shadow-xl hover:bg-white hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 text-sm uppercase tracking-wide">
-          Become a Member <i class="fas fa-arrow-right"></i>
-        </a>
-        <a href="about.html"
-           class="w-full sm:w-auto px-10 py-4 border-2 border-white/60 text-white font-bold rounded-xl hover:bg-white hover:text-brand-green hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm text-center text-sm uppercase tracking-wide">
-          Learn More
-        </a>
+        <!-- Trust strip -->
+        <div class="flex items-center gap-3" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 20px;width:100%;max-width:380px;backdrop-filter:blur(10px)">
+          <i class="fas fa-check-circle text-brand-gold text-lg"></i>
+          <span class="text-white/80 text-sm">Accredited by Nigeria's Federal Ministry of Health</span>
+        </div>
       </div>
 
-      <!-- Slide dots -->
-      <div class="flex gap-2 mt-12">
-        <button class="slide-dot w-6 h-1.5 rounded-full bg-brand-gold transition-all" data-slide="0" aria-label="Slide 1"></button>
-        <button class="slide-dot w-2 h-1.5 rounded-full bg-white/40 transition-all" data-slide="1" aria-label="Slide 2"></button>
-      </div>
     </div>
+  </div>
+
+  <!-- Diagonal bottom slice -->
+  <div id="heroSlice" style="z-index:5">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" style="display:block;width:100%;height:80px">
+      <polygon points="0,80 1440,0 1440,80" fill="#F0FDF4"/>
+    </svg>
   </div>
 
   <!-- Scroll indicator -->
-  <div class="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 opacity-40">
-    <span class="text-white text-xs uppercase tracking-widest font-medium">Scroll</span>
-    <div class="w-px h-10 bg-gradient-to-b from-white to-transparent"></div>
+  <div class="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 flex-col items-center gap-2" style="z-index:7;opacity:.45">
+    <div class="w-px h-16 bg-gradient-to-b from-transparent to-white"></div>
+    <span class="text-white text-[10px] uppercase tracking-[.25em] font-medium" style="writing-mode:vertical-rl">Scroll</span>
+    <div class="w-px h-16 bg-gradient-to-b from-white to-transparent"></div>
   </div>
 </section>
 
 <!-- ═══════════════════════════════════════
      STATS CARD
 ═══════════════════════════════════════ -->
-<div class="relative z-20 -mt-12 container mx-auto px-6">
+<div class="relative z-20 container mx-auto px-6" style="margin-top:-40px">
   <div class="bg-white rounded-2xl shadow-2xl p-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center border-b-4 border-brand-gold reveal">
     <div class="group">
       <div class="text-4xl font-heading font-bold text-brand-green mb-1">
