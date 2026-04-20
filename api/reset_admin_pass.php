@@ -2,7 +2,7 @@
 // ONE-TIME admin password reset — DELETE THIS FILE after use
 require_once __DIR__ . '/db.php';
 
-$email    = 'admin@ahrimpn.org'; // ← change to your admin email
+$email    = 'support@ahrimpn.org'; // ← change to your admin email
 $newPass  = 'Admin@2025!';       // ← set a strong new password
 
 $hash = password_hash($newPass, PASSWORD_BCRYPT, ['cost' => 12]);
