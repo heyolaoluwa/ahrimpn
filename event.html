@@ -146,6 +146,70 @@
 </nav>
 
 <!-- ══════════════════════════════════════
+     UPCOMING EVENTS (from events.php)
+══════════════════════════════════════ -->
+<section id="events" class="py-20 md:py-28 bg-brand-dark relative overflow-hidden">
+  <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image:url('1.jpg');background-size:cover;background-position:center"></div>
+  <div class="container mx-auto px-6 relative z-10">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6 reveal">
+      <div>
+        <span class="text-brand-gold font-bold uppercase text-xs tracking-widest">Calendar</span>
+        <h2 class="text-3xl md:text-4xl text-white font-display font-bold mt-2">Events</h2>
+        <p class="text-white/50 text-sm mt-1">Conferences, workshops &amp; professional gatherings</p>
+      </div>
+      <!-- Filter tabs -->
+      <div class="flex gap-2 flex-wrap mt-4 md:mt-0" id="events-filter-tabs">
+        <button type="button" onclick="setEventsFilter('all')" data-filter="all"
+          class="events-filter-tab px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-gold text-brand-dark transition">All</button>
+        <button type="button" onclick="setEventsFilter('Upcoming')" data-filter="Upcoming"
+          class="events-filter-tab px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 text-white hover:bg-white/20 transition">Upcoming</button>
+        <button type="button" onclick="setEventsFilter('Completed')" data-filter="Completed"
+          class="events-filter-tab px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 text-white hover:bg-white/20 transition">Completed</button>
+      </div>
+    </div>
+
+    <!-- Events grid -->
+    <div id="events-list" class="grid md:grid-cols-2 gap-6 reveal" style="transition-delay:.1s">
+      <div class="col-span-2 text-center py-12 text-white/40">
+        <i class="fas fa-spinner fa-spin text-3xl block mb-3"></i> Loading events…
+      </div>
+    </div>
+
+    <!-- Event detail modal -->
+    <div id="eventModal" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+         onclick="if(event.target===this)closeEventModal()">
+      <div class="bg-white w-full max-w-2xl rounded-2xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl relative">
+        <div id="eventModal-img" class="flex-shrink-0 h-56 bg-brand-dark overflow-hidden hidden">
+          <img id="eventModal-imgEl" src="" alt="" class="w-full h-full object-cover opacity-80">
+        </div>
+        <div class="overflow-y-auto flex-1 p-8">
+          <div class="flex items-center gap-3 mb-4">
+            <span id="eventModal-type" class="bg-brand-green/10 text-brand-green text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full"></span>
+            <span id="eventModal-status" class="text-xs font-bold px-3 py-1 rounded-full"></span>
+          </div>
+          <h2 id="eventModal-title" class="font-display text-2xl font-bold text-brand-dark mb-4 leading-tight"></h2>
+          <div class="grid grid-cols-2 gap-4 mb-6 text-sm text-gray-600">
+            <div class="flex items-start gap-2"><i class="fas fa-calendar-alt text-brand-gold mt-0.5"></i><span id="eventModal-dates"></span></div>
+            <div class="flex items-start gap-2"><i class="fas fa-map-marker-alt text-brand-gold mt-0.5"></i><span id="eventModal-venue"></span></div>
+          </div>
+          <div id="eventModal-desc" class="text-gray-600 leading-relaxed text-sm mb-6 space-y-3"></div>
+          <div id="eventModal-reg" class="hidden">
+            <a id="eventModal-regLink" href="#" target="_blank" rel="noopener"
+               class="inline-flex items-center gap-2 bg-brand-green text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-brand-dark transition">
+              <i class="fas fa-user-plus"></i> Register for this Event
+            </a>
+          </div>
+        </div>
+        <button onclick="closeEventModal()" class="absolute top-4 right-4 w-9 h-9 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition text-lg z-10">×</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
      HERO — FEATURED STORY (from news.php)
 ══════════════════════════════════════ -->
 <section class="featured-hero text-white pt-20 pb-32 relative">
@@ -577,7 +641,137 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ── EVENTS ──────────────────────────────────────────────
+  let allEvents = [];
+  let activeEventsFilter = 'all';
+
+  async function loadEvents() {
+    try {
+      const res  = await fetch(`${API_BASE}/events.php`);
+      const data = await res.json();
+      allEvents  = data.success ? (data.data || []) : [];
+    } catch(_) { allEvents = []; }
+    renderEvents();
+  }
+
+  function setEventsFilter(filter) {
+    activeEventsFilter = filter;
+    document.querySelectorAll('.events-filter-tab').forEach(btn => {
+      const isActive = btn.dataset.filter === filter;
+      btn.className = `events-filter-tab px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition ${
+        isActive ? 'bg-brand-gold text-brand-dark' : 'bg-white/10 text-white hover:bg-white/20'
+      }`;
+    });
+    renderEvents();
+  }
+
+  function renderEvents() {
+    const list = document.getElementById('events-list');
+    const filtered = activeEventsFilter === 'all'
+      ? allEvents
+      : allEvents.filter(e => e.status === activeEventsFilter);
+
+    if (!filtered.length) {
+      list.innerHTML = `<div class="col-span-2 text-center py-16 text-white/40">
+        <i class="fas fa-calendar-times text-4xl block mb-3"></i>No events found.</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map((e, i) => {
+      const d     = e.start_date ? new Date(e.start_date) : null;
+      const day   = d ? d.getDate() : '—';
+      const mon   = d ? d.toLocaleString('en-GB', { month: 'short' }) : '—';
+      const yr    = d ? d.getFullYear() : '';
+      const done  = e.status === 'Completed';
+      const typeColors = {
+        'Conference': 'bg-brand-gold/20 text-brand-gold',
+        'Workshop':   'bg-blue-500/20 text-blue-300',
+        'Seminar':    'bg-purple-500/20 text-purple-300',
+        'Webinar':    'bg-teal-500/20 text-teal-300',
+        'Training':   'bg-orange-500/20 text-orange-300',
+      };
+      const typeClass = typeColors[e.event_type] || 'bg-white/10 text-white/70';
+      return `
+        <div class="group bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/25 rounded-2xl p-6 flex gap-5 cursor-pointer transition duration-300 reveal"
+             style="animation-delay:${i * 0.06}s"
+             onclick="openEventModal(${e.id})">
+          <div class="flex-shrink-0 ${done ? 'bg-white/10' : 'bg-brand-green'} text-white w-20 h-20 rounded-xl flex flex-col items-center justify-center shadow-lg">
+            <span class="text-2xl font-display font-bold leading-none">${day}</span>
+            <span class="text-[10px] uppercase tracking-wider mt-1 opacity-80">${mon}</span>
+            <span class="text-[9px] opacity-50">${yr}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${typeClass}">${esc(e.event_type || 'Event')}</span>
+              ${done ? '<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-gray-500/20 text-gray-400">Completed</span>'
+                     : '<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-green-500/20 text-green-400">Upcoming</span>'}
+            </div>
+            <h3 class="text-white font-display font-bold text-lg mb-1 group-hover:text-brand-gold transition leading-tight">${esc(e.title)}</h3>
+            <p class="text-gray-400 text-sm flex items-center gap-2 mb-3">
+              <i class="${(e.venue||'').toLowerCase().includes('virtual') || (e.venue||'').toLowerCase().includes('zoom') ? 'fas fa-video' : 'fas fa-map-marker-alt'} text-brand-gold/60 text-xs"></i>
+              ${esc(e.venue || 'TBA')}
+            </p>
+            ${e.description ? `<p class="text-white/40 text-xs line-clamp-1">${esc(e.description)}</p>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    setTimeout(() => list.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')), 50);
+  }
+
+  function openEventModal(id) {
+    const e = allEvents.find(ev => ev.id === id);
+    if (!e) return;
+
+    document.getElementById('eventModal-title').textContent  = e.title;
+    document.getElementById('eventModal-type').textContent   = e.event_type || 'Event';
+    document.getElementById('eventModal-venue').textContent  = e.venue || 'TBA';
+
+    const statusEl = document.getElementById('eventModal-status');
+    if (e.status === 'Completed') {
+      statusEl.textContent  = 'Completed';
+      statusEl.className    = 'text-xs font-bold px-3 py-1 rounded-full bg-gray-100 text-gray-500';
+    } else {
+      statusEl.textContent  = 'Upcoming';
+      statusEl.className    = 'text-xs font-bold px-3 py-1 rounded-full bg-green-100 text-green-700';
+    }
+
+    const fmt = d => d ? new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : '';
+    const dates = e.end_date && e.end_date !== e.start_date
+      ? `${fmt(e.start_date)} – ${fmt(e.end_date)}`
+      : fmt(e.start_date) || 'TBA';
+    document.getElementById('eventModal-dates').textContent = dates;
+
+    const descEl = document.getElementById('eventModal-desc');
+    descEl.innerHTML = e.description
+      ? e.description.split(/\n\s*\n/).map(p => `<p>${esc(p.replace(/\n/g,'<br>'))}</p>`).join('')
+      : '<p class="text-gray-400 italic">No description available.</p>';
+
+    const imgWrap = document.getElementById('eventModal-img');
+    const imgEl   = document.getElementById('eventModal-imgEl');
+    if (e.image_url) { imgEl.src = e.image_url; imgWrap.classList.remove('hidden'); }
+    else             { imgWrap.classList.add('hidden'); }
+
+    const regWrap = document.getElementById('eventModal-reg');
+    if (e.reg_link) {
+      document.getElementById('eventModal-regLink').href = e.reg_link;
+      regWrap.classList.remove('hidden');
+    } else { regWrap.classList.add('hidden'); }
+
+    const modal = document.getElementById('eventModal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEventModal() {
+    document.getElementById('eventModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEventModal(); });
+
   // ── Init ────────────────────────────────────────────────
+  loadEvents();
   loadStories();
 </script>
 
