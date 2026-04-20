@@ -1,6 +1,12 @@
 <?php
 // api/helpers.php — Shared utilities
 // FIX: Complete rewrite to resolve parse error (unclosed brace) and clean up all functions.
+
+// Prevent PHP warnings/notices from leaking into JSON responses
+ini_set('display_errors', '0');
+error_reporting(0);
+ob_start();
+
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 
@@ -18,6 +24,7 @@ function cors(): void {
 
 // ── JSON RESPONSES ───────────────────────────────────────────
 function respond(array $data, int $code = 200): void {
+    ob_clean(); // discard any PHP warnings that snuck in
     http_response_code($code);
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
