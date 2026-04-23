@@ -52,7 +52,7 @@ elseif ($method === 'POST' && $action === 'register') {
     $category      = trim($b['membership_category']   ?? '');
     $cadre         = trim($b['professional_cadre']    ?? '');
     $qualification = trim($b['present_qualification'] ?? '');
-    $paymentType   = trim($b['payment_type']          ?? 'individual');
+    $paymentType   = trim($b['payment_type']          ?? 'state');
 
     // Validate required fields
     if (!$name)  fail('Full name is required');
@@ -70,7 +70,7 @@ elseif ($method === 'POST' && $action === 'register') {
     if (!in_array($category, $allowedCategories))      fail('Invalid membership category');
     if (!in_array($cadre, $allowedCadres))             fail('Invalid professional cadre');
     if (!in_array($qualification, $allowedQuals))      fail('Invalid qualification');
-    if (!in_array($paymentType, ['chapter','individual'])) $paymentType = 'individual';
+    if (!in_array($paymentType, ['chapter','state'])) $paymentType = 'state';
 
     // Check email not already taken
     $chk = $db->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");

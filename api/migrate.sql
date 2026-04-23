@@ -6,7 +6,7 @@ ALTER TABLE users
   ADD COLUMN membership_category    VARCHAR(50)  DEFAULT NULL AFTER workplace,
   ADD COLUMN professional_cadre     VARCHAR(50)  DEFAULT NULL AFTER membership_category,
   ADD COLUMN present_qualification  VARCHAR(50)  DEFAULT NULL AFTER professional_cadre,
-  ADD COLUMN payment_type           VARCHAR(20)  DEFAULT 'individual' AFTER present_qualification;
+  ADD COLUMN payment_type           VARCHAR(20)  DEFAULT 'state' AFTER present_qualification;
 
 -- ── 2. MANUAL PAYMENTS TABLE (replaces Flutterwave) ─────────────────────────
 CREATE TABLE IF NOT EXISTS manual_payments (

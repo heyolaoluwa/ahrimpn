@@ -83,6 +83,23 @@ elseif ($method === 'POST' && $action === 'record_chapter') {
     ok(null, 'Chapter payment recorded. Account will be activated by chapter admin.');
 }
 
+// ── RECORD STATE PAYMENT (JSON POST) ───────────────────────────────────────
+elseif ($method === 'POST' && $action === 'record_state') {
+    $user   = requireAuth();
+    $b      = body();
+    $userId = (int) ($b['user_id'] ?? $user['id']);
+
+    if ($user['id'] !== $userId && !in_array($user['role'], ['admin', 'executive'])) {
+        fail('Forbidden', 403);
+    }
+
+    // Mark user as state-payment-type (stays inactive/pending until admin approves)
+    $db->prepare("UPDATE users SET payment_type = 'state' WHERE id = ?")
+       ->execute([$userId]);
+
+    ok(null, 'State payment recorded. Account is pending admin approval.');
+}
+
 // ── GET CERTIFICATE PAYMENT STATUS ─────────────────────────────────────────
 elseif ($method === 'GET' && $action === 'cert_status') {
     $user   = requireAuth();
