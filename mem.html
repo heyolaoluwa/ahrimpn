@@ -3822,7 +3822,7 @@ async function loadMyCerts() {
             <input type="file" id="certPayProof" accept=".pdf,.jpg,.jpeg,.png"
               style="width:100%;font-size:12px;padding:8px;border:1.5px solid var(--border);border-radius:8px"/>
           </div>
-          <button type="button" class="btn-sm btn-green" style="width:100%;justify-content:center" onclick="submitCertPaymentProof()">
+          <button type="button" id="certPayBtn" class="btn-sm btn-green" style="width:100%;justify-content:center" onclick="submitCertPaymentProof()">
             <i class="fas fa-upload"></i> Submit Payment Proof
           </button>
         </div>`;
@@ -3845,17 +3845,23 @@ async function loadMyCerts() {
 }
 
 async function submitCertPaymentProof() {
+  const btn = document.getElementById('certPayBtn');
   const fileInput = document.getElementById('certPayProof');
   if (!fileInput?.files[0]) { showToast('Please upload your payment proof', 'error'); return; }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…'; }
   try {
     const fd = new FormData();
     fd.append('user_id', CURRENT_USER.id);
+    fd.append('amount',  '2000');
     fd.append('purpose', 'certificate');
     fd.append('proof',   fileInput.files[0]);
     await uploadFile('payment_manual', 'upload_proof', fd);
     showToast('Payment proof submitted! Certificate will be unlocked after admin review.', 'success');
     loadMyCerts();
-  } catch(e) { showToast(e.message, 'error'); }
+  } catch(e) {
+    showToast(e.message, 'error');
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload"></i> Submit Payment Proof'; }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
