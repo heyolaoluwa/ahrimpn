@@ -1315,6 +1315,9 @@ function launchApp() {
   buildSidebar();
   navigate(u.role === 'member' ? 'member-home' : 'dashboard');
   refreshPendingBadge();
+  if (['admin', 'executive'].includes(u.role)) {
+    setInterval(refreshPendingBadge, 120000);
+  }
 }
 
 if (TOKEN && CURRENT_USER) { launchApp(); checkPaymentRedirect(); }
@@ -1332,7 +1335,7 @@ function buildSidebar() {
     { sec: 'members',            icon: 'fa-users',            label: 'Members' },
     { sec: 'pending-approvals',  icon: 'fa-user-clock',       label: 'Pending Approvals', badge: true },
     { sec: 'job-approvals',      icon: 'fa-briefcase',        label: 'Job Approvals' },
-    { sec: 'cert-payments',      icon: 'fa-certificate',      label: 'Certificate Payments' },
+    { sec: 'cert-payments',      icon: 'fa-certificate',      label: 'Certificate Payments', certBadge: true },
     { sec: 'dues',               icon: 'fa-money-bill-wave',  label: 'Dues & Arrears' },
     { sec: 'courses-admin',      icon: 'fa-graduation-cap',   label: 'Courses (LMS)' },
     { sec: 'events-admin',       icon: 'fa-calendar-star',    label: 'Events' },
@@ -1363,6 +1366,7 @@ function buildSidebar() {
         <i class="fas ${it.icon}"></i>
         <span>${it.label}</span>
         ${it.badge ? `<span class="nav-badge" id="pendingBadge" style="display:${_pendingCount ? 'inline' : 'none'}">${_pendingCount}</span>` : ''}
+        ${it.certBadge ? `<span class="nav-badge" id="certBadge" style="display:none">0</span>` : ''}
       </div>
     `).join('')}
     ${isAdm && u.role === 'admin' ? '' : ''}
@@ -1844,10 +1848,16 @@ async function loadPendingApprovals() {
 async function refreshPendingBadge() {
   if (!['admin', 'executive'].includes(CURRENT_USER?.role)) return;
   try {
-    const rows = await api('members', 'pending');
+    const [rows, certRows] = await Promise.all([
+      api('members', 'pending'),
+      api('payment_manual', 'list_cert_payments&status=pending').catch(() => []),
+    ]);
     _pendingCount = rows.length;
     const badge = document.getElementById('pendingBadge');
     if (badge) { badge.textContent = _pendingCount; badge.style.display = _pendingCount ? 'inline' : 'none'; }
+    const certCount = certRows.length;
+    const certBadge = document.getElementById('certBadge');
+    if (certBadge) { certBadge.textContent = certCount; certBadge.style.display = certCount ? 'inline' : 'none'; }
   } catch {}
 }
 
@@ -3488,6 +3498,10 @@ async function loadCertPayments() {
       api('payment_manual', 'list_cert_payments&status=approved'),
     ]);
 
+    // ── Sync cert sidebar badge ──
+    const certBadge = document.getElementById('certBadge');
+    if (certBadge) { certBadge.textContent = pending.length; certBadge.style.display = pending.length ? 'inline' : 'none'; }
+
     // ── Pending table ──
     if (!pending.length) {
       pendingEl.innerHTML = '<div class="empty-state"><i class="fas fa-certificate"></i><h3>No pending payments</h3><p>All certificate payment proofs have been reviewed.</p></div>';
@@ -3771,9 +3785,10 @@ async function loadMyCerts() {
       api('courses', 'mine'),
       api('payment_manual', 'cert_status&user_id=' + CURRENT_USER.id).catch(() => ({ status: 'none' }))
     ]);
-    const completed   = courses.filter(c => c.completed);
+    const completed    = courses.filter(c => c.completed);
     const certApproved = certStatus?.status === 'approved';
     const certPending  = certStatus?.status === 'pending';
+    const certRejected = certStatus?.status === 'rejected';
     const certPayId    = certStatus?.id || null;
 
     // ── Membership Certificate Card ──
@@ -3807,7 +3822,28 @@ async function loadMyCerts() {
         <div style="background:var(--gold-pale);border:1px solid #fde68a;border-radius:10px;padding:20px;text-align:center">
           <div style="font-size:32px;margin-bottom:8px">⏳</div>
           <div style="font-weight:700;color:var(--amber);font-size:14px">Payment Under Review</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-top:6px">Your payment proof has been submitted. The admin will verify and unlock your certificate shortly.</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:6px">Your payment proof has been submitted and is awaiting admin verification. Once approved, your certificate will be available here to view and print.</div>
+        </div>`;
+    } else if (certRejected) {
+      const reason = certStatus?.notes ? esc(certStatus.notes) : 'Your payment proof was not accepted.';
+      memberCertHtml += `
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;margin-bottom:16px;text-align:center">
+          <div style="font-size:28px;margin-bottom:6px">❌</div>
+          <div style="font-weight:700;color:var(--red);font-size:14px;margin-bottom:4px">Payment Proof Rejected</div>
+          <div style="font-size:12px;color:var(--gray-500)">Reason: <b>${reason}</b></div>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Please correct the issue and resubmit your proof below.</div>
+        </div>
+        <div style="text-align:center;padding:4px 0">
+          ${BANK_DETAILS_HTML}
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;text-align:left">Amount: <b style="color:var(--green)">₦2,000</b> (one-time, non-refundable)</div>
+          <div style="margin-bottom:14px;text-align:left">
+            <label style="font-size:12px;font-weight:600;color:var(--gray-700);display:block;margin-bottom:6px">Re-upload Payment Proof</label>
+            <input type="file" id="certPayProof" accept=".pdf,.jpg,.jpeg,.png"
+              style="width:100%;font-size:12px;padding:8px;border:1.5px solid var(--border);border-radius:8px"/>
+          </div>
+          <button type="button" id="certPayBtn" class="btn-sm btn-green" style="width:100%;justify-content:center" onclick="submitCertPaymentProof()">
+            <i class="fas fa-upload"></i> Resubmit Payment Proof
+          </button>
         </div>`;
     } else {
       memberCertHtml += `

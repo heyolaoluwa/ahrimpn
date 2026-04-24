@@ -36,9 +36,7 @@ if ($method === 'POST' && $action === 'upload_proof') {
     if ($file['size'] > $maxBytes) fail('File is too large (max 5 MB)');
 
     $allowed  = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-    $finfo    = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = finfo_file($finfo, $file['tmp_name']);
-    finfo_close($finfo);
+    $mimeType = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']);
     if (!in_array($mimeType, $allowed)) fail('Invalid file type. Allowed: PDF, JPG, PNG');
 
     $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -110,7 +108,7 @@ elseif ($method === 'GET' && $action === 'cert_status') {
     }
 
     $stmt = $db->prepare("
-        SELECT id, status, created_at, reviewed_at,
+        SELECT id, status, created_at, reviewed_at, notes,
                CONCAT('AHRIMPN/CERT/',
                  YEAR(COALESCE(reviewed_at, created_at)),
                  '/', LPAD(id, 5, '0')) AS cert_number
